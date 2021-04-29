@@ -26,17 +26,17 @@ const octokit = new Octokit({
   // }
 })
 
-async function getBranch(branch) {
+function getBranch(branch) {
   console.log('branch', branch)
-  return await octokit.request('GET /repos/{owner}/{repo}/branches/{branch}', {
+  return octokit.request('GET /repos/{owner}/{repo}/branches/{branch}', {
     ...repoMetadata,
     branch
   })
 }
 
-async function getTree(tree_sha) {
+function getTree(tree_sha) {
   console.log('tree_sha', tree_sha)
-  return await octokit.request('GET /repos/{owner}/{repo}/git/trees/{tree_sha}', {
+  return octokit.request('GET /repos/{owner}/{repo}/git/trees/{tree_sha}', {
     ...repoMetadata,
     tree_sha,
   })
@@ -63,7 +63,7 @@ async function getDataTree() {
 
 async function loadContentBySHA(fileSHA) {
   console.log('loadContentBySHA', fileSHA)
-  return await octokit.request('GET /repos/{owner}/{repo}/git/blobs/{file_sha}', {
+  return octokit.request('GET /repos/{owner}/{repo}/git/blobs/{file_sha}', {
     ...repoMetadata,
     file_sha: fileSHA
   })
