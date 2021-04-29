@@ -9,9 +9,9 @@ const repoMetadata = {
 
 const octokit = new Octokit({
   auth: secret,
-  userAgent: 'myApp v1.2.3',
-  timeZone: 'Europe/Amsterdam',
+  userAgent: 'volt.link',
   // previews: ['thomasrosen'],
+  timeZone: 'Europe/Berlin',
   baseUrl: 'https://api.github.com',
   // log: {
   //   debug: console.log,
