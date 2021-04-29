@@ -10,20 +10,20 @@ const repoMetadata = {
 const octokit = new Octokit({
   auth: secret,
   userAgent: 'myApp v1.2.3',
-  previews: ['thomasrosen'],
   timeZone: 'Europe/Amsterdam',
+  // previews: ['thomasrosen'],
   baseUrl: 'https://api.github.com',
-  log: {
-    debug: console.log,
-    info: console.log,
-    warn: console.warn,
-    error: console.error
-  },
-  request: {
-    agent: undefined,
-    fetch: undefined,
-    timeout: 0
-  }
+  // log: {
+  //   debug: console.log,
+  //   info: console.log,
+  //   warn: console.warn,
+  //   error: console.error
+  // },
+  // request: {
+  //   agent: undefined,
+  //   fetch: undefined,
+  //   timeout: 0
+  // }
 })
 
 async function getBranch(branch) {
