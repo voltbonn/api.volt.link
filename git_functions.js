@@ -44,7 +44,11 @@ function getTree(tree_sha) {
 
 async function getDataTree() {
   console.log('getDataTree')
+  try {
   const branch_infos = await getBranch('main')
+  } catch (err) {
+    console.error(err)
+  }
   const branch_sha = branch_infos.data.commit.sha
   const tree_main = await getTree(branch_sha)
 
