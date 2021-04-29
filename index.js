@@ -9,7 +9,9 @@ app.use(express.json())
 
 app.get('/', (req, res) => {
   // res.redirect('https://www.volteuropa.org/')
-  res.send('Volt Europa')
+  res.send(`<h1>Redirect Server for Volt Europa</h1>
+Contact: <a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a></br>
+Example: <a href="https://volt.link/bonn">volt.link/bonn</a>`)
 })
 
 app.get('/:code', (req, res) => {
