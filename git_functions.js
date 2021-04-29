@@ -44,16 +44,13 @@ async function getDataTree() {
   const branch_infos = await getBranch('main')
   const branch_sha = branch_infos.data.commit.sha
   const tree_main = await getTree(branch_sha)
-  console.log('tree_main', tree_main)
 
   let data_tree_sha = tree_main.data.tree.filter(t => t.path === 'data')
-  console.log('data_tree_sha', data_tree_sha)
 
   if (data_tree_sha.length > 0) {
     data_tree_sha = data_tree_sha[0].sha
 
     const tree_data = await getTree(data_tree_sha)
-    console.log('tree_data', tree_data)
 
     return tree_data.data.tree.filter(file => file.path !== '.gitkeep')
   }
