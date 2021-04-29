@@ -49,6 +49,7 @@ async function getDataTree() {
   const tree_main = await getTree(branch_sha)
 
   let data_tree_sha = tree_main.data.tree.filter(t => t.path === 'data')
+  console.log('data_tree_sha', data_tree_sha)
 
   if (data_tree_sha.length > 0) {
     data_tree_sha = data_tree_sha[0].sha
