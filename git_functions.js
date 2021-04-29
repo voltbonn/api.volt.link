@@ -1,6 +1,8 @@
 
 const { Octokit } = require('@octokit/core')
 
+console.log('process.env', process.env)
+
 const secret = process.env.git_secret || null
 const repoMetadata = {
   owner: 'voltbonn',
@@ -44,27 +46,24 @@ function getTree(tree_sha) {
 
 async function getDataTree() {
   console.log('getDataTree')
-  let branch_infos = null
+  const branch_infos = await getBranch('main')
 
-  try {
-    branch_infos = await getBranch('main')
-  } catch (err) {
-    console.error(err)
-  }
-  console.log('branch_infos', branch_infos)
+  if (!!branch_infos) {
+    console.log('branch_infos', branch_infos)
 
-  const branch_sha = branch_infos.data.commit.sha
-  const tree_main = await getTree(branch_sha)
+    const branch_sha = branch_infos.data.commit.sha
+    const tree_main = await getTree(branch_sha)
 
-  let data_tree_sha = tree_main.data.tree.filter(t => t.path === 'data')
-  console.log('data_tree_sha', data_tree_sha)
+    let data_tree_sha = tree_main.data.tree.filter(t => t.path === 'data')
+    console.log('data_tree_sha', data_tree_sha)
 
-  if (data_tree_sha.length > 0) {
-    data_tree_sha = data_tree_sha[0].sha
+    if (data_tree_sha.length > 0) {
+      data_tree_sha = data_tree_sha[0].sha
 
-    const tree_data = await getTree(data_tree_sha)
+      const tree_data = await getTree(data_tree_sha)
 
-    return tree_data.data.tree.filter(file => file.path !== '.gitkeep')
+      return tree_data.data.tree.filter(file => file.path !== '.gitkeep')
+    }
   }
 
   return []
