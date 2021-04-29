@@ -6,6 +6,7 @@ const repoMetadata = {
   owner: 'voltbonn',
   repo: 'tree-data',
 }
+const folder_name_paths = 'paths'
 
 const octokit = new Octokit({
   auth: secret,
@@ -40,21 +41,21 @@ function getTree(tree_sha) {
   })
 }
 
-async function getDataTree() {
+async function getPathsTree() {
   const branch_infos = await getBranch('main')
 
   if (!!branch_infos) {
     const branch_sha = branch_infos.data.commit.sha
     const tree_main = await getTree(branch_sha)
 
-    let data_tree_sha = tree_main.data.tree.filter(t => t.path === 'data')
+    let paths_tree_sha = tree_main.data.tree.filter(t => t.path === folder_name_paths)
 
-    if (data_tree_sha.length > 0) {
-      data_tree_sha = data_tree_sha[0].sha
+    if (paths_tree_sha.length > 0) {
+      paths_tree_sha = paths_tree_sha[0].sha
 
-      const tree_data = await getTree(data_tree_sha)
+      const tree_paths = await getTree(paths_tree_sha)
 
-      return tree_data.data.tree.filter(file => file.path !== '.gitkeep')
+      return tree_paths.data.tree.filter(file => file.path !== '.gitkeep')
     }
   }
 
@@ -69,7 +70,7 @@ function loadContentBySHA(fileSHA) {
 }
 
 async function getFile(filename) {
-  const tree = await getDataTree()
+  const tree = await getPathsTree()
 
   const wanted_file = tree.filter(file => file.path === filename + '.yml')
   if (wanted_file.length > 0) {
