@@ -61,7 +61,7 @@ async function getDataTree() {
   return []
 }
 
-async function loadContentBySHA(fileSHA) {
+function loadContentBySHA(fileSHA) {
   return octokit.request('GET /repos/{owner}/{repo}/git/blobs/{file_sha}', {
     ...repoMetadata,
     file_sha: fileSHA
