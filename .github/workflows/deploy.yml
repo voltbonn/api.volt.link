@@ -30,4 +30,4 @@ jobs:
             cd ~/volt.link/ && git pull && yarn && supervisorctl restart volt_link;
           host: maury.uberspace.de
           username: volteu
-          password: ${{ secrets.UBERSPACE_PASSWORD }}
+          password: ${{ secrets.UBERSPACE_PASSWORD_VOLTEU }}
