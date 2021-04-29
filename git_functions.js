@@ -27,13 +27,15 @@ const octokit = new Octokit({
 })
 
 async function getBranch(branch) {
+  console.log('branch', branch)
   return await octokit.request('GET /repos/{owner}/{repo}/branches/{branch}', {
     ...repoMetadata,
     branch
   })
 }
 
-async function getTree(tree_sha){
+async function getTree(tree_sha) {
+  console.log('tree_sha', tree_sha)
   return await octokit.request('GET /repos/{owner}/{repo}/git/trees/{tree_sha}', {
     ...repoMetadata,
     tree_sha,
@@ -41,6 +43,7 @@ async function getTree(tree_sha){
 }
 
 async function getDataTree() {
+  console.log('getDataTree')
   const branch_infos = await getBranch('main')
   const branch_sha = branch_infos.data.commit.sha
   const tree_main = await getTree(branch_sha)
@@ -59,16 +62,19 @@ async function getDataTree() {
 }
 
 async function loadContentBySHA(fileSHA) {
+  console.log('loadContentBySHA', fileSHA)
   return await octokit.request('GET /repos/{owner}/{repo}/git/blobs/{file_sha}', {
     ...repoMetadata,
     file_sha: fileSHA
   })
 }
 
-async function getFile(filename){
+async function getFile(filename) {
+  console.log('getFile', filename)
   const tree = await getDataTree()
 
   const wanted_file = tree.filter(file => file.path === filename + '.yml')
+  console.log('wanted_file', wanted_file)
   if (wanted_file.length > 0) {
     const file = await loadContentBySHA(wanted_file[0].sha)
     return Buffer.from(file.data.content, 'base64').toString('utf-8')
