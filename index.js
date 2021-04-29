@@ -13,8 +13,8 @@ app.get('/', (req, res) => {
 })
 
 app.get('/:code', (req, res) => {
+  console.log('req.params.code', req.params.code)
   getFile(req.params.code)
-    console.log('req.params.code', req.params.code)
     .then(content => {
       console.log(content)
       if (!!content) {
