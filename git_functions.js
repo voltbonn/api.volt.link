@@ -4,7 +4,7 @@ const { Octokit } = require('@octokit/core')
 const secret = process.env.git_secret || null
 const repoMetadata = {
   owner: 'voltbonn',
-  repo: 'volt.link',
+  repo: 'tree-data',
 }
 
 const octokit = new Octokit({
