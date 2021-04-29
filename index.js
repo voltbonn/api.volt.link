@@ -22,7 +22,8 @@ app.get('/:code', (req, res) => {
         if (!!content_parsed.redirect && content_parsed.redirect !== '') {
           res.redirect(content_parsed.redirect)
         } else {
-          res.send(`${JSON.stringify(content_parsed, null, 2)}`)
+          res.redirect('/')
+          // res.send(`${JSON.stringify(content_parsed, null, 2)}`)
         }
       } else {
         res.redirect('/')
