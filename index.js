@@ -13,8 +13,15 @@ app.get('/', (req, res) => {
 <style>
 body {
   font-family: Ubuntu, sans-serif;
-  background: #502379;
-  color: #fff;
+  color: #502379;
+  padding: 32px;
+}
+a,
+a:visited {
+  color: #502379;
+}
+a:hover {
+  opacity: 0.8;
 }
 </style>
 <body>
