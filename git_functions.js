@@ -1,7 +1,7 @@
 
 const { Octokit } = require('@octokit/core')
 
-console.log('process.env', process.env)
+console.log('process.env.git_secret', process.env.git_secret)
 
 const secret = process.env.git_secret || null
 const repoMetadata = {
