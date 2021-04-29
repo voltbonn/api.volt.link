@@ -8,7 +8,8 @@ const app = express()
 app.use(express.json())
 
 app.get('/', (req, res) => {
-  res.redirect('https://www.volteuropa.org/')
+  // res.redirect('https://www.volteuropa.org/')
+  res.send('Volt Europa')
 })
 
 app.get('/:code', (req, res) => {
