@@ -70,6 +70,8 @@ function loadContentBySHA(fileSHA) {
 }
 
 async function getFile(filename) {
+  filename = filename.toLowerCase()
+
   const tree = await getPathsTree()
 
   const wanted_file = tree.filter(file => file.path === filename + '.yml')
