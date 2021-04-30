@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../tree-data"
+		},
+		{
+			"path": "../edit.volt.link"
 		}
 	],
 	"settings": {}
