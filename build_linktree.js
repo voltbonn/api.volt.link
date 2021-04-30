@@ -26,8 +26,10 @@ function build(linktree){
     !!linktree.items && !!linktree.items
       ? `<div class="items">
         ${
-            if (!!title && !!link) {
-          linktree.items.map(({ type, title, link }) => {
+          linktree.items.map(({ active, type, title, link }) => {
+            if (active === false) {
+              return null
+            } else if (!!title && !!link) {
               return `<a href="${link}"><button>${title}</button></a>`
             } else if (type === 'headline' && !!title) {
               return `<h2>${title}</h2>`
