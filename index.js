@@ -13,7 +13,7 @@ app.use(express.static('public'))
 app.get('/', (req, res) => {
   // res.redirect('https://www.volteuropa.org/')
   res.send(`
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
 body {
   font-family: Ubuntu, sans-serif;

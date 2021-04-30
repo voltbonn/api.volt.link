@@ -60,7 +60,7 @@ function build(linktree){
     <head>
       <meta charset="utf-8" />
       <link rel="icon" href="/volt-logo-white-64.png" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
       <meta name="theme-color" content="#502379" />
       <meta
         name="description"
