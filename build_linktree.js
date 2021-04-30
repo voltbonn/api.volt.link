@@ -65,7 +65,7 @@ function build(linktree){
         name="description"
         content="${description_text.length > 0 ? description_text : default_description_text}"
       />
-      <link rel="stylesheet" href="/style.css" type="text/css">
+      <link rel="stylesheet" href="/index.css" type="text/css">
       <title>${title_text.length > 0 ? title_text : default_title_text}</title>
     </head>
     <body>
