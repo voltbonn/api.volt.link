@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@fluent/langneg": "^0.5.2",
     "@octokit/core": "^3.4.0",
     "@octokit/rest": "^18.5.3",
     "dotenv": "^8.2.0",

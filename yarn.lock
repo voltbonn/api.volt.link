@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@fluent/langneg@^0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@fluent/langneg/-/langneg-0.5.2.tgz#ae73cd5f3e59b6232715591e7e3f6a2c2da8a5bd"
+  integrity sha512-6l8BfDB9mmNaeRhqu+N5BCWrUU+ZSKouyabMDnG6IDuurf+p2AAIvW0Wxe1saYYJ6vQ5QRdbT9NXtYZFz2ay6Q==
+
 "@octokit/auth-token@^2.4.4":
   version "2.4.5"
   resolved "https://registry.yarnpkg.com/@octokit/auth-token/-/auth-token-2.4.5.tgz#568ccfb8cb46f36441fac094ce34f7a875b197f3"

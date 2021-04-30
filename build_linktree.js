@@ -1,6 +1,55 @@
-function build(linktree) {
+const { negotiateLanguages, acceptedLanguages } = require('@fluent/langneg')
 
-  const locale = (!!linktree.locale && linktree.locale !== '' ? linktree.locale : 'en')
+
+const _supportedLocales_ = ['en']
+const _defaultLocale_ = 'en'
+
+
+function fluentByObject(object, userLocales){
+  const supportedLocales = Object.keys(object)
+
+  const lookupedLocale = negotiateLanguages(
+    userLocales,
+    supportedLocales,
+    {
+      defaultLocale: supportedLocales[0],
+      strategy: 'lookup',
+    }
+  )
+
+  if (lookupedLocale.length === 0) {
+    return null
+  } else {
+    return object[lookupedLocale[0]]
+  }
+}
+
+
+function build(linktree, { acceptLanguage }) {
+  const userLocales = acceptedLanguages(acceptLanguage)
+
+  const translations = {
+    imprint: fluentByObject({
+      en: 'Imprint',
+      de: 'Impressum'
+    }, userLocales),
+    privacy_policy: fluentByObject({
+      en: 'Privacy Policy',
+      de: 'Datenschutz'
+    }, userLocales)
+  }
+
+  let global_locale = 'en'
+  if (!!linktree.locales && Array.isArray(linktree.locales) && linktree.locales.length > 0) {
+    global_locale = negotiateLanguages(
+      userLocales,
+      linktree.locales,
+      {
+        defaultLocale: linktree.locales[0],
+        strategy: 'lookup'
+      }
+    )
+  }
 
   const coverphoto = (
     !!linktree.style && !!linktree.style.coverphoto
@@ -9,19 +58,25 @@ function build(linktree) {
   )
 
   const default_title_text = 'Volt Europa'
-  const title_text = (
+  let title_text = (
     !!linktree.title && linktree.title !== ''
       ? linktree.title
       : ''
   )
+  if (typeof title_text === 'object') {
+    title_text = fluentByObject(title_text, userLocales)
+  }
   const title = (title_text !== '' ? `<h1>${title_text}</h1>` : '')
 
   const default_description_text = ''
-  const description_text = (
+  let description_text = (
     !!linktree.description && linktree.description !== ''
       ? linktree.description
       : ''
   )
+  if (typeof description_text === 'object') {
+    description_text = fluentByObject(description_text, userLocales)
+  }
   const description = (description_text !== '' ? `<p>${description_text.replace(/\n/g, '<br/>')}</p>` : '')
 
   const items = (
@@ -32,8 +87,14 @@ function build(linktree) {
             if (active === false) {
               return null
             } else if (!!title && !!link) {
+              if (typeof title === 'object') {
+                title = fluentByObject(title, userLocales)
+              }
               return `<a href="${link}"><button>${title}</button></a>`
             } else if (type === 'headline' && !!title) {
+              if (typeof title === 'object') {
+                title = fluentByObject(title, userLocales)
+              }
               return `<h2>${title}</h2>`
             }
             return null
@@ -59,7 +120,7 @@ function build(linktree) {
 
   return `
   <!DOCTYPE html>
-  <html lang="${locale}">
+  <html lang="${global_locale}">
     <head>
       <meta charset="utf-8" />
       <link rel="icon" href="/volt-logo-white-64.png" />
@@ -88,11 +149,11 @@ function build(linktree) {
       </div>
       <footer>
         <a href="${imprint_link}">
-          Imprint
+          ${translations.imprint}
         </a>
         &nbsp; • &nbsp;
         <a href="${privacy_policy_link}">
-          Privacy Policy
+          ${translations.privacy_policy}
         </a>
       </footer>
     </body>
