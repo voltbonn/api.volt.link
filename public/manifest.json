@@ -1,0 +1,25 @@
+{
+  "short_name": "volt.link",
+  "name": "Links from Volt Europa",
+  "icons": [
+    {
+      "src": "volt-logo-white-64.png",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "volt-logo-white-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "volt-logo-white-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "browser",
+  "theme_color": "#502379",
+  "background_color": "#502379"
+}

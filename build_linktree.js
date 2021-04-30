@@ -59,12 +59,16 @@ function build(linktree){
   <html>
     <head>
       <meta charset="utf-8" />
+      <link rel="icon" href="/volt-logo-white-64.png" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       <meta name="theme-color" content="#502379" />
       <meta
         name="description"
         content="${description_text.length > 0 ? description_text : default_description_text}"
       />
+      <link rel="apple-touch-icon" href="/volt-logo-white-192.png" />
+      <link rel="manifest" href="/manifest.json" />
+
       <link rel="stylesheet" href="/index.css" type="text/css">
       <link rel="stylesheet" href="/Ubuntu/index.css" type="text/css">
       <title>${title_text.length > 0 ? title_text : default_title_text}</title>
