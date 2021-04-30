@@ -1,7 +1,11 @@
 const { negotiateLanguages, acceptedLanguages } = require('@fluent/langneg')
 
-function fluentByObject(object, userLocales){
+function fluentByObject(object = {}, userLocales = ['en']){
   const supportedLocales = Object.keys(object)
+
+  if (supportedLocales.length === 0) {
+    return null
+  }
 
   const lookupedLocale = negotiateLanguages(
     userLocales,
@@ -14,12 +18,16 @@ function fluentByObject(object, userLocales){
 
   if (lookupedLocale.length === 0) {
     return null
-  } else {
-    return object[lookupedLocale[0]]
   }
+
+  return object[lookupedLocale[0]]
 }
 
 function build(linktree, { acceptLanguage }) {
+  if (typeof acceptLanguage !== 'string' || acceptLanguage === '') {
+    acceptLanguage = 'en'
+  }
+
   const userLocales = acceptedLanguages(acceptLanguage)
 
   const translations = {
