@@ -6,17 +6,21 @@ function build(linktree){
       : ''
   )
 
-  const title = (
-    !!linktree.title && !!linktree.title !== ''
-      ? `<h1>${linktree.title}</h1>`
+  const default_title_text = 'Volt Europa'
+  const title_text = (
+    !!linktree.title && linktree.title !== ''
+      ? linktree.title
       : ''
   )
+  const title = (title_text !== '' ? `<h1>${title_text}</h1>` : '')
 
-  const description = (
-    !!linktree.description && !!linktree.description !== ''
-      ? `<p>${linktree.description.replace(/\n/g, '<br/>')}</p>`
+  const default_description_text = ''
+  const description_text = (
+    !!linktree.description && linktree.description !== ''
+      ? linktree.description
       : ''
   )
+  const description = (description_text !== '' ? `<p>${description_text.replace(/\n/g, '<br/>')}</p>` : '')
 
   const links = (
     !!linktree.links && !!linktree.links
@@ -52,7 +56,12 @@ function build(linktree){
   return `
   <html>
     <head>
+      <meta
+        name="description"
+        content="${description_text.length > 0 ? description_text : default_description_text}"
+      />
       <link rel="stylesheet" href="/style.css" type="text/css">
+      <title>${title_text.length > 0 ? title_text : default_title_text}</title>
     </head>
     <body>
       <div class="app">
