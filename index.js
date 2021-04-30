@@ -13,6 +13,8 @@ app.use(express.static('public'))
 app.get('/', (req, res) => {
   // res.redirect('https://www.volteuropa.org/')
   res.send(`
+<html lang="en">
+<head>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
 body {
@@ -28,11 +30,13 @@ a:hover {
   opacity: 0.7;
 }
 </style>
+</head>
 <body>
   <h1>Redirect Server for Volt Europa</h1>
   <!--sse-->Contact: <a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a></br><!--/sse-->
   Example: <a href="https://volt.link/bonn">volt.link/bonn</a>
 </body>
+</html>
 `)
 })
 

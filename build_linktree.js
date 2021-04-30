@@ -1,4 +1,6 @@
-function build(linktree){
+function build(linktree) {
+
+  const locale = (!!linktree.locale && linktree.locale !== '' ? linktree.locale : 'en')
 
   const coverphoto = (
     !!linktree.style && !!linktree.style.coverphoto
@@ -56,7 +58,7 @@ function build(linktree){
   )
 
   return `
-  <html>
+  <html lang="${locale}">
     <head>
       <meta charset="utf-8" />
       <link rel="icon" href="/volt-logo-white-64.png" />
