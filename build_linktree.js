@@ -58,6 +58,7 @@ function build(linktree) {
   )
 
   return `
+  <!DOCTYPE html>
   <html lang="${locale}">
     <head>
       <meta charset="utf-8" />
