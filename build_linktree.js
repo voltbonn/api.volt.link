@@ -74,6 +74,9 @@ function build(linktree) {
       <link rel="stylesheet" href="/index.css" type="text/css">
       <link rel="stylesheet" href="/Ubuntu/index.css" type="text/css">
       <title>${title_text.length > 0 ? title_text : default_title_text}</title>
+
+      <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-regular.woff2" as="font" type="font/woff2">
+      <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-700.woff2" as="font" type="font/woff2">
     </head>
     <body>
       <div class="app">
