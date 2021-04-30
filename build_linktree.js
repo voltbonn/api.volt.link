@@ -1,10 +1,5 @@
 const { negotiateLanguages, acceptedLanguages } = require('@fluent/langneg')
 
-
-const _supportedLocales_ = ['en']
-const _defaultLocale_ = 'en'
-
-
 function fluentByObject(object, userLocales){
   const supportedLocales = Object.keys(object)
 
@@ -23,7 +18,6 @@ function fluentByObject(object, userLocales){
     return object[lookupedLocale[0]]
   }
 }
-
 
 function build(linktree, { acceptLanguage }) {
   const userLocales = acceptedLanguages(acceptLanguage)
