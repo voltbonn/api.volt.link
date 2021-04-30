@@ -65,7 +65,7 @@ app.get('/:code', (req, res) => {
           hasLinktree
           && (useAs === 'linktree' || !hasUseAs)
         ) {
-          res.send(build(content_parsed.linktree, { acceptLanguage: req.headers['accept-language'] }))
+          res.send(build(content_parsed.linktree, { acceptLanguage: req.headers['accept-language'] || 'en' }))
         } else {
           res.redirect('/')
         }
