@@ -2,10 +2,13 @@ require('dotenv').config()
 
 const express = require('express')
 const { getFile } = require('./git_functions.js')
+const { build } = require('./build_linktree.js')
 const yaml = require('js-yaml')
 
 const app = express()
 app.use(express.json())
+
+app.use(express.static('public'))
 
 app.get('/', (req, res) => {
   // res.redirect('https://www.volteuropa.org/')
@@ -38,11 +41,28 @@ app.get('/:code', (req, res) => {
     .then(content => {
       if (!!content) {
         const content_parsed = yaml.load(content)
-        if (!!content_parsed.redirect && content_parsed.redirect !== '') {
+
+        let useAs = null
+        if (content_parsed.hasOwnProperty('useAs')) {
+          useAs = content_parsed.useAs
+        }
+
+        const hasUseAs = useAs !== null
+        const hasRedirect = !!content_parsed.redirect && content_parsed.redirect !== ''
+        const hasLinktree = !!content_parsed.linktree
+
+        if (
+          hasRedirect
+          && (useAs === 'redirect' || !hasUseAs)
+        ) {
           res.redirect(content_parsed.redirect)
+        } else if (
+          hasLinktree
+          && (useAs === 'linktree' || !hasUseAs)
+        ) {
+          res.send(build(content_parsed.linktree))
         } else {
           res.redirect('/')
-          // res.send(`${JSON.stringify(content_parsed, null, 2)}`)
         }
       } else {
         res.redirect('/')
