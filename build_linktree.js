@@ -22,12 +22,12 @@ function build(linktree){
   )
   const description = (description_text !== '' ? `<p>${description_text.replace(/\n/g, '<br/>')}</p>` : '')
 
-  const links = (
-    !!linktree.links && !!linktree.links
-      ? `<div class="links">
+  const items = (
+    !!linktree.items && !!linktree.items
+      ? `<div class="items">
         ${
-          linktree.links.map(({ type, title, link }) => {
             if (!!title && !!link) {
+          linktree.items.map(({ type, title, link }) => {
               return `<a href="${link}"><button>${title}</button></a>`
             } else if (type === 'headline' && !!title) {
               return `<h2>${title}</h2>`
@@ -71,7 +71,7 @@ function build(linktree){
         ${coverphoto}
         ${title}
         ${description}
-        ${links}
+        ${items}
       </div>
       <footer>
         <a href="${imprint_link}">

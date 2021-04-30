@@ -116,12 +116,12 @@ p{
   }
 }
 
-.links {
+.items {
   margin-top: var(--basis_x2);
   width: var(--basis_x64);
   max-width: 100%;
 }
-.links a {
+.items a {
   display: block;
 }
 
