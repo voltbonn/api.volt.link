@@ -20,7 +20,7 @@ async function session_middleware(req, res, next) {
 
   const origin = req.header('Origin')
   if (typeof origin === 'string' && origin.endsWith('localhost:3000')) { // allow for localhost
-    req.headers['-x-session'] = 's%3AzeK98T7GuiMDf0cx01Rb2k8swE_uWjd9.DcQqy1XWz6SUyYuQEAtshez5Od5n3sZTyeKV71aAT9c'
+    req.headers['-x-session'] = 's%3A98Wa9FIkoqdguedgRiOa1O_Faexl8eMc.ldykIQLpjQUQjZkgKdlPsZeZltkbnClN8Diq7swf3Hw'
   }
 
   if (!!req.headers['-x-session']) {
@@ -168,7 +168,6 @@ app.get('/user.json', (req, res) => {
 
   // const origin = req.get('origin')
   const origin = req.header('Origin')
-  console.log('origin', origin)
   if (
     typeof origin === 'string'
     && (origin.endsWith('.volt.link') || origin.endsWith('localhost:3000'))
