@@ -19,9 +19,10 @@ app.use(express.static('public'))
 async function session_middleware(req, res, next) {
 
   const origin = req.header('Origin')
-  console.log('Origin: ' + origin)
+  if (typeof origin === 'string' && origin.endsWith('localhost:3000')) { // allow for localhost
+    req.headers['-x-session'] = 's%3A0uji6A1FkMVqsqZP8pK1pKlhKCbWqY6k.LQ0tAfDcbjE%2BtIXl%2FYH6%2Bm%2F99q%2B7cBP962BmTUmwbzs'
+  }
 
-  req.headers['-x-session'] = 's%3A0uji6A1FkMVqsqZP8pK1pKlhKCbWqY6k.LQ0tAfDcbjE%2BtIXl%2FYH6%2Bm%2F99q%2B7cBP962BmTUmwbzs'
   if (!!req.headers['-x-session']) {
     req.headers.cookie = '__session=' + req.headers['-x-session']
   }
