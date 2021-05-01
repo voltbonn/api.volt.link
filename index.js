@@ -114,6 +114,12 @@ app.get('/logout', function (req, res) {
 // END AUTH
 
 app.get('/user.json', (req, res) => {
+
+  const origin = req.get('origin')
+  if (origin.endsWith('.volt.link')) { // allow from subdomains
+    res.setHeader('Access-Control-Allow-Origin', '*')
+  }
+
   res.json({ user: req.user })
 })
 
