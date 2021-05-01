@@ -131,6 +131,10 @@ app.get('/user.json', (req, res) => {
   res.json({ user: req.user })
 })
 
+app.get('/login', (req, res) => {
+  res.redirect('/auth/google')
+})
+
 app.get('/', (req, res) => {
   // res.redirect('https://www.volteuropa.org/')
   res.send(`
