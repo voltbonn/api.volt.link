@@ -76,12 +76,15 @@ passport.use(new GoogleStrategy({
       // && profile.provider === 'google'
     ) {
       done(null, {
+        status: 'internal',
         id: profile.id,
         displayName: profile.displayName,
         email: profile.emails[0].value,
       })
     } else {
-      done(null, {})
+      done(null, {
+        status: 'external'
+      })
       // done('Wrong Email Domain. You need to be part of Volt Europa.', null)
     }
   }
