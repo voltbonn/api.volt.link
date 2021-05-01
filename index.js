@@ -60,7 +60,6 @@ passport.use(new GoogleStrategy({
   callbackURL: 'https://volt.link/auth/google/callback',
 },
   function (accessToken, refreshToken, profile, done) {
-    // console.log('profile', JSON.stringify(profile, null, 2))
     if (
       !!accessToken
       && profile.hasOwnProperty('emails')
