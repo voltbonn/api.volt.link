@@ -85,7 +85,7 @@ passport.use(new GoogleStrategy({
       // done(null, {
       //   status: 'external'
       // })
-      done('Wrong Email Domain. You need to be part of Volt Europa.', null)
+      done(new Error('Wrong Email Domain. You need to be part of Volt Europa.'), null)
     }
   }
 ))
