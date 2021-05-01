@@ -90,6 +90,16 @@ passport.use(new GoogleStrategy({
 app.use(passport.initialize())
 app.use(passport.session())
 
+app.use(function (req, res, next) {
+  console.log('req.originalUrl', req.originalUrl)
+  req.session.lastUrl = req.originalUrl
+  if (req.isAuthenticated()) {
+    next()
+  } else {
+    passport.authenticate('google')(req, res, next)
+  }
+})
+
 app.get('/auth/google', passport.authenticate('google', { scope: [
   'https://www.googleapis.com/auth/userinfo.email'
 ] }))
@@ -98,7 +108,7 @@ app.get(
   '/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
   function (req, res) {
-    res.redirect('/')
+    res.redirect(req.session.lastUrl || '/')
   }
 )
 
