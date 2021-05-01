@@ -9,7 +9,6 @@ const session = require('express-session')
 const FileStore = require('session-file-store')(session)
 const passport = require('passport')
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
-const fs = require('fs')
 
 const app = express()
 app.use(express.json())
