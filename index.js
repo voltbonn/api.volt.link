@@ -9,19 +9,19 @@ const session = require('express-session')
 const FileStore = require('session-file-store')(session)
 const passport = require('passport')
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
-const cors = require('cors')
+// const cors = require('cors')
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    console.log('origin', origin)
-    callback(null, ['edit.volt.link'])
-    // db.loadOrigins is an example call to load
-    // a list of origins from a backing database
-    // db.loadOrigins(function (error, origins) {
-    //   callback(error, origins)
-    // })
-  }
-}
+// const corsOptions = {
+//   origin: function (origin, callback) {
+//     console.log('origin', origin)
+//     callback(null, ['edit.volt.link'])
+//     // db.loadOrigins is an example call to load
+//     // a list of origins from a backing database
+//     // db.loadOrigins(function (error, origins) {
+//     //   callback(error, origins)
+//     // })
+//   }
+// }
 
 const app = express()
 app.use(express.json())
@@ -125,15 +125,15 @@ app.get('/logout', function (req, res) {
   })
 })
 // END AUTH
-
-app.get('/user.json', cors(corsOptions), (req, res) => {
+// , cors(corsOptions)
+app.get('/user.json', (req, res) => {
 
   // const origin = req.get('origin')
   const origin = req.header('Origin')
   console.log('origin', origin)
-  // if (origin.endsWith('.volt.link')) { // allow from subdomains
-  //   res.setHeader('Access-Control-Allow-Origin', '*')
-  // }
+  if (origin.endsWith('.volt.link')) { // allow from subdomains
+    res.setHeader('Access-Control-Allow-Origin', '*')
+  }
 
   res.json({ user: req.user })
 })
