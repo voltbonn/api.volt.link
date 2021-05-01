@@ -93,11 +93,7 @@ app.use(passport.session())
 app.use(function (req, res, next) {
   console.log('req.originalUrl', req.originalUrl)
   req.session.lastUrl = req.originalUrl
-  if (req.isAuthenticated()) {
-    next()
-  } else {
-    passport.authenticate('google')(req, res, next)
-  }
+  next()
 })
 
 app.get('/auth/google', passport.authenticate('google', { scope: [
