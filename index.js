@@ -95,7 +95,7 @@ app.use(function (req, res, next) {
     typeof req.query.redirect_to === 'string'
     && req.query.redirect_to !== ''
   ) {
-    req.session.redirectTo = req.query.redirect_to
+    req.session.redirectTo = req.query.redirect_to + '' // TODO: Why does this need to be converted to a string? To need pass a pointer but the value?
   }
   next()
 })
