@@ -32,7 +32,8 @@ async function session_middleware(req, res, next) {
     secret: process.env.express_session_secret,
     cookie: {
       httpOnly: false,
-      domain: false, // 'volt.link',
+      // domain: false,
+      domain: 'volt.link',
       sameSite: 'lax',
       secure: false, // somehow doesnt work when its true
       maxAge: 1000 * sessionTTL,
@@ -56,7 +57,8 @@ passport.deserializeUser(function (id, done) {
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'http://localhost:4000/auth/google/callback' // 'https://volt.link/auth/google/callback'
+  // callbackURL: 'http://localhost:4000/auth/google/callback',
+  callbackURL: 'https://volt.link/auth/google/callback',
 },
   function (accessToken, refreshToken, profile, done) {
     // console.log('profile', JSON.stringify(profile, null, 2))
