@@ -5,10 +5,113 @@ const { getFile } = require('./git_functions.js')
 const { build } = require('./build_linktree.js')
 const yaml = require('js-yaml')
 
+const session = require('express-session')
+const FileStore = require('session-file-store')(session)
+const passport = require('passport')
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
+const fs = require('fs')
+
 const app = express()
 app.use(express.json())
 
 app.use(express.static('public'))
+
+// START AUTH
+async function session_middleware(req, res, next) {
+  if (
+    !(!!req.headers.cookie)
+    && !!req.headers['-x-session']
+  ) {
+    req.headers.cookie = '__session=' + req.headers['-x-session']
+  }
+
+  const sessionTTL = 60 * 60 * 24 * 14 // = 14 days
+
+  session({
+    name: '__session',
+    secret: process.env.express_session_secret,
+    cookie: {
+      httpOnly: false,
+      domain: false, // 'volt.link',
+      sameSite: 'lax',
+      secure: false, // somehow doesnt work when its true
+      maxAge: 1000 * sessionTTL,
+    },
+    store: new FileStore(),
+    saveUninitialized: false, // don't create session until something stored
+    resave: true, // don't save session if unmodified
+    unset: 'destroy',
+  })(req, res, next)
+}
+
+app.use(session_middleware)
+
+passport.serializeUser(function (user, done) {
+  done(null, user)
+})
+passport.deserializeUser(function (id, done) {
+  done(null, id)
+})
+
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: 'http://localhost:4000/auth/google/callback' // 'https://volt.link/auth/google/callback'
+},
+  function (accessToken, refreshToken, profile, done) {
+    // console.log('profile', JSON.stringify(profile, null, 2))
+    if (
+      !!accessToken
+      && profile.hasOwnProperty('emails')
+      && profile.emails.length > 0
+      && profile.emails[0].verified === true
+      && profile.emails[0].value.endsWith('@volteuropa.org')
+      // && profile._json.hd === '@volteuropa.org'
+      // && profile.provider === 'google'
+    ) {
+      const user_profile = {
+        id: profile.id,
+        displayName: profile.displayName,
+        email: profile.emails[0].value,
+      }
+      done(null, user_profile)
+    } else {
+      done('Wrong Email Domain. You need to be part of Volt Europa.', null)
+    }
+  }
+))
+
+app.use(passport.initialize())
+app.use(passport.session())
+
+app.get('/auth/google', passport.authenticate('google', { scope: [
+  'https://www.googleapis.com/auth/userinfo.email'
+] }))
+
+app.get(
+  '/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/' }),
+  function (req, res) {
+    res.redirect('/')
+  }
+)
+
+app.get('/logout', function (req, res) {
+  req.session.cookie.maxAge = 0 // set the maxAge to zero, to delete the cookie
+  req.logout()
+  req.session.save(error => { // save the above setting
+    if (error) {
+      console.error(error)
+    } else {
+      res.redirect('/') // send the updated cookie to the user and go to the start page
+    }
+  })
+})
+// END AUTH
+
+app.get('/user.json', (req, res) => {
+  res.json({ user: req.user })
+})
 
 app.get('/', (req, res) => {
   // res.redirect('https://www.volteuropa.org/')
@@ -76,7 +179,7 @@ app.get('/:code', (req, res) => {
 })
 
 const port = 4000
-const host = '0.0.0.0' // Uberspace wants 0.0.0.0
+const host = 'localhost' // '0.0.0.0' // Uberspace wants 0.0.0.0
 app.listen({ port, host }, () =>
   console.info(`
     🚀 Server ready
