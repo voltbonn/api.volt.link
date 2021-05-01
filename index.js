@@ -91,7 +91,6 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.use(function (req, res, next) {
-  console.log('req.query.redirect_to', req.query.redirect_to)
   if (
     typeof req.query.redirect_to === 'string'
     && req.query.redirect_to !== ''
@@ -123,8 +122,7 @@ app.get('/logout', function (req, res) {
     if (error) {
       console.error(error)
     } else {
-      const redirect_to = req.session.redirect_to
-      console.log('redirect_to', redirect_to)
+      const redirect_to = req.session.redirect_to + '' // TODO: Why does this need to be converted to a string? To need pass a pointer but the value?
       req.session.redirect_to = null
       res.redirect(redirect_to || '/') // send the updated cookie to the user and go to the start page
     }
