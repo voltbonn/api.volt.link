@@ -116,6 +116,7 @@ app.get('/logout', function (req, res) {
 app.get('/user.json', (req, res) => {
 
   const origin = req.get('origin')
+  console.log('origin', origin)
   if (origin.endsWith('.volt.link')) { // allow from subdomains
     res.setHeader('Access-Control-Allow-Origin', '*')
   }
