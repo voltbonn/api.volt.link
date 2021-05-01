@@ -132,7 +132,7 @@ app.get('/user.json', (req, res) => {
   const origin = req.header('Origin')
   console.log('origin', origin)
   if (typeof origin === 'string' && origin.endsWith('.volt.link')) { // allow from subdomains
-    res.setHeader('Access-Control-Allow-Origin', origin)
+    res.setHeader('Access-Control-Allow-Origin', true)
   }
 
   res.json({ user: req.user })
