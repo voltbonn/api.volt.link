@@ -95,7 +95,7 @@ app.use(function (req, res, next) {
     typeof req.query.redirect_to === 'string'
     && req.query.redirect_to !== ''
   ) {
-    req.session.redirectTo = req.query.redirect_to + ''
+    req.session.redirectTo = req.query.redirect_to
   }
   next()
 })
