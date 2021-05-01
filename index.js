@@ -37,7 +37,10 @@ async function session_middleware(req, res, next) {
       secure: false, // somehow doesnt work when its true
       maxAge: 1000 * sessionTTL,
     },
-    store: new FileStore(),
+    store: new FileStore({
+      path: './sessions/',
+      retries: 2,
+    }),
     saveUninitialized: false, // don't create session until something stored
     resave: true, // don't save session if unmodified
     unset: 'destroy',
@@ -99,6 +102,7 @@ app.get(
 app.get('/logout', function (req, res) {
   req.session.cookie.maxAge = 0 // set the maxAge to zero, to delete the cookie
   req.logout()
+  res.clearCookie('__session')
   req.session.save(error => { // save the above setting
     if (error) {
       console.error(error)
