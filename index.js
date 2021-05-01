@@ -1,14 +1,15 @@
 require('dotenv').config()
 
-const express = require('express')
 const { getFile } = require('./git_functions.js')
 const { build } = require('./build_linktree.js')
 const yaml = require('js-yaml')
 
+const express = require('express')
 const session = require('express-session')
 const FileStore = require('session-file-store')(session)
 const passport = require('passport')
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
+const flash = require('connect-flash')
 
 const app = express()
 app.use(express.json())
@@ -92,6 +93,7 @@ passport.use(new GoogleStrategy({
 
 app.use(passport.initialize())
 app.use(passport.session())
+app.use(flash())
 
 app.use(function (req, res, next) {
   if (
@@ -102,6 +104,12 @@ app.use(function (req, res, next) {
   }
   next()
 })
+
+app.get('/flash', function (req, res) {
+  // Set a flash message by passing the key, followed by the value, to req.flash().
+  req.flash('info', 'Flash is back!')
+  res.redirect('/');
+});
 
 app.get('/auth/google', passport.authenticate('google', { scope: [
   'https://www.googleapis.com/auth/userinfo.email'
