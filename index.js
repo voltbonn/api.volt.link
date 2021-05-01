@@ -168,6 +168,7 @@ app.get('/user.json', (req, res) => {
 
   // const origin = req.get('origin')
   const origin = req.header('Origin')
+  console.log('origin', origin)
   if (
     typeof origin === 'string'
     && (origin.endsWith('.volt.link') || origin.endsWith('localhost:3000'))
