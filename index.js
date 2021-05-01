@@ -91,6 +91,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.use(function (req, res, next) {
+  console.log('req.query.redirect_to', req.query.redirect_to)
   if (
     typeof req.query.redirect_to === 'string'
     && req.query.redirect_to !== ''
