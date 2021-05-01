@@ -91,12 +91,11 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.use(function (req, res, next) {
-  console.log('req.query.redirectTo', req.query.redirectTo)
   if (
-    typeof req.query.redirectTo === 'string'
-    && req.query.redirectTo !== ''
+    typeof req.query.redirect_to === 'string'
+    && req.query.redirect_to !== ''
   ) {
-    req.session.redirectTo = req.query.redirectTo
+    req.session.redirectTo = req.query.redirect_to
   }
   next()
 })
@@ -110,7 +109,6 @@ app.get(
   passport.authenticate('google', { failureRedirect: '/' }),
   function (req, res) {
     const redirectTo = req.session.redirectTo
-    console.log('redirectTo-/auth/google/callback', redirectTo)
     req.session.redirectTo = null
     res.redirect(redirectTo || '/')
   }
@@ -124,7 +122,9 @@ app.get('/logout', function (req, res) {
     if (error) {
       console.error(error)
     } else {
-      res.redirect('/') // send the updated cookie to the user and go to the start page
+      const redirectTo = req.session.redirectTo
+      req.session.redirectTo = null
+      res.redirect(redirectTo || '/') // send the updated cookie to the user and go to the start page
     }
   })
 })
