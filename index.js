@@ -119,7 +119,7 @@ app.get('/user.json', (req, res) => {
   const origin = req.header('Origin')
   if (
     typeof origin === 'string'
-    && (origin.endsWith('.volt.link') || origin.endsWith('http://localhost:3000/'))
+    && (origin.endsWith('.volt.link') || origin.endsWith('localhost:3000'))
   ) { // allow from subdomains
     res.setHeader('Access-Control-Allow-Origin', origin)
     res.setHeader('Access-Control-Allow-Credentials', true)
