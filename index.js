@@ -92,7 +92,10 @@ app.use(passport.session())
 
 app.use(function (req, res, next) {
   console.log('req.query.redirectTo', req.query.redirectTo)
-  if (!!req.query.redirectTo && req.query.redirectTo !== '') {
+  if (
+    typeof req.query.redirectTo === 'string'
+    && req.query.redirectTo !== ''
+  ) {
     req.session.redirectTo = req.query.redirectTo
   }
   next()
@@ -107,6 +110,7 @@ app.get(
   passport.authenticate('google', { failureRedirect: '/' }),
   function (req, res) {
     const redirectTo = req.session.redirectTo
+    console.log('redirectTo-/auth/google/callback', redirectTo)
     req.session.redirectTo = null
     res.redirect(redirectTo || '/')
   }
