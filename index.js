@@ -82,10 +82,10 @@ passport.use(new GoogleStrategy({
         email: profile.emails[0].value,
       })
     } else {
-      done(null, {
-        status: 'external'
-      })
-      // done('Wrong Email Domain. You need to be part of Volt Europa.', null)
+      // done(null, {
+      //   status: 'external'
+      // })
+      done('Wrong Email Domain. You need to be part of Volt Europa.', null)
     }
   }
 ))
@@ -109,13 +109,44 @@ app.get('/auth/google', passport.authenticate('google', { scope: [
 
 app.get(
   '/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/' }),
+  passport.authenticate('google', { failureRedirect: '/auth/failure' }),
   function (req, res) {
     const redirect_to = req.session.redirect_to
     req.session.redirect_to = null
     res.redirect(redirect_to || '/')
   }
 )
+app.get('/auth/failure', function (req, res) {
+    const redirect_to = req.session.redirect_to
+  res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+body {
+  font-family: Ubuntu, sans-serif;
+  color: #502379;
+  padding: 32px;
+}
+a,
+a:visited {
+  color: #502379;
+}
+a:hover {
+  opacity: 0.7;
+}
+</style>
+</head>
+<body>
+  <h1>Login Error</h1>
+  <p>You need to use a Volt Europa account to log in.</p>
+  <!--sse-->Contact: <a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a></br><!--/sse-->
+  Go back to: <a href="${redirect_to}">${redirect_to}</a>
+</body>
+</html>
+`)
+})
 
 app.get('/logout', function (req, res) {
   req.session.cookie.maxAge = 0 // set the maxAge to zero, to delete the cookie
