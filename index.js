@@ -100,6 +100,28 @@ app.use(function (req, res, next) {
   ) {
     req.session.redirect_to = req.query.redirect_to + '' // TODO: Why does this need to be converted to a string? To need pass a pointer but the value?
   }
+
+  if (!!req.user && !!req.user.id && req.user.id !== null) {
+    req.logged_in = true
+  } else {
+    req.logged_in = false
+  }
+
+  // const origin = req.get('origin')
+  const origin = req.header('Origin')
+  console.log('origin', origin)
+  if (
+    typeof origin === 'string'
+    && (origin.endsWith('.volt.link') || origin.endsWith('localhost:3000') || origin.endsWith('0.0.0.0:3000'))
+  ) { // allow from subdomains
+    req.is_subdomain = true
+    req.origin = origin
+    res.setHeader('Access-Control-Allow-Origin', origin)
+    res.setHeader('Access-Control-Allow-Credentials', true)
+  } else {
+    req.is_subdomain = false
+  }
+
   next()
 })
 
@@ -163,19 +185,21 @@ app.get('/logout', function (req, res) {
   })
 })
 // END AUTH
-// , cors(corsOptions)
-app.get('/user.json', (req, res) => {
 
-  // const origin = req.get('origin')
-  const origin = req.header('Origin')
-  if (
-    typeof origin === 'string'
-    && (origin.endsWith('.volt.link') || origin.endsWith('localhost:3000'))
-  ) { // allow from subdomains
-    res.setHeader('Access-Control-Allow-Origin', origin)
+app.options("/*", function (req, res, next) {
+  // correctly response for cors
+  if (req.is_subdomain) {
+    res.setHeader('Access-Control-Allow-Origin', req.origin)
     res.setHeader('Access-Control-Allow-Credentials', true)
+    res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With')
+    res.sendStatus(200)
+  } else {
+    res.sendStatus(403)
   }
+})
 
+app.get('/user.json', (req, res) => {
   res.json({ user: req.user })
 })
 
