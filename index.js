@@ -203,6 +203,13 @@ app.get('/user.json', (req, res) => {
   res.json({ user: req.user })
 })
 
+app.post('/save/path', (req, res) => {
+  console.log('req.user', req.user)
+  console.log('req.body', req.body)
+
+  res.json({ done: false })
+})
+
 app.get('/login', (req, res) => {
   res.redirect('/auth/google')
 })
