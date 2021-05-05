@@ -1,5 +1,14 @@
+require('dotenv').config()
 
+const execShPromise = require('exec-sh').promise
+
+const fs = require('fs')
 const { Octokit } = require('@octokit/core')
+
+let tree_data_path = process.env.tree_data_path
+if (!tree_data_path.endsWith('/')) {
+  tree_data_path = tree_data_path + '/'
+}
 
 const secret = process.env.git_secret || null
 const repoMetadata = {
@@ -83,6 +92,33 @@ async function getFile(filename) {
   return null
 }
 
+function doesFileExist(filename, callback) {
+  fs.stat(tree_data_path + 'paths/' + filename + '.yml', function (error, stat) {
+    if (error === null) {
+      callback(true)
+    } else if (error.code === 'ENOENT') {
+      callback(false)
+    }
+  })
+}
+
+async function gitPull() {
+  if (!!tree_data_path) {
+    try {
+      await execShPromise('git pull --no-rebase', {
+        cwd: tree_data_path,
+        stdio: null // "stdio: null" for no output
+      })
+    } catch (error) {
+      console.error('Error: ', error)
+      console.error('Stderr: ', error.stderr)
+      console.error('Stdout: ', error.stdout)
+    }
+  }
+}
+
 module.exports = {
-  getFile
+  getFile,
+  gitPull,
+  doesFileExist,
 }

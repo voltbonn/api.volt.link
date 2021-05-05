@@ -1,6 +1,9 @@
 require('dotenv').config()
 
-const { getFile } = require('./git_functions.js')
+const {
+  getFile,
+  doesFileExist
+} = require('./git_functions.js')
 const { build } = require('./build_linktree.js')
 const yaml = require('js-yaml')
 
@@ -242,6 +245,32 @@ a:hover {
 </body>
 </html>
 `)
+})
+
+app.get('/exists/:code', (req, res) => {
+  req.logged_in = true
+  if (!req.logged_in) {
+    res.status(403).json({ error: 'You are not logged in.' })
+  } else {
+    if (!!req.params.code && req.params.code !== '') {
+      doesFileExist(req.params.code, result => res.json({ exists: result }))
+    } else {
+      res.status(404).json({ exists: false })
+    }
+  }
+})
+
+app.get('/get/:code', (req, res) => {
+  if (!req.logged_in) {
+    res.status(403).json({ error: 'You are not logged in.' })
+  }else{
+    getFile(req.params.code)
+      .then(content => {
+        const content_parsed = yaml.load(content)
+        res.json(content_parsed)
+      })
+      .catch(err => res.status(500).json(err))
+  }
 })
 
 app.get('/:code', (req, res) => {
