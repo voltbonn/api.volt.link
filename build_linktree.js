@@ -61,7 +61,15 @@ function fluentByAny(any = '', userLocales = ['en'], fallback = '') {
   return any
 }
 
-function build({ locales, style, title, description, items, imprint, privacy_policy }, { acceptLanguage }) {
+function build({
+  locales,
+  title: title_text = '',
+  description: description_text = '',
+  coverphoto: coverphoto_url = '',
+  imprint = '',
+  privacy_policy = '',
+  items = []
+}, { acceptLanguage }) {
   if (typeof acceptLanguage !== 'string' || acceptLanguage === '') {
     acceptLanguage = 'en'
   }
@@ -92,20 +100,20 @@ function build({ locales, style, title, description, items, imprint, privacy_pol
   }
 
   const coverphoto = (
-    !!style && !!style.coverphoto
-      ? `<div style="background-image: url(${style.coverphoto});" class="coverphoto"></div>`
+    !!coverphoto_url
+      ? `<div style="background-image: url(${coverphoto_url});" class="coverphoto"></div>`
       : ''
   )
 
   const default_title_text = 'Volt Europa'
-  const title_text = fluentByAny(title, userLocales, default_title_text)
+  title_text = fluentByAny(title_text, userLocales, default_title_text)
   const title = (title_text !== '' ? `<h1>${title_text}</h1>` : '')
 
   const default_description_text = ''
-  const description_text = fluentByAny(description, userLocales, default_description_text)
+  description_text = fluentByAny(description_text, userLocales, default_description_text)
   const description = (description_text !== '' ? `<p>${description_text.replace(/\n/g, '<br/>')}</p>` : '')
 
-  const items = (
+  items = (
     !!items && !!items
       ? `<div class="items">
         ${
