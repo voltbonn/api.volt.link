@@ -205,13 +205,6 @@ app.get('/user.json', (req, res) => {
   res.json({ user: req.user })
 })
 
-app.post('/save/path', (req, res) => {
-  console.log('req.user', req.user)
-  console.log('req.body', req.body)
-
-  res.json({ done: false })
-})
-
 app.get('/login', (req, res) => {
   res.redirect('/auth/google')
 })
@@ -257,6 +250,18 @@ app.get('/exists/:code', (req, res) => {
     } else {
       res.status(404).json({ exists: false })
     }
+  }
+})
+
+app.post('/set/:code', (req, res) => {
+  if (!req.logged_in) {
+    res.status(403).json({ error: 'You are not logged in.' })
+  } else {
+    console.log('req.params.code', req.params.code)
+    console.log('req.user', req.user)
+    console.log('req.body', JSON.stringify(req.body, null, 2))
+
+    res.json({ done: false })
   }
 })
 
