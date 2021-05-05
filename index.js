@@ -252,7 +252,7 @@ app.get('/:code', (req, res) => {
 
         let useAs = null
         if (content_parsed.hasOwnProperty('use_as')) {
-          useAs = content_parsed.useAs
+          useAs = content_parsed.use_as
         }
 
         const hasUseAs = useAs !== null
