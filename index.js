@@ -109,7 +109,6 @@ app.use(function (req, res, next) {
 
   // const origin = req.get('origin')
   const origin = req.header('Origin')
-  console.log('origin', origin)
   if (
     typeof origin === 'string'
     && (origin.endsWith('.volt.link') || origin.endsWith('localhost:3000') || origin.endsWith('0.0.0.0:3000'))
