@@ -251,7 +251,7 @@ app.get('/:code', (req, res) => {
         const content_parsed = yaml.load(content)
 
         let useAs = null
-        if (content_parsed.hasOwnProperty('useAs')) {
+        if (content_parsed.hasOwnProperty('use_as')) {
           useAs = content_parsed.useAs
         }
 
