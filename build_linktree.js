@@ -61,7 +61,7 @@ function fluentByAny(any = '', userLocales = ['en'], fallback = '') {
   return any
 }
 
-function build(linktree, { acceptLanguage }) {
+function build({ locales, style, title, description, items, imprint, privacy_policy }, { acceptLanguage }) {
   if (typeof acceptLanguage !== 'string' || acceptLanguage === '') {
     acceptLanguage = 'en'
   }
@@ -80,36 +80,36 @@ function build(linktree, { acceptLanguage }) {
   }
 
   let global_locale = 'en'
-  if (!!linktree.locales && Array.isArray(linktree.locales) && linktree.locales.length > 0) {
+  if (!!locales && Array.isArray(locales) && locales.length > 0) {
     global_locale = negotiateLanguages(
       userLocales,
-      linktree.locales,
+      locales,
       {
-        defaultLocale: linktree.locales[0],
+        defaultLocale: locales[0],
         strategy: 'lookup'
       }
     )
   }
 
   const coverphoto = (
-    !!linktree.style && !!linktree.style.coverphoto
-      ? `<div style="background-image: url(${linktree.style.coverphoto});" class="coverphoto"></div>`
+    !!style && !!style.coverphoto
+      ? `<div style="background-image: url(${style.coverphoto});" class="coverphoto"></div>`
       : ''
   )
 
   const default_title_text = 'Volt Europa'
-  const title_text = fluentByAny(linktree.title, userLocales, default_title_text)
+  const title_text = fluentByAny(title, userLocales, default_title_text)
   const title = (title_text !== '' ? `<h1>${title_text}</h1>` : '')
 
   const default_description_text = ''
-  const description_text = fluentByAny(linktree.description, userLocales, default_description_text)
+  const description_text = fluentByAny(description, userLocales, default_description_text)
   const description = (description_text !== '' ? `<p>${description_text.replace(/\n/g, '<br/>')}</p>` : '')
 
   const items = (
-    !!linktree.items && !!linktree.items
+    !!items && !!items
       ? `<div class="items">
         ${
-          linktree.items.map(({ active, type, title, link }) => {
+          items.map(({ active, type, title, link }) => {
             if (active === false) {
               return null
             } else if (!!title && !!link) {
@@ -129,14 +129,14 @@ function build(linktree, { acceptLanguage }) {
   )
 
   const imprint_link = (
-    !!linktree.imprint && !!linktree.imprint !== ''
-      ? linktree.imprint
+    !!imprint && !!imprint !== ''
+      ? imprint
       : 'https://www.volteuropa.org/legal'
   )
 
   const privacy_policy_link = (
-    !!linktree.privacy_policy && !!linktree.privacy_policy !== ''
-      ? linktree.privacy_policy
+    !!privacy_policy && !!privacy_policy !== ''
+      ? privacy_policy
       : 'https://www.volteuropa.org/privacy'
   )
 
