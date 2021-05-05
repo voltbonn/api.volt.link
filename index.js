@@ -257,7 +257,7 @@ app.get('/:code', (req, res) => {
 
         const hasUseAs = useAs !== null
         const hasRedirect = !!content_parsed.redirect && content_parsed.redirect !== ''
-        const hasLinktree = !!content_parsed.linktree
+        const hasLinktree = !!content_parsed.items
 
         if (
           hasRedirect
