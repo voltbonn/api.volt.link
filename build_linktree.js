@@ -23,6 +23,44 @@ function fluentByObject(object = {}, userLocales = ['en']){
   return object[lookupedLocale[0]]
 }
 
+function fluentByArray(array = [], userLocales = ['en'], key = 'locale') {
+  const supportedLocales = array.map(item => item[key]).filter(Boolean)
+
+  if (supportedLocales.length === 0) {
+    return null
+  }
+
+  const lookupedLocale = negotiateLanguages(
+    userLocales,
+    supportedLocales,
+    {
+      defaultLocale: supportedLocales[0],
+      strategy: 'lookup',
+    }
+  )
+
+  if (lookupedLocale.length === 0) {
+    return null
+  }
+
+  return array.filter(item => item[key] === lookupedLocale[0])
+}
+
+function fluentByAny(any = '', userLocales = ['en'], fallback = '') {
+  if (Array.isArray(any)) {
+    const result = fluentByArray(any, userLocales)
+    if (result.length > 0) {
+      any = result[0].value
+    }
+  } else if (typeof any === 'object') {
+    any = fluentByObject(any, userLocales)
+  }
+  if (typeof any !== 'string') {
+    any = fallback
+  }
+  return any
+}
+
 function build(linktree, { acceptLanguage }) {
   if (typeof acceptLanguage !== 'string' || acceptLanguage === '') {
     acceptLanguage = 'en'
@@ -60,25 +98,11 @@ function build(linktree, { acceptLanguage }) {
   )
 
   const default_title_text = 'Volt Europa'
-  let title_text = (
-    !!linktree.title && linktree.title !== ''
-      ? linktree.title
-      : ''
-  )
-  if (typeof title_text === 'object') {
-    title_text = fluentByObject(title_text, userLocales)
-  }
+  const title_text = fluentByAny(linktree.title, userLocales, default_title_text)
   const title = (title_text !== '' ? `<h1>${title_text}</h1>` : '')
 
   const default_description_text = ''
-  let description_text = (
-    !!linktree.description && linktree.description !== ''
-      ? linktree.description
-      : ''
-  )
-  if (typeof description_text === 'object') {
-    description_text = fluentByObject(description_text, userLocales)
-  }
+  const description_text = fluentByAny(linktree.description, userLocales, default_description_text)
   const description = (description_text !== '' ? `<p>${description_text.replace(/\n/g, '<br/>')}</p>` : '')
 
   const items = (
@@ -89,14 +113,10 @@ function build(linktree, { acceptLanguage }) {
             if (active === false) {
               return null
             } else if (!!title && !!link) {
-              if (typeof title === 'object') {
-                title = fluentByObject(title, userLocales)
-              }
+              title = fluentByAny(title, userLocales, '')
               return `<a href="${link}"><button>${title}</button></a>`
             } else if (type === 'headline' && !!title) {
-              if (typeof title === 'object') {
-                title = fluentByObject(title, userLocales)
-              }
+              title = fluentByAny(title, userLocales, '')
               return `<h2>${title}</h2>`
             }
             return null
