@@ -66,13 +66,17 @@ function build({
   title: title_text = '',
   description: description_text = '',
   coverphoto: coverphoto_url = '',
-  imprint = '',
-  privacy_policy = '',
+  overwrites = {},
   items = []
 }, { acceptLanguage }) {
   if (typeof acceptLanguage !== 'string' || acceptLanguage === '') {
     acceptLanguage = 'en'
   }
+
+  const {
+    imprint = '',
+    privacy_policy = '',
+  } = overwrites
 
   const userLocales = acceptedLanguages(acceptLanguage)
 
