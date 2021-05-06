@@ -115,13 +115,14 @@ async function getFileContentLocal(filename){
       if (error === null) {
         fs.readFile(getFilePathLocal(filename), (error, data) => {
           if (error) {
-            reject(error)
+            console.error(error)
+            resolve('')
           } else {
             resolve(data)
           }
         })
       } else {
-        reject(error)
+        resolve('')
       }
     })
   })
