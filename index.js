@@ -331,7 +331,8 @@ app.get('/get/:code', (req, res) => {
 })
 
 app.get('/:code', (req, res) => {
-  getFileContentLocal(req.params.code)
+  const code = req.params.code
+  getFileContentLocal(code)
     .then(content => {
       if (!!content) {
         const content_parsed = yaml.load(content) || {}
@@ -354,7 +355,7 @@ app.get('/:code', (req, res) => {
           hasLinktree
           && (useAs === 'linklist' || !hasUseAs)
         ) {
-          res.send(build(content_parsed, { acceptLanguage: req.headers['accept-language'] }))
+          res.send(build({code, ...content_parsed}, { acceptLanguage: req.headers['accept-language'] }))
         } else {
           res.redirect('/')
         }

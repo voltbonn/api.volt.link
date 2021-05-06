@@ -62,6 +62,7 @@ function fluentByAny(any = '', userLocales = ['en'], fallback = '') {
 }
 
 function build({
+  code = '',
   locales,
   title: title_text = '',
   description: description_text = '',
@@ -103,8 +104,9 @@ function build({
     )
   }
 
+  coverphoto_url = coverphoto_url || ''
   const coverphoto = (
-    !!coverphoto_url
+    coverphoto_url !== ''
       ? `<div style="background-image: url(${coverphoto_url});" class="coverphoto"></div>`
       : ''
   )
@@ -112,10 +114,12 @@ function build({
   const default_title_text = 'Volt Europa'
   title_text = fluentByAny(title_text, userLocales, default_title_text)
   const title = (title_text !== '' ? `<h1>${title_text}</h1>` : '')
+  title_text = title_text.length > 0 ? title_text : default_title_text
 
   const default_description_text = ''
   description_text = fluentByAny(description_text, userLocales, default_description_text)
   const description = (description_text !== '' ? `<p>${description_text.replace(/\n/g, '<br/>')}</p>` : '')
+  description_text = description_text.length > 0 ? description_text : default_description_text
 
   items = (
     !!items && !!items
@@ -152,6 +156,8 @@ function build({
       : 'https://www.volteuropa.org/privacy'
   )
 
+  const canonical = !!code && code !== '' ? `https://volt.link/${code}` : 'https://volt.link/'
+
   return `
   <!DOCTYPE html>
   <html lang="${global_locale}">
@@ -160,16 +166,44 @@ function build({
       <link rel="icon" href="/volt-logo-white-64.png" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <meta name="theme-color" content="#502379" />
-      <meta
-        name="description"
-        content="${description_text.length > 0 ? description_text : default_description_text}"
-      />
       <link rel="apple-touch-icon" href="/volt-logo-white-192.png" />
       <link rel="manifest" href="/manifest.json" />
 
       <link rel="stylesheet" href="/index.css" type="text/css">
       <link rel="stylesheet" href="/Ubuntu/index.css" type="text/css">
-      <title>${title_text.length > 0 ? title_text : default_title_text}</title>
+      <title>${title_text}</title>
+
+      <link rel="canonical" href="${canonical}" />
+      <link rel="me" href="https://twitter.com/volteuropa" />
+      <meta name="description" content="${description_text}" />
+      <meta itemprop="name" content="${title_text}" />
+      <meta itemprop="description" content="${description_text}" />
+      <meta itemprop="image" content="${coverphoto_url}" />
+
+      <meta property="twitter:card" content="summary" />
+      <meta property="twitter:title" content="${title_text}" />
+      <meta property="twitter:description" content="${description_text}" />
+      <meta property="twitter:site" content="@volteuropa" />
+      <meta property="twitter:creator" content="@volteuropa" />
+      <meta property="twitter:image" content="${coverphoto_url}" />
+
+      <meta property="og:title" content="${title_text}" />
+      <meta property="og:url" content="${canonical}" />
+      <meta property="og:site_name" content="${title_text}" />
+      <meta property="og:type" content="website" />
+      <meta property="og:locale" content="${global_locale}" />
+      <meta property="og:image" content="${coverphoto_url}" />
+
+      <meta name="pinterest-rich-pin" content="true" />
+
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Website",
+          "url": "${canonical}",
+          "logo": "${coverphoto_url}"
+        }
+      </script>
 
       <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
       <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-700.woff2" as="font" type="font/woff2" crossorigin/>
