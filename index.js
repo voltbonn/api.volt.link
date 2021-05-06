@@ -323,7 +323,7 @@ app.get('/get/:code', (req, res) => {
   }else{
     getFileContentLocal(req.params.code)
       .then(content => {
-        const content_parsed = yaml.load(content)
+        const content_parsed = yaml.load(content) || {}
         res.json(content_parsed)
       })
       .catch(err => res.status(500).json(err))
@@ -334,7 +334,7 @@ app.get('/:code', (req, res) => {
   getFileContentLocal(req.params.code)
     .then(content => {
       if (!!content) {
-        const content_parsed = yaml.load(content)
+        const content_parsed = yaml.load(content) || {}
 
         let useAs = null
         if (content_parsed.hasOwnProperty('use_as')) {
