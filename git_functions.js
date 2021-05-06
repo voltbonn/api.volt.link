@@ -19,7 +19,7 @@ function getFilePathLocal (filename) {
 const secret = process.env.git_secret || null
 const repoMetadata = {
   owner: 'voltbonn',
-  repo: 'tree-data',
+  repo: 'data-for-volt.link',
   branch: 'main',
 }
 const folder_name_paths = 'paths'
