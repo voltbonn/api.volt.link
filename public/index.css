@@ -74,6 +74,28 @@ p{
     max-width: 100%;
 }
 
+button{
+    position: relative;
+    outline: none;
+    border: none;
+    margin: var(--basis);
+    padding: var(--basis_x0_5) var(--basis);
+    font-size: calc(var(--font-add) + var(--basis));
+    font-weight: bold;
+    cursor: pointer;
+
+    background: var(--on-background);
+    color: var(--background-contrast);
+    transition: transform 0.2s ease;
+}
+button.isInRow{
+    margin: var(--basis_x0_5);
+}
+button:hover{
+    transform-origin: center center;
+    transform: scale(1.05);
+}
+
 .app {
     display: flex;
     flex-direction: column;
@@ -119,28 +141,7 @@ p{
   width: var(--basis_x64);
   max-width: 100%;
 }
-.items a {
-  display: block;
-}
-
-button{
-    position: relative;
-    outline: none;
-    border: none;
-    margin: var(--basis);
-    padding: var(--basis_x0_5) var(--basis);
-    font-size: calc(var(--font-add) + var(--basis));
-    font-weight: bold;
-    cursor: pointer;
-
-    background: var(--on-background);
-    color: var(--background-contrast);
-    transition: transform 0.2s ease;
-}
-button.isInRow{
-    margin: var(--basis_x0_5);
-}
-button:hover{
-    transform-origin: center center;
-    transform: scale(1.05);
+.items button {
+  margin-right: 0;
+  margin-left: 0;
 }
