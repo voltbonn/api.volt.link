@@ -6,7 +6,7 @@ const {
   saveFile,
   gitPull,
 } = require('./git_functions.js')
-const { build } = require('./build_linktree.js')
+const { build } = require('./build_linklist.js')
 const yaml = require('js-yaml')
 
 const express = require('express')
