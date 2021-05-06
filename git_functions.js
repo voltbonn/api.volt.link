@@ -4,20 +4,29 @@ const execShPromise = require('exec-sh').promise
 
 const fs = require('fs')
 const { Octokit } = require('@octokit/core')
+// const { restEndpointMethods } = require('@octokit/plugin-rest-endpoint-methods')
+// const crypto = require('crypto')
 
 let tree_data_path = process.env.tree_data_path
 if (!tree_data_path.endsWith('/')) {
   tree_data_path = tree_data_path + '/'
 }
 
+function getFilePathLocal (filename) {
+  return tree_data_path + 'paths/' + filename + '.yml'
+}
+
 const secret = process.env.git_secret || null
 const repoMetadata = {
   owner: 'voltbonn',
   repo: 'tree-data',
+  branch: 'main',
 }
 const folder_name_paths = 'paths'
 
-const octokit = new Octokit({
+// const OctokitWithRest = Octokit.plugin(restEndpointMethods)
+const OctokitWithRest = Octokit
+const octokit = new OctokitWithRest({
   auth: secret,
   userAgent: 'volt.link',
   // previews: ['thomasrosen'],
@@ -71,29 +80,87 @@ async function getPathsTree() {
   return []
 }
 
-function loadContentBySHA(fileSHA) {
-  return octokit.request('GET /repos/{owner}/{repo}/git/blobs/{file_sha}', {
-    ...repoMetadata,
-    file_sha: fileSHA
-  })
-}
+// function loadContentBySHA(fileSHA) {
+//   return octokit.request('GET /repos/{owner}/{repo}/git/blobs/{file_sha}', {
+//     ...repoMetadata,
+//     file_sha: fileSHA
+//   })
+// }
 
-async function getFile(filename) {
+async function getFileInfo (filename) {
   filename = filename.toLowerCase()
 
   const tree = await getPathsTree()
 
   const wanted_file = tree.filter(file => file.path === filename + '.yml')
   if (wanted_file.length > 0) {
-    const file = await loadContentBySHA(wanted_file[0].sha)
-    return Buffer.from(file.data.content, 'base64').toString('utf-8')
+    return wanted_file[0]
   }
 
   return null
 }
 
+// async function getFileContent(filename) {
+//   filename = filename.toLowerCase()
+//   const file = await octokit.rest.repos.getContent({
+//     ...repoMetadata,
+//     path: `paths/${filename}.yml`,
+//   })
+//   return Buffer.from(file.data.content, file.data.encoding).toString('utf-8')
+// }
+
+async function getFileContentLocal(filename){
+  return new Promise((resolve, reject) => {
+    fs.stat(getFilePathLocal(filename), (error, stat) => {
+      if (error === null) {
+        fs.readFile(getFilePathLocal(filename), (error, data) => {
+          if (error) {
+            reject(error)
+          } else {
+            resolve(data)
+          }
+        })
+      } else {
+        reject(error)
+      }
+    })
+  })
+}
+
+// // Source of getOid(): https://dev.to/ethanarrowood/building-git-with-node-js-and-typescript-part-1-1d94
+// function getOid(type, str) {
+//   // Function to create git object ids
+//   // str needs to be a Buffer
+//   // type needs to be a string. Eg.: "blob"
+//
+//   // create a buffer from the type, binary string length, and a null byte
+//   const header = Buffer.from(`${type} ${str.length}\0`)
+//   // create the hash content by concatenating the header and the binary string
+//   const content = Buffer.concat([header, str], header.length + str.length)
+//   // create a hash generator using the 'sha1' algorithm
+//   const shasum = crypto.createHash('sha1')
+//   // update the hash generator with the content and use a hexadecimal digest to create the object id
+//   const oid = shasum.update(content).digest('hex')
+//
+//   return oid
+// }
+
+async function saveFile(filename, content = '') {
+  const fileinfo = await getFileInfo(filename)
+  const prev_sha = fileinfo !== null && typeof fileinfo === 'object' ? fileinfo.sha : null
+
+  return octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
+    ...repoMetadata,
+    path: `paths/${filename}.yml`,
+    message: 'Automatic update',
+    content: Buffer.from(content, 'utf-8').toString('base64'),
+    encoding: 'base64',
+    sha: prev_sha
+  })
+}
+
 function doesFileExist(filename, callback) {
-  fs.stat(tree_data_path + 'paths/' + filename + '.yml', function (error, stat) {
+  fs.stat(getFilePathLocal(filename), (error, stat) => {
     if (error === null) {
       callback(true)
     } else if (error.code === 'ENOENT') {
@@ -118,7 +185,9 @@ async function gitPull() {
 }
 
 module.exports = {
-  getFile,
+  getFileContent,
+  getFileContentLocal,
   gitPull,
   doesFileExist,
+  saveFile,
 }
