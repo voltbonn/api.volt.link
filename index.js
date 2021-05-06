@@ -15,6 +15,22 @@ const FileStore = require('session-file-store')(session)
 const passport = require('passport')
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 
+const forbidden_codes = `
+auth/google
+auth/google/callback
+auth/failure
+logout
+user.json
+login
+forbidden_codes
+pull
+exists/
+get/
+set/
+`
+.split('\n')
+.filter(Boolean)
+
 const app = express()
 app.use(express.json())
 
@@ -251,6 +267,14 @@ app.get('/exists/:code', (req, res) => {
     } else {
       res.status(404).json({ exists: false })
     }
+  }
+})
+
+app.get('/forbidden_codes', (req, res) => {
+  if (!req.logged_in) {
+    res.status(403).json({ error: 'You are not logged in.' })
+  } else {
+    res.json({ codes: forbidden_codes })
   }
 })
 
