@@ -185,7 +185,7 @@ async function gitPull() {
 }
 
 module.exports = {
-  getFileContent,
+  // getFileContent,
   getFileContentLocal,
   gitPull,
   doesFileExist,
