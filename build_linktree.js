@@ -75,7 +75,7 @@ function build({
 
   const {
     imprint = '',
-    privacy_policy = '',
+    privacy_policy = ''
   } = overwrites
 
   const userLocales = acceptedLanguages(acceptLanguage)
