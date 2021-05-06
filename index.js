@@ -1,8 +1,9 @@
 require('dotenv').config()
 
 const {
-  getFile,
-  doesFileExist
+  getFileContentLocal,
+  doesFileExist,
+  saveFile,
 } = require('./git_functions.js')
 const { build } = require('./build_linktree.js')
 const yaml = require('js-yaml')
@@ -256,11 +257,30 @@ app.post('/set/:code', (req, res) => {
   if (!req.logged_in) {
     res.status(403).json({ error: 'You are not logged in.' })
   } else {
-    console.log('req.params.code', req.params.code)
-    console.log('req.user', req.user)
-    console.log('req.body', JSON.stringify(req.body, null, 2))
+    if (!!req.params.code && req.params.code !== '') {
+      let new_content = req.body
+      delete new_content.last_modified
+      new_content = {
+        last_modified: new Date(),
+        ...new_content,
+      }
+      new_content = yaml.dump(new_content, {
+        indent: 2,
+        sortKeys: false,
+        lineWidth: -1,
+      })
 
-    res.json({ done: false })
+      saveFile(req.params.code, new_content)
+      .then(async () => {
+        res.json({ error: null, saved: true })
+        await gitPull()
+      })
+      .catch(error => res.status(500).json({ error, saved: false }))
+    }else{
+      res.status(500).json({ error: 'Please provide a code.', saved: false })
+    }
+  }
+})
   }
 })
 
@@ -268,7 +288,7 @@ app.get('/get/:code', (req, res) => {
   if (!req.logged_in) {
     res.status(403).json({ error: 'You are not logged in.' })
   }else{
-    getFile(req.params.code)
+    getFileContentLocal(req.params.code)
       .then(content => {
         const content_parsed = yaml.load(content)
         res.json(content_parsed)
@@ -278,7 +298,7 @@ app.get('/get/:code', (req, res) => {
 })
 
 app.get('/:code', (req, res) => {
-  getFile(req.params.code)
+  getFileContentLocal(req.params.code)
     .then(content => {
       if (!!content) {
         const content_parsed = yaml.load(content)
