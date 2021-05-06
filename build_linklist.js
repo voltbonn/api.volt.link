@@ -68,7 +68,8 @@ function build({
   description: description_text = '',
   coverphoto: coverphoto_url = '',
   overwrites = {},
-  items = []
+  items = [],
+  last_modified = new Date(),
 }, { acceptLanguage }) {
   if (typeof acceptLanguage !== 'string' || acceptLanguage === '') {
     acceptLanguage = 'en'
@@ -158,6 +159,8 @@ function build({
 
   const canonical = !!code && code !== '' ? `https://volt.link/${code}` : 'https://volt.link/'
 
+  last_modified = last_modified.toUTCString()
+
   return `
   <!DOCTYPE html>
   <html lang="${global_locale}">
@@ -199,9 +202,35 @@ function build({
       <script type="application/ld+json">
         {
           "@context": "https://schema.org",
-          "@type": "Website",
+          "@type": "WebPage",
+          "url": "${canonical}"
+        }
+      </script>
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "CreativeWork",
+          "author": "Volt Europa",
+          "image": "${coverphoto_url}",
+          "name": "${title_text}",
+          "dateModified": "${last_modified}",
+          "sourceOrganization": {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Volt Europa",
+            "alternateName": "Volt",
+            "email": "info@volteuropa.org",
+            "startDate": "2027-03-29",
+            "location": "Europe",
+            "areaServed": "Europa"
+          },
+          "identifier": "${code}",
           "url": "${canonical}",
-          "logo": "${coverphoto_url}"
+          "maintainer": "thomas.rosen@volteuropa.org",
+          "sameAs": [
+            "https://en.wikipedia.org/wiki/Volt_Europa",
+            "https://www.wikidata.org/wiki/Q55229798"
+          ]
         }
       </script>
 
