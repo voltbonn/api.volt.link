@@ -1,6 +1,16 @@
 :root {
   --basis: 1rem;
 }
+@media (max-width: 1000px) {
+  :root {
+    --basis: 0.8rem;
+  }
+}
+@media (max-width: 800px) {
+  :root {
+    --basis: 0.4rem;
+  }
+}
 
 .app {
   display: flex;
