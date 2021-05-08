@@ -114,12 +114,12 @@ function build({
 
   const default_title_text = 'Volt Europa'
   title_text = fluentByAny(title_text, userLocales, default_title_text)
-  const title = (title_text !== '' ? `<h1>${title_text}</h1>` : '')
+  const title = (title_text !== '' ? `<h1 dir="auto">${title_text}</h1>` : '')
   title_text = title_text.length > 0 ? title_text : default_title_text
 
   const default_description_text = ''
   description_text = fluentByAny(description_text, userLocales, default_description_text)
-  const description = (description_text !== '' ? `<p>${description_text.replace(/\n/g, '<br/>')}</p>` : '')
+  const description = (description_text !== '' ? `<p dir="auto">${description_text.replace(/\n/g, '<br/>')}<br/><br/></p>` : '')
   description_text = description_text.length > 0 ? description_text : default_description_text
 
   items = (
@@ -131,7 +131,7 @@ function build({
               return null
             } else if (!!title && !!link) {
               title = fluentByAny(title, userLocales, '')
-              return `<div><a href="${link}"><button>${title}</button></a></div>`
+              return `<div><a href="${link}"><button dir="auto">${title}</button></a></div>`
             } else if (type === 'headline' && !!title) {
               title = fluentByAny(title, userLocales, '')
               return `<h2>${title}</h2>`
@@ -173,6 +173,7 @@ function build({
       <link rel="manifest" href="/manifest.json" />
 
       <link rel="stylesheet" href="/index.css" type="text/css">
+      <link rel="stylesheet" href="/app.css" type="text/css">
       <link rel="stylesheet" href="/Ubuntu/index.css" type="text/css">
       <title>${title_text}</title>
 
@@ -238,11 +239,13 @@ function build({
       <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-700.woff2" as="font" type="font/woff2" crossorigin/>
     </head>
     <body>
-      <div class="app">
+      <div class="app spine_aligned" dir="auto">
         ${coverphoto}
-        ${title}
-        ${description}
-        ${items}
+        <main class="contentWrapper">
+          ${title}
+          ${description}
+          ${items}
+        </main>
       </div>
       <footer>
         <a href="${imprint_link}">

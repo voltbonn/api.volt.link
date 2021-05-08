@@ -1,0 +1,69 @@
+:root {
+  --basis: 1rem;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  text-align: center;
+
+  padding: var(--basis_x4);
+  min-height: 80vh;
+
+  background: var(--background);
+  color: var(--on-background);
+}
+.app.spine_aligned {
+  text-align: unset;
+  align-items: flex-start;
+}
+.app.spine_aligned:dir(rtl) {
+  align-items: flex-start;
+}
+
+
+.coverphoto {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 20rem;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-bottom: var(--basis_x4);
+}
+@media (max-width: 1000px) {
+  .coverphoto{
+    height: 16rem;
+  }
+}
+@media (max-width: 800px) {
+  .coverphoto{
+    height: 10rem;
+  }
+}
+@media (max-width: 500px) {
+  .coverphoto{
+    height: 7rem;
+  }
+}
+
+.contentWrapper{
+  width: auto;
+  margin: 0 auto;
+}
+
+.items button {
+  margin-right: 0;
+  margin-left: 0;
+  text-align: unset;
+}
+@media (max-width: 800px) {
+  .contentWrapper,
+  .items,
+  .items button{
+    width: 100%;
+  }
+}
