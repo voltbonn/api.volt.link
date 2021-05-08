@@ -48,7 +48,22 @@ bdo[dir="rtl"] { direction: rtl; unicode-bidi: bidi-override; }
 *{
   margin: 0;
   padding: 0;
-  font-family: 'Ubuntu', 'Amiri', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'Ubuntu', 'Noto Kufi Arabic', 'Geeza Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  /*
+    Ubuntu = Volt (It includes latin and arabic characters.)
+
+    Noto Kufi Arabic = A Noto font from Google (maybe it's installed)
+    Geeza Pro = macOS Arabic Default
+
+    -apple-system, BlinkMacSystemFont = macOS Default
+    Helvetica Neue = Old macOS Default
+    Segoe UI = Windows Default
+    Roboto = Android Default
+    Fira Sans = Firefox OS Default
+    Oxygen, Cantarell, Droid Sans = Linux
+
+    sans-serif = Fallback
+  */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
