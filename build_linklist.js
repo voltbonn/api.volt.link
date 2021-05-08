@@ -131,7 +131,7 @@ function build({
               return null
             } else if (!!title && !!link) {
               title = fluentByAny(title, userLocales, '')
-              return `<div><a href="${link}"><button dir="auto">${title}</button></a></div>`
+              return `<a href="${link}"><button dir="auto">${title}</button></a>`
             } else if (type === 'headline' && !!title) {
               title = fluentByAny(title, userLocales, '')
               return `<h2>${title}</h2>`
@@ -139,7 +139,7 @@ function build({
             return null
           })
           .filter(Boolean)
-          .join('')
+          .join('<br />')
         }
       </div>`
       : ''
