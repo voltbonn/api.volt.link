@@ -173,7 +173,7 @@ function build({
       <link rel="manifest" href="/manifest.json" />
 
       <link rel="stylesheet" href="/index.css" type="text/css">
-      <link rel="stylesheet" href="/app.css" type="text/css">
+      <link rel="stylesheet" href="/index-overwrites.css" type="text/css">
       <link rel="stylesheet" href="/Ubuntu/index.css" type="text/css">
       <title>${title_text}</title>
 
