@@ -49,7 +49,7 @@ function fluentByArray(array = [], userLocales = ['en'], key = 'locale') {
 function fluentByAny(any = '', userLocales = ['en'], fallback = '') {
   if (Array.isArray(any)) {
     const result = fluentByArray(any, userLocales)
-    if (result.length > 0) {
+    if (Array.isArray(result) && result.length > 0) {
       any = result[0].value
     }
   } else if (typeof any === 'object') {
