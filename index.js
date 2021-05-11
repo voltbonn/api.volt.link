@@ -363,7 +363,7 @@ app.get('/:code', (req, res) => {
         res.redirect('/')
       }
     })
-    .catch(err => res.status(500).json(err))
+    .catch(err => res.json(err))
 })
 
 const port = 4000
