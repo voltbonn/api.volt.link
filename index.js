@@ -248,6 +248,13 @@ a:hover {
   opacity: 0.7;
 }
 </style>
+<script
+  async
+  defer
+  data-website-id="becf9dc6-db9a-42a7-bc64-9637bd885bff"
+  src="https://umami.qiekub.org/umami.js"
+  data-domains="volt.link"
+></script>
 </head>
 <body>
   <h1>Redirect Server for Volt Europa</h1>
