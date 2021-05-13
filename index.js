@@ -273,7 +273,7 @@ a:hover {
 ></script>
 </head>
 <body>
-  <h1>Redirect Server for Volt Europa</h1>
+  <h1>Linklist and Redirect Server for Volt Europa</h1>
   <!--sse-->Contact: <a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a></br><!--/sse-->
   Example: <a href="https://volt.link/bonn">volt.link/bonn</a>
 </body>
