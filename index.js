@@ -31,6 +31,19 @@ set/
 .split('\n')
 .filter(Boolean)
 
+const admin_addresses = (process.env.admin_addresses || '').split(',')
+
+function hasEditPermission(permissions, userEmail) {
+  return (
+    permissions !== null
+    && typeof permissions === 'object'
+    && typeof userEmail === 'string'
+    && (
+      permissions.map(e => e.value).includes(userEmail)
+      || admin_addresses.includes(userEmail)
+    )
+  )
+}
 const app = express()
 app.use(express.json())
 
@@ -290,24 +303,41 @@ app.post('/set/:code', (req, res) => {
     res.status(403).json({ error: 'You are not logged in.' })
   } else {
     if (!!req.params.code && req.params.code !== '') {
-      let new_content = req.body
-      delete new_content.last_modified
-      new_content = {
-        last_modified: new Date(),
-        ...new_content,
-      }
-      new_content = yaml.dump(new_content, {
-        indent: 2,
-        sortKeys: false,
-        lineWidth: -1,
-      })
+    getFileContentLocal(req.params.code)
+      .then(content => {
+        content = yaml.load(content) || null
 
-      saveFile(req.params.code, new_content)
-      .then(async () => {
-        res.json({ error: null, saved: true })
-        await gitPull()
+        let new_content = req.body
+
+        if (!!new_content) {
+          if (hasEditPermission(content.permissions, req.user.email)) {
+            delete new_content.last_modified
+            new_content = {
+              last_modified: new Date(),
+              last_modified_by: req.user.email || '',
+              ...new_content,
+            }
+            new_content = yaml.dump(new_content, {
+              indent: 2,
+              sortKeys: false,
+              lineWidth: -1,
+            })
+
+            saveFile(req.params.code, new_content)
+            .then(async () => {
+              res.json({ error: null, saved: true })
+              await gitPull()
+            })
+              .catch(error => res.status(400).json({ error, saved: false }))
+          } else {
+            res.status(403).json({ error: 'no_edit_permission', saved: false })
+          }
+        } else {
+          res.status(400).json({ error: 'Plase provide a valid content.', saved: false })
+        }
       })
-      .catch(error => res.status(500).json({ error, saved: false }))
+      .catch(err => res.status(400).json(err))
+
     } else {
       res.status(404).json({ error: 'Please provide a code.', saved: false })
     }
@@ -329,8 +359,13 @@ app.get('/get/:code', (req, res) => {
   }else{
     getFileContentLocal(req.params.code)
       .then(content => {
-        const content_parsed = yaml.load(content) || {}
-        res.json(content_parsed)
+        const content_parsed = yaml.load(content) || {}
+
+        if (hasEditPermission(content_parsed.permissions, req.user.email)) {
+          res.json(content_parsed)
+        } else {
+          res.status(403).json({ error: 'no_edit_permission' })
+        }
       })
       .catch(err => res.status(404).json(err))
   }
