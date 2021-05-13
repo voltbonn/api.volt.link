@@ -315,7 +315,6 @@ app.post('/set/:code', (req, res) => {
 })
 
 app.get('/pull', async (req, res) => {
-  req.logged_in = true
   if (!req.logged_in) {
     res.status(403).json({ error: 'You are not logged in.' })
   } else {
