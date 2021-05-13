@@ -308,8 +308,8 @@ app.post('/set/:code', (req, res) => {
         await gitPull()
       })
       .catch(error => res.status(500).json({ error, saved: false }))
-    }else{
-      res.status(500).json({ error: 'Please provide a code.', saved: false })
+    } else {
+      res.status(404).json({ error: 'Please provide a code.', saved: false })
     }
   }
 })
@@ -333,7 +333,7 @@ app.get('/get/:code', (req, res) => {
         const content_parsed = yaml.load(content) || {}
         res.json(content_parsed)
       })
-      .catch(err => res.status(500).json(err))
+      .catch(err => res.status(404).json(err))
   }
 })
 
@@ -370,7 +370,7 @@ app.get('/:code', (req, res) => {
         res.redirect('/')
       }
     })
-    .catch(err => res.json(err))
+    .catch(err => res.status(404).json(err))
 })
 
 const port = 4000
