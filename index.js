@@ -35,12 +35,15 @@ const admin_addresses = (process.env.admin_addresses || '').split(',')
 
 function hasEditPermission(permissions, userEmail) {
   return (
-    permissions !== null
-    && typeof permissions === 'object'
-    && typeof userEmail === 'string'
+    typeof userEmail === 'string'
+    && userEmail !== ''
     && (
-      permissions.map(e => e.value).includes(userEmail)
-      || admin_addresses.includes(userEmail)
+      admin_addresses.includes(userEmail)
+      || (
+        permissions !== null
+        && typeof permissions === 'object'
+        && permissions.map(e => e.value).includes(userEmail)
+      )
     )
   )
 }
