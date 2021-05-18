@@ -126,7 +126,7 @@ function build({
     !!items && !!items
       ? `<div class="items">
         ${
-          items.map(({ active, type, title, link }) => {
+          items.map(({ active, type, title, text, link }) => {
             if (active === false) {
               return null
             } else if (!!title && !!link) {
@@ -139,6 +139,9 @@ function build({
               } else {
                 return `<h2 dir="auto">${title}</h2>`
               }
+            } else if (type === 'text' && !!text) {
+              text = fluentByAny(text, userLocales, '')
+              return `<p dir="auto">${text.split('\n').join('<br/>')}</p>`
             }
             return null
           })
