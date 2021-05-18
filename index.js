@@ -292,8 +292,10 @@ app.get('/exists/:code', (req, res) => {
   if (!req.logged_in) {
     res.status(403).json({ error: 'You are not logged in.' })
   } else {
-    if (!!req.params.code && req.params.code !== '') {
-      doesFileExist(req.params.code, result => res.json({ exists: result }))
+    let code = req.params.code
+    if (!!code && code !== '') {
+      code = code.toLowerCase()
+      doesFileExist(code, result => res.json({ exists: result }))
     } else {
       res.status(404).json({ exists: false })
     }
@@ -312,8 +314,10 @@ app.post('/set/:code', (req, res) => {
   if (!req.logged_in) {
     res.status(403).json({ error: 'You are not logged in.' })
   } else {
-    if (!!req.params.code && req.params.code !== '') {
-    getFileContentLocal(req.params.code)
+    let code = req.params.code
+    if (!!code && code !== '') {
+      code = code.toLowerCase()
+      getFileContentLocal(code)
       .then(content => {
         const old_content = yaml.load(content) || {}
 
@@ -366,8 +370,10 @@ app.get('/pull', async (req, res) => {
 app.get('/get/:code', (req, res) => {
   if (!req.logged_in) {
     res.status(403).json({ error: 'You are not logged in.' })
-  }else{
-    getFileContentLocal(req.params.code)
+  } else {
+    let code = req.params.code
+    code = code.toLowerCase()
+    getFileContentLocal(code)
       .then(content => {
         const content_parsed = yaml.load(content) || {}
 
@@ -382,7 +388,8 @@ app.get('/get/:code', (req, res) => {
 })
 
 app.get('/:code', (req, res) => {
-  const code = req.params.code
+  let code = req.params.code
+  code = code.toLowerCase()
   getFileContentLocal(code)
     .then(content => {
       if (!!content) {
