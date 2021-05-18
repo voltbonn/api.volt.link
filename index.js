@@ -34,16 +34,23 @@ set/
 const admin_addresses = (process.env.admin_addresses || '').split(',')
 
 function hasEditPermission(permissions, userEmail) {
+  const permissions_array_has_content = (
+    typeof permissions === 'object'
+    && permissions !== null
+    && Array.isArray(permissions)
+    && permissions.length > 0
+  )
+
   return (
     typeof userEmail === 'string'
     && userEmail !== ''
     && (
-      admin_addresses.includes(userEmail)
+      !permissions_array_has_content
       || (
-        permissions !== null
-        && typeof permissions === 'object'
+        permissions_array_has_content
         && permissions.map(e => e.value).includes(userEmail)
       )
+      || admin_addresses.includes(userEmail)
     )
   )
 }
@@ -308,12 +315,12 @@ app.post('/set/:code', (req, res) => {
     if (!!req.params.code && req.params.code !== '') {
     getFileContentLocal(req.params.code)
       .then(content => {
-        content = yaml.load(content) || null
+        const old_content = yaml.load(content) || {}
 
         let new_content = req.body
 
         if (!!new_content) {
-          if (hasEditPermission(content.permissions, req.user.email)) {
+          if (hasEditPermission(old_content.permissions || null, req.user.email)) {
             delete new_content.last_modified
             new_content = {
               last_modified: new Date(),
