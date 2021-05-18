@@ -64,7 +64,7 @@ async function session_middleware(req, res, next) {
 
   const origin = req.header('Origin')
   if (typeof origin === 'string' && origin.endsWith('localhost:3000')) { // allow for localhost
-    req.headers['-x-session'] = 's%3A98Wa9FIkoqdguedgRiOa1O_Faexl8eMc.ldykIQLpjQUQjZkgKdlPsZeZltkbnClN8Diq7swf3Hw'
+    req.headers['-x-session'] = 's%3AOiY6jEc4tS-jkKeuIuB2ubAW9Vpgkij4.HT1EkmpOPB3MxNCmGvxvLeENzyxsxJkXYq%2FmY1QafDw'
   }
 
   if (!!req.headers['-x-session']) {
