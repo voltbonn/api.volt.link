@@ -132,7 +132,7 @@ function build({
             } else if (!!title && !!link) {
               title = fluentByAny(title, userLocales, '')
               return `<div><a href="${link}"><button dir="auto">${title}</button></a></div>`
-            } else if (type.startsWith('headline') && !!title) {
+            } else if (typeof type === 'string' && type.startsWith('headline') && !!title) {
               title = fluentByAny(title, userLocales, '')
               if (type === 'headline3') {
                 return `<h3 dir="auto">${title}</h3>`
