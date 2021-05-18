@@ -71,6 +71,9 @@
   margin-left: 0;
   text-align: unset;
 }
+.items p {
+  margin-bottom: 0;
+}
 @media (max-width: 800px) {
   .contentWrapper,
   .items,
