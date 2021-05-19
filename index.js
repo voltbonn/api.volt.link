@@ -32,6 +32,9 @@ set
 .split('\n')
 .filter(Boolean)
 
+const forbidden_letters = '/\\\'"´`(){}[]<>,;:?!¿¡=#+|~^°'
+const special_letters = '.'
+
 const admin_addresses = (process.env.admin_addresses || '').split(',')
 
 function hasEditPermission(permissions, userEmail) {
@@ -307,7 +310,7 @@ app.get('/forbidden_codes', (req, res) => {
   if (!req.logged_in) {
     res.status(403).json({ error: 'You are not logged in.' })
   } else {
-    res.json({ codes: forbidden_codes })
+    res.json({ codes: forbidden_codes, letters: forbidden_letters, special_letters })
   }
 })
 
