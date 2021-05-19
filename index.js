@@ -337,7 +337,7 @@ app.post('/set/:code', (req, res) => {
               lineWidth: -1,
             })
 
-            saveFile(req.params.code, new_content)
+            saveFile(code, new_content)
             .then(async () => {
               res.json({ error: null, saved: true })
               await gitPull()
