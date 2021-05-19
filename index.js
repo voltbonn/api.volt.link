@@ -16,6 +16,7 @@ const passport = require('passport')
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 
 const forbidden_codes = `
+auth
 auth/google
 auth/google/callback
 auth/failure
@@ -24,9 +25,9 @@ user.json
 login
 forbidden_codes
 pull
-exists/
-get/
-set/
+exists
+get
+set
 `
 .split('\n')
 .filter(Boolean)
