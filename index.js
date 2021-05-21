@@ -56,7 +56,7 @@ function quickcheckCode(code, { username = '' }) {
       allowed_to_edit = false
     }
   } else {
-    allowed_to_edit = false
+    allowed_to_edit = true
   }
 
   return { allowed_to_edit }
