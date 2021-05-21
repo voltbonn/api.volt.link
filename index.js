@@ -32,7 +32,7 @@ set
 .split('\n')
 .filter(Boolean)
 
-const forbidden_letters = '/\\\'"´`(){}[]<>,;:?!¿¡=#+|~^°'
+const forbidden_letters = ' /\\\'"´`(){}[]<>,;:?!¿¡=#+|~^°'
 const special_letters = '.'
 
 const admin_addresses = (process.env.admin_addresses || '').split(',')
