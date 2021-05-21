@@ -15,7 +15,8 @@ const FileStore = require('session-file-store')(session)
 const passport = require('passport')
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 
-const forbidden_codes = `
+const forbidden = {
+  codes: `
 auth
 auth/google
 auth/google/callback
@@ -29,11 +30,37 @@ exists
 get
 set
 `
-.split('\n')
-.filter(Boolean)
+  .split('\n')
+  .filter(Boolean),
+  letters: ' /\\\'"´`(){}[]<>,;:?!¿¡=#+|~^°',
+  special_letters: '.'
+}
+const forbidden_letters_splitted = forbidden.letters.split('')
 
-const forbidden_letters = ' /\\\'"´`(){}[]<>,;:?!¿¡=#+|~^°'
-const special_letters = '.'
+function quickcheckCode(code, { username = '' }) {
+  const code_split = code.split('')
+
+  let allowed_to_edit = false
+
+  if (
+    code === ''
+    || code.includes('/')
+    || forbidden.codes.includes(code)
+    || forbidden_letters_splitted.filter(value => !code_split.includes(value)).length < forbidden_letters_splitted.length
+  ) {
+    allowed_to_edit = false
+  } else if (code.includes('.')) {
+    if (username !== '' && code === username) {
+      allowed_to_edit = true
+    } else {
+      allowed_to_edit = false
+    }
+  } else {
+    allowed_to_edit = false
+  }
+
+  return { allowed_to_edit }
+}
 
 const admin_addresses = (process.env.admin_addresses || '').split(',')
 
@@ -300,9 +327,27 @@ app.get('/exists/:code', (req, res) => {
     if (!!code && code !== '') {
       code = code.toLowerCase()
       doesFileExist(code, result => res.json({ exists: result }))
-    } else {
+    } else {
       res.status(404).json({ exists: false })
     }
+  }
+})
+
+app.get('/quickcheck/:code', (req, res) => {
+  if (!req.logged_in) {
+    res.status(403).json({ error: 'You are not logged in.' })
+  } else {
+    const response_json = { exists: false, allowed: false }
+
+    const code = (req.params.code || '').toLowerCase()
+    const username = (req.user.email || '').split('@')[0]
+    const { allowed_to_edit } = quickcheckCode(code, {username})
+    response_json.allowed = allowed_to_edit
+
+    doesFileExist(code, exists_result => {
+      response_json.exists = exists_result
+      res.json(response_json)
+    })
   }
 })
 
@@ -310,7 +355,7 @@ app.get('/forbidden_codes', (req, res) => {
   if (!req.logged_in) {
     res.status(403).json({ error: 'You are not logged in.' })
   } else {
-    res.json({ codes: forbidden_codes, letters: forbidden_letters, special_letters })
+    res.json(forbidden)
   }
 })
 
@@ -318,9 +363,11 @@ app.post('/set/:code', (req, res) => {
   if (!req.logged_in) {
     res.status(403).json({ error: 'You are not logged in.' })
   } else {
-    let code = req.params.code
-    if (!!code && code !== '') {
-      code = code.toLowerCase()
+    const code = (req.params.code || '').toLowerCase()
+    const username = (req.user.email || '').split('@')[0]
+    const { allowed_to_edit } = quickcheckCode(code, { username })
+
+    if (allowed_to_edit) {
       getFileContentLocal(code)
       .then(content => {
         const old_content = yaml.load(content) || {}
@@ -357,7 +404,7 @@ app.post('/set/:code', (req, res) => {
       .catch(err => res.status(400).json(err))
 
     } else {
-      res.status(404).json({ error: 'Please provide a code.', saved: false })
+      res.status(404).json({ error: 'Please provide a valid code.', saved: false })
     }
   }
 })
