@@ -37,7 +37,9 @@ set
 }
 const forbidden_letters_splitted = forbidden.letters.split('')
 
-function quickcheckCode(code, { username = '' }) {
+function quickcheckCode(code, { userEmail = '' }) {
+
+  const username = (userEmail || '').split('@')[0]
   const code_split = code.split('')
 
   let allowed_to_edit = false
@@ -50,7 +52,10 @@ function quickcheckCode(code, { username = '' }) {
   ) {
     allowed_to_edit = false
   } else if (code.includes('.')) {
-    if (username !== '' && code === username) {
+    if (
+      (username !== '' && code === username)
+      || (userEmail !== '' && admin_addresses.includes(userEmail))
+    ) {
       allowed_to_edit = true
     } else {
       allowed_to_edit = false
@@ -76,12 +81,12 @@ function hasEditPermission(permissions, userEmail) {
     typeof userEmail === 'string'
     && userEmail !== ''
     && (
-      !permissions_array_has_content
+      admin_addresses.includes(userEmail)
+      || !permissions_array_has_content
       || (
         permissions_array_has_content
         && permissions.map(e => e.value).includes(userEmail)
       )
-      || admin_addresses.includes(userEmail)
     )
   )
 }
@@ -340,8 +345,7 @@ app.get('/quickcheck/:code', (req, res) => {
     const response_json = { exists: false, allowed: false }
 
     const code = (req.params.code || '').toLowerCase()
-    const username = (req.user.email || '').split('@')[0]
-    const { allowed_to_edit } = quickcheckCode(code, {username})
+    const { allowed_to_edit } = quickcheckCode(code, { userEmail: req.user.email })
     response_json.allowed = allowed_to_edit
 
     doesFileExist(code, exists_result => {
@@ -364,8 +368,7 @@ app.post('/set/:code', (req, res) => {
     res.status(403).json({ error: 'You are not logged in.' })
   } else {
     const code = (req.params.code || '').toLowerCase()
-    const username = (req.user.email || '').split('@')[0]
-    const { allowed_to_edit } = quickcheckCode(code, { username })
+    const { allowed_to_edit } = quickcheckCode(code, { userEmail: req.user.email })
 
     if (allowed_to_edit) {
       getFileContentLocal(code)
