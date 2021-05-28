@@ -334,7 +334,7 @@ app.get('/exists/:code', (req, res) => {
       code = code.toLowerCase()
       doesFileExist(code, result => res.json({ exists: result }))
     } else {
-      res.status(404).json({ exists: false })
+      res.status(200).json({ exists: false })
     }
   }
 })
@@ -408,7 +408,7 @@ app.post('/set/:code', (req, res) => {
       .catch(err => res.status(400).json(err))
 
     } else {
-      res.status(404).json({ error: 'Please provide a valid code.', saved: false })
+      res.status(200).json({ error: 'Please provide a valid code.', saved: false })
     }
   }
 })
