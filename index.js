@@ -47,6 +47,7 @@ function quickcheckCode(code, { userEmail = '' }) {
   if (
     code === ''
     || code.includes('/')
+    || code.startsWith('volt')
     || forbidden.codes.includes(code)
     || forbidden_letters_splitted.filter(value => !code_split.includes(value)).length < forbidden_letters_splitted.length
   ) {
