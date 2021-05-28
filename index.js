@@ -1,5 +1,7 @@
 require('dotenv').config()
 
+const { sendInitialStats } = require('./stats.js')
+
 const {
   getFileContentLocal,
   doesFileExist,
@@ -463,6 +465,11 @@ app.get('/:code', (req, res) => {
           hasRedirect
           && (useAs === 'redirect' || !hasUseAs)
         ) {
+          sendInitialStats({
+            url: '/' + code,
+            website: (process.env.umami_volt_link_id || ''),
+            hostname: 'volt.link'
+          }, req.headers)
           res.redirect(content_parsed.redirect)
         } else if (
           hasLinktree
