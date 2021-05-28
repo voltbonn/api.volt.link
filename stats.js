@@ -11,7 +11,7 @@ function trackPageview(payload, headers) {
       referrer: '',
       hostname: '', // 'your-hostname',
       language: '', // 'en-US',
-      screen: '', // '1920x1080',
+      screen: '1920x1080',
       ...payload,
     },
     type: 'pageview'
@@ -43,7 +43,7 @@ function trackEvent(payload, headers) {
       event_value: '', // 'signup-button',
       hostname: '', // 'your-hostname',
       language: '', // 'en-US',
-      screen: '', // '1920x1080',
+      screen: '1920x1080',
       ...payload,
     },
     type: 'event'
