@@ -153,7 +153,7 @@ async function saveFile(filename, content = '') {
   return octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
     ...repoMetadata,
     path: `paths/${filename}.yml`,
-    message: 'Automatic update',
+    message: `Changes in ${filename}`,
     content: Buffer.from(content, 'utf-8').toString('base64'),
     encoding: 'base64',
     sha: prev_sha
