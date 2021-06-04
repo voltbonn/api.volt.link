@@ -12,8 +12,8 @@ if (!tree_data_path.endsWith('/')) {
   tree_data_path = tree_data_path + '/'
 }
 
-function getFilePathLocal (filename) {
-  return tree_data_path + 'paths/' + filename + '.yml'
+function getFilePathLocal(code) {
+  return tree_data_path + 'paths/' + code + '.yml'
 }
 
 const secret = process.env.git_secret || null
@@ -109,11 +109,11 @@ async function getFileInfo (filename) {
 //   return Buffer.from(file.data.content, file.data.encoding).toString('utf-8')
 // }
 
-async function getFileContentLocal(filename){
+async function getFileContentLocal(code){
   return new Promise((resolve, reject) => {
-    fs.stat(getFilePathLocal(filename), (error, stat) => {
+    fs.stat(getFilePathLocal(code), (error, stat) => {
       if (error === null) {
-        fs.readFile(getFilePathLocal(filename), (error, data) => {
+        fs.readFile(getFilePathLocal(code), (error, data) => {
           if (error) {
             console.error(error)
             resolve('')
@@ -146,22 +146,22 @@ async function getFileContentLocal(filename){
 //   return oid
 // }
 
-async function saveFile(filename, content = '') {
-  const fileinfo = await getFileInfo(filename)
+async function saveFile(code, content = '') {
+  const fileinfo = await getFileInfo(code)
   const prev_sha = fileinfo !== null && typeof fileinfo === 'object' ? fileinfo.sha : null
 
   return octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
     ...repoMetadata,
-    path: `paths/${filename}.yml`,
-    message: `Changes in ${filename}`,
+    path: `paths/${code}.yml`,
+    message: `Changes in ${code}`,
     content: Buffer.from(content, 'utf-8').toString('base64'),
     encoding: 'base64',
     sha: prev_sha
   })
 }
 
-function doesFileExist(filename, callback) {
-  fs.stat(getFilePathLocal(filename), (error, stat) => {
+function doesFileExist(code, callback) {
+  fs.stat(getFilePathLocal(code), (error, stat) => {
     if (error === null) {
       callback(true)
     } else if (error.code === 'ENOENT') {
