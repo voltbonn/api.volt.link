@@ -408,7 +408,6 @@ app.post('/set/:code', (req, res) => {
         }
       })
       .catch(err => res.status(400).json(err))
-
     } else {
       res.status(200).json({ error: 'Please provide a valid code.', saved: false })
     }
