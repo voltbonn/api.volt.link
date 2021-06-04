@@ -7,7 +7,7 @@ const { Octokit } = require('@octokit/core')
 // const { restEndpointMethods } = require('@octokit/plugin-rest-endpoint-methods')
 // const crypto = require('crypto')
 
-let tree_data_path = process.env.tree_data_path
+let tree_data_path = process.env.tree_data_path || ''
 if (!tree_data_path.endsWith('/')) {
   tree_data_path = tree_data_path + '/'
 }
