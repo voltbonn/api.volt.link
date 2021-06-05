@@ -329,21 +329,21 @@ a:hover {
 
 app.get('/exists/:code', (req, res) => {
   if (!req.logged_in) {
-    res.status(200).json({ error: 'You are not logged in.' })
+    res.json({ error: 'You are not logged in.' })
   } else {
     let code = req.params.code
     if (!!code && code !== '') {
       code = code.toLowerCase()
       doesFileExist(code, result => res.json({ exists: result }))
     } else {
-      res.status(200).json({ exists: false })
+      res.json({ exists: false })
     }
   }
 })
 
 app.get('/quickcheck/:code', (req, res) => {
   if (!req.logged_in) {
-    res.status(200).json({ error: 'You are not logged in.' })
+    res.json({ error: 'You are not logged in.' })
   } else {
     const response_json = { exists: false, allowed: false }
 
@@ -360,7 +360,7 @@ app.get('/quickcheck/:code', (req, res) => {
 
 app.get('/forbidden_codes', (req, res) => {
   if (!req.logged_in) {
-    res.status(200).json({ error: 'You are not logged in.' })
+    res.json({ error: 'You are not logged in.' })
   } else {
     res.json(forbidden)
   }
@@ -368,7 +368,7 @@ app.get('/forbidden_codes', (req, res) => {
 
 app.post('/set/:code', (req, res) => {
   if (!req.logged_in) {
-    res.status(200).json({ error: 'You are not logged in.' })
+    res.json({ error: 'You are not logged in.' })
   } else {
     const code = (req.params.code || '').toLowerCase()
     const { allowed_to_edit } = quickcheckCode(code, { userEmail: req.user.email })
@@ -409,14 +409,14 @@ app.post('/set/:code', (req, res) => {
       })
       .catch(err => res.status(400).json(err))
     } else {
-      res.status(200).json({ error: 'Please provide a valid code.', saved: false })
+      res.json({ error: 'Please provide a valid code.', saved: false })
     }
   }
 })
 
 app.get('/pull', async (req, res) => {
   if (!req.logged_in) {
-    res.status(200).json({ error: 'You are not logged in.' })
+    res.json({ error: 'You are not logged in.' })
   } else {
     await gitPull()
     res.json({ done: true })
@@ -425,7 +425,7 @@ app.get('/pull', async (req, res) => {
 
 app.get('/get/:code', (req, res) => {
   if (!req.logged_in) {
-    res.status(200).json({ error: 'You are not logged in.' })
+    res.json({ error: 'You are not logged in.' })
   } else {
     let code = req.params.code
     code = code.toLowerCase()
