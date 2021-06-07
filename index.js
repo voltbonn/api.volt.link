@@ -7,6 +7,7 @@ const {
   doesFileExist,
   saveFile,
   gitPull,
+  removeFile,
 } = require('./git_functions.js')
 const { build } = require('./build_linklist.js')
 const yaml = require('js-yaml')
@@ -423,6 +424,62 @@ app.get('/pull', async (req, res) => {
   }
 })
 
+app.get('/rename/:code_old/:code_new', (req, res) => {
+  req.logged_in = true
+  req.user = { email: 'thomas.rosen@volteuropa.org' }
+  if (!req.logged_in) {
+    res.json({ error: 'You are not logged in.' })
+  } else {
+    const code_old = (req.params.code_old || '').toLowerCase()
+    const code_new = (req.params.code_new || '').toLowerCase()
+    const { allowed_to_edit: allowed_to_edit_old_code } = quickcheckCode(code_old, { userEmail: req.user.email })
+    const { allowed_to_edit: allowed_to_edit_new_code } = quickcheckCode(code_new, { userEmail: req.user.email })
+
+    if (allowed_to_edit_old_code && allowed_to_edit_new_code) {
+      doesFileExist(code_new, does_exist => {
+        if (!does_exist) {
+          getFileContentLocal(code_old)
+            .then(content => {
+              content = content.toString() || ''
+              if (content === '') {
+                res.json({ error: 'content_is_empty', saved: false })
+              }else{
+                content = yaml.load(content)
+                if (hasEditPermission(content.permissions, req.user.email)) {
+                  delete content.last_modified
+                  content = {
+                    last_modified: new Date(),
+                    last_modified_by: req.user.email || '',
+                    ...content,
+                  }
+                  content = yaml.dump(content, {
+                    indent: 2,
+                    sortKeys: false,
+                    lineWidth: -1,
+                  })
+
+                  saveFile(code_new, content)
+                    .then(async () => {
+                      await removeFile(code_old)
+                      await gitPull()
+                      res.json({ error: null, saved: true })
+                    })
+                    .catch(error => res.json({ error: error+'', saved: false }))
+                } else {
+                  res.json({ error: 'no_edit_permission', saved: false })
+                }
+              }
+            })
+            .catch(error => res.json({ error: error+'', saved: false }))
+        } else {
+          res.json({ error: 'new_code_already_exists', saved: false })
+        }
+      })
+    } else {
+      res.json({ error: 'no_edit_permission', saved: false })
+    }
+  }
+})
 app.get('/get/:code', (req, res) => {
   if (!req.logged_in) {
     res.json({ error: 'You are not logged in.' })
