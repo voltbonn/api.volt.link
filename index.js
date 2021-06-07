@@ -480,6 +480,43 @@ app.get('/rename/:code_old/:code_new', (req, res) => {
     }
   }
 })
+
+app.get('/delete/:code', (req, res) => {
+  req.logged_in = true
+  req.user = { email: 'thomas.rosen@volteuropa.org' }
+  if (!req.logged_in) {
+    res.json({ error: 'You are not logged in.' })
+  } else {
+    const code = (req.params.code || '').toLowerCase()
+
+    console.log('code', code)
+
+    getFileContentLocal(code)
+      .then(async content => {
+        content = content.toString() || ''
+
+        let isAllowedToEdit = false
+        if (content === '') {
+          isAllowedToEdit = true
+        } else {
+          content = yaml.load(content)
+          if (hasEditPermission(content.permissions, req.user.email)) {
+            isAllowedToEdit = true
+          }
+        }
+
+        if (isAllowedToEdit) {
+          await removeFile(code)
+          await gitPull()
+          res.json({ error: null, deleted: true })
+        } else {
+          res.json({ error: 'no_edit_permission', deleted: false })
+        }
+      })
+      .catch(error => res.json({ error: error + '', deleted: false }))
+  }
+})
+
 app.get('/get/:code', (req, res) => {
   if (!req.logged_in) {
     res.json({ error: 'You are not logged in.' })
