@@ -158,6 +158,24 @@ async function saveFile(code, content = '') {
     sha: prev_sha
   })
 }
+async function removeFile(code) {
+  const fileinfo = await getFileInfo(code)
+  const prev_sha = fileinfo !== null && typeof fileinfo === 'object' ? fileinfo.sha : null
+
+  return new Promise(async resolve => {
+    try {
+      await octokit.request('DELETE /repos/{owner}/{repo}/contents/{path}', {
+        ...repoMetadata,
+        path: `paths/${code}.yml`,
+        message: `Removed ${code}`,
+        sha: prev_sha
+      })
+    } catch(error) {
+      console.error(error)
+    }
+    resolve(true)
+  })
+}
 
 function doesFileExist(code, callback) {
   fs.stat(getFilePathLocal(code), (error, stat) => {
@@ -190,4 +208,5 @@ module.exports = {
   gitPull,
   doesFileExist,
   saveFile,
+  removeFile,
 }
