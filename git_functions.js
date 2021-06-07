@@ -112,17 +112,16 @@ async function getFileInfo (filename) {
 async function getFileContentLocal(code){
   return new Promise((resolve, reject) => {
     fs.stat(getFilePathLocal(code), (error, stat) => {
-      if (error === null) {
+      if (error) {
+        reject(error)
+      }else{
         fs.readFile(getFilePathLocal(code), (error, data) => {
           if (error) {
-            console.error(error)
-            resolve('')
+            reject(error)
           } else {
             resolve(data)
           }
         })
-      } else {
-        resolve('')
       }
     })
   })
