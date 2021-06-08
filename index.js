@@ -300,6 +300,7 @@ app.get('/', (req, res) => {
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<title>volt.link • Linklist and Redirect Server for Volt Europa</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
 body {
@@ -566,6 +567,7 @@ function generateErrorPage(error) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<title>volt.link Error</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
 body {
