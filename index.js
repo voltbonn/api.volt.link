@@ -428,8 +428,6 @@ app.get('/pull', async (req, res) => {
 })
 
 app.get('/rename/:code_old/:code_new', (req, res) => {
-  req.logged_in = true
-  req.user = { email: 'thomas.rosen@volteuropa.org' }
   if (!req.logged_in) {
     res.json({ error: 'You are not logged in.' })
   } else {
