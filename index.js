@@ -540,8 +540,6 @@ app.get('/get/:code', (req, res) => {
   }
 })
 
-
-
 function generateErrorPage(error) {
   let memeFilename = null
 
