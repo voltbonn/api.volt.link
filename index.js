@@ -1,5 +1,7 @@
 require('dotenv').config()
 
+const fs = require('fs')
+const path = require('path')
 const { sendInitialStats } = require('./stats.js')
 
 const {
@@ -537,6 +539,76 @@ app.get('/get/:code', (req, res) => {
   }
 })
 
+
+
+function generateErrorPage(error) {
+  let memeFilename = null
+
+  try {
+    let files = fs.readdirSync('./public/memes/')
+    files = files
+      .filter(file => path.extname(file).toLowerCase() === '.jpg')
+      .filter(Boolean)
+
+    memeFilename = files[Math.floor(Math.random() * files.length)]
+  } catch (error) {
+    console.error(error)
+  }
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+body {
+  font-family: Ubuntu, sans-serif;
+  color: #502379;
+  padding: 32px;
+}
+a,
+a:visited {
+  color: #502379;
+}
+a:hover {
+  opacity: 0.7;
+}
+.meme {
+  width: 400px;
+  max-width: 100%;
+  margin: 32px 0;
+  border: 10px solid #502379;
+}
+</style>
+<script
+  async
+  defer
+  data-website-id="becf9dc6-db9a-42a7-bc64-9637bd885bff"
+  src="https://umami.qiekub.org/umami.js"
+  data-domains="volt.link"
+></script>
+</head>
+<body>
+  <h1>This is an error page!</h1>
+  <p>There was a problem or we couldn't find the page associated with this url. Please contact <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a><!--/sse--> for further information.</p>
+  <p>Go to <a href="https://volteuropa.org">volteuropa.org</a> for information about the Pan-European Political Movement.</p>
+  <br />
+  <br />
+  <strong>Here's a meme for your entertainment:</strong><br/>
+  ${
+    !!memeFilename
+    ? `<img class="meme" src="./memes/${memeFilename}" />`
+    : ''
+  }
+  <br />
+  <br />
+  Detailed error message:<br />
+  <pre><code>${JSON.stringify(error, null, 2)}</code></pre>
+</body>
+</html>
+    `
+}
+
 app.get('/:code', (req, res) => {
   let code = req.params.code
   code = code.toLowerCase()
@@ -576,7 +648,7 @@ app.get('/:code', (req, res) => {
         res.redirect('/')
       }
     })
-    .catch(err => res.status(404).json(err))
+    .catch(error => res.status(404).send(generateErrorPage(error)))
 })
 
 const port = 4000
