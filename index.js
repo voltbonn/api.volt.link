@@ -603,7 +603,7 @@ a:hover {
   }
   <br />
   <br />
-  Detailed error message:<br />
+  <strong>Detailed error message:</strong><br />
   <pre><code>${JSON.stringify(error, null, 2)}</code></pre>
 </body>
 </html>
