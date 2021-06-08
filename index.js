@@ -378,8 +378,18 @@ app.post('/set/:code', (req, res) => {
     const { allowed_to_edit } = quickcheckCode(code, { userEmail: req.user.email })
 
     if (allowed_to_edit) {
-      getFileContentLocal(code)
-      .then(content => {
+      doesFileExist(code, does_exist => {
+        let content = ''
+
+        if (does_exist) {
+          try {
+            const content_tmp = await getFileContentLocal(code)
+            content = content_tmp.toString() || ''
+          } catch (error) {
+            console.error(error)
+          }
+        }
+
         const old_content = yaml.load(content) || {}
 
         let new_content = req.body
