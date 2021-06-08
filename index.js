@@ -22,6 +22,7 @@ const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 
 const forbidden = {
   codes: `
+error
 public
 auth
 auth/google
