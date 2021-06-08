@@ -22,6 +22,7 @@ const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 
 const forbidden = {
   codes: `
+public
 auth
 auth/google
 auth/google/callback
@@ -597,7 +598,7 @@ a:hover {
   <strong>Here's a meme for your entertainment:</strong><br/>
   ${
     !!memeFilename
-    ? `<img class="meme" src="./memes/${memeFilename}" />`
+    ? `<img class="meme" src="./public/memes/${memeFilename}" />`
     : ''
   }
   <br />
