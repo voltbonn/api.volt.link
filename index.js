@@ -378,7 +378,7 @@ app.post('/set/:code', (req, res) => {
     const { allowed_to_edit } = quickcheckCode(code, { userEmail: req.user.email })
 
     if (allowed_to_edit) {
-      doesFileExist(code, does_exist => {
+      doesFileExist(code, async does_exist => {
         let content = ''
 
         if (does_exist) {
