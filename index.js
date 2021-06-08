@@ -421,7 +421,6 @@ app.post('/set/:code', (req, res) => {
           res.status(200).json({ error: 'Plase provide a valid content.', saved: false })
         }
       })
-      .catch(error => res.status(200).json({ error, saved: false }))
     } else {
       res.json({ error: 'Please provide a valid code.', saved: false })
     }
