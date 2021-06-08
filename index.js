@@ -598,7 +598,7 @@ a:hover {
   <strong>Here's a meme for your entertainment:</strong><br/>
   ${
     !!memeFilename
-    ? `<img class="meme" src="./public/memes/${memeFilename}" />`
+    ? `<img class="meme" src="/public/memes/${memeFilename}" />`
     : ''
   }
   <br />
