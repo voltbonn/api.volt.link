@@ -403,15 +403,15 @@ app.post('/set/:code', (req, res) => {
               res.json({ error: null, saved: true })
               await gitPull()
             })
-              .catch(error => res.status(400).json({ error, saved: false }))
+              .catch(error => res.status(200).json({ error, saved: false }))
           } else {
-            res.status(403).json({ error: 'no_edit_permission', saved: false })
+            res.status(200).json({ error: 'no_edit_permission', saved: false })
           }
         } else {
-          res.status(400).json({ error: 'Plase provide a valid content.', saved: false })
+          res.status(200).json({ error: 'Plase provide a valid content.', saved: false })
         }
       })
-      .catch(err => res.status(400).json(err))
+      .catch(error => res.status(200).json({ error, saved: false }))
     } else {
       res.json({ error: 'Please provide a valid code.', saved: false })
     }
