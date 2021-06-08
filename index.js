@@ -546,7 +546,7 @@ function generateErrorPage(error) {
   let memeFilename = null
 
   try {
-    let files = fs.readdirSync('./public/memes/')
+    let files = fs.readdirSync('./public/public/memes/')
     files = files
       .filter(file => path.extname(file).toLowerCase() === '.jpg')
       .filter(Boolean)
