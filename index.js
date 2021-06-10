@@ -11,7 +11,7 @@ const {
   gitPull,
   removeFile,
 } = require('./git_functions.js')
-const { build } = require('./build_linklist.js')
+const { build, buildLoginPage } = require('./build_linklist.js')
 const yaml = require('js-yaml')
 
 const express = require('express')
@@ -635,21 +635,34 @@ app.get('/:code', (req, res) => {
         const hasRedirect = !!content_parsed.redirect && content_parsed.redirect !== ''
         const hasLinktree = !!content_parsed.items
 
-        if (
-          hasRedirect
-          && (useAs === 'redirect' || !hasUseAs)
-        ) {
-          sendInitialStats({
-            url: '/' + code,
-            website: (process.env.umami_volt_link_id || ''),
-            hostname: 'volt.link'
-          }, req.headers)
-          res.redirect(content_parsed.redirect)
-        } else if (
-          hasLinktree
-          && (useAs === 'linklist' || !hasUseAs)
-        ) {
+        const needsToLogin = false
+        if (!req.logged_in) {
+          if (
+            !!content_parsed.permissions
+            && Array.isArray(content_parsed.permissions)
+            && content_parsed.permissions.length > 0
+          ) {
+            needsToLogin = content_parsed.permissions.filter(p => p.role === 'viewer' && p.value === '@volteuropa.org').length > 0
+          }
+        }
+
+        if (needsToLogin) {
+          res.send(buildLoginPage({ code, acceptLanguage: req.headers['accept-language'] }))
         } else {
+          if (
+            hasRedirect
+            && (useAs === 'redirect' || !hasUseAs)
+          ) {
+            sendInitialStats({
+              url: '/' + code,
+              website: (process.env.umami_volt_link_id || ''),
+              hostname: 'volt.link'
+            }, req.headers)
+            res.redirect(content_parsed.redirect)
+          } else if (
+            hasLinktree
+            && (useAs === 'linklist' || !hasUseAs)
+          ) {
           res.send(build({ code, ...content_parsed, acceptLanguage: req.headers['accept-language'] }))
           } else {
             res.status(404).send(generateErrorPage(error))

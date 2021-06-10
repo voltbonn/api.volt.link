@@ -61,7 +61,94 @@ function fluentByAny(any = '', userLocales = ['en'], fallback = '') {
   return any
 }
 
+function buildLoginPage({
+  code = '',
+  acceptLanguage = 'en'
+}) {
+  if (typeof acceptLanguage !== 'string' || acceptLanguage === '') {
+    acceptLanguage = 'en'
+  }
+
+  const userLocales = acceptedLanguages(acceptLanguage)
+
+  const translations = {
+    title: fluentByObject({
+      en: 'This page is Volt only!'
+    }, userLocales),
+    description: fluentByObject({
+      en: 'You need to login with a Volt Europa account to view this page.<br/>Contact your local community lead if you are unsure about your Volt Europa account.'
+    }, userLocales),
+    login_button: fluentByObject({
+      en: 'Login',
+    }, userLocales)
+  }
+
+  const locales = ['en']
+  const global_locale = negotiateLanguages(
+    userLocales,
+    locales,
+    {
+      defaultLocale: locales[0],
+      strategy: 'lookup'
+    }
+  )
+
+  const canonical = !!code && code !== '' ? `https://volt.link/${code}` : 'https://volt.link/'
+
+  return `
+  <!DOCTYPE html>
+  <html lang="${global_locale}">
+    <head>
+      <meta charset="utf-8" />
+      <link rel="icon" href="/volt-logo-white-64.png" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <meta name="theme-color" content="#502379" />
+      <link rel="apple-touch-icon" href="/volt-logo-white-192.png" />
+      <link rel="manifest" href="/manifest.json" />
+
+      <script
+        async
+        defer
+        data-website-id="becf9dc6-db9a-42a7-bc64-9637bd885bff"
+        src="https://umami.qiekub.org/umami.js"
+        data-domains="volt.link"
+      ></script>
+
+      <link rel="stylesheet" href="/index.css" type="text/css">
+      <link rel="stylesheet" href="/index-overwrites.css" type="text/css">
+      <link rel="stylesheet" href="/Ubuntu/index.css" type="text/css">
+      <title>${translations.title}</title>
+
+      <link rel="canonical" href="${canonical}" />
+      <link rel="me" href="https://twitter.com/volteuropa" />
+
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "url": "${canonical}"
+        }
+      </script>
+
+      <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
+      <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-700.woff2" as="font" type="font/woff2" crossorigin/>
+    </head>
+    <body>
+      <div class="app spine_aligned" dir="auto">
         <main class="contentWrapper">
+          <h1>${translations.title}</h1>
+          <br />
+          <p>${translations.description}</p>
+          <a href="https://volt.link/login?redirect_to=${encodeURIComponent(canonical)}">
+            <button style="margin-left: 0; margin-right: 0;">${translations.login_button}</button>
+          </a>
+        </main>
+      </div>
+    </body>
+  </html>
+  `
+}
+
 function build({
   code = '',
   locales,
@@ -279,5 +366,6 @@ function build({
 }
 
 module.exports = {
-  build
+  build,
+  buildLoginPage
 }
