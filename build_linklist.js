@@ -70,7 +70,8 @@ function build({
   overwrites = {},
   items = [],
   last_modified = new Date(),
-}, { acceptLanguage }) {
+  acceptLanguage = 'en'
+}) {
   if (typeof acceptLanguage !== 'string' || acceptLanguage === '') {
     acceptLanguage = 'en'
   }
