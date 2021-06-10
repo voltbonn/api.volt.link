@@ -665,7 +665,12 @@ app.get('/:code', (req, res) => {
             hasLinktree
             && (useAs === 'linklist' || !hasUseAs)
           ) {
-          res.send(build({ code, ...content_parsed, acceptLanguage: req.headers['accept-language'] }))
+            res.send(build({
+              ...content_parsed,
+              code,
+              logged_in: req.logged_in,
+              acceptLanguage: req.headers['accept-language'],
+            }))
           } else {
             console.log('else')
             res.status(404).send(generateErrorPage(error))

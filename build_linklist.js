@@ -158,7 +158,8 @@ function build({
   overwrites = {},
   items = [],
   last_modified = new Date(),
-  acceptLanguage = 'en'
+  acceptLanguage = 'en',
+  logged_in = false,
 }) {
   if (typeof acceptLanguage !== 'string' || acceptLanguage === '') {
     acceptLanguage = 'en'
@@ -179,7 +180,11 @@ function build({
     privacy_policy: fluentByObject({
       en: 'Privacy Policy',
       de: 'Datenschutz'
-    }, userLocales)
+    }, userLocales),
+    logout: fluentByObject({
+      en: 'Logout',
+      de: 'Abmelden'
+    }, userLocales),
   }
 
   let global_locale = 'en'
@@ -352,13 +357,15 @@ function build({
         </main>
       </div>
       <footer>
-        <a href="${imprint_link}">
-          ${translations.imprint}
-        </a>
-        &nbsp; • &nbsp;
-        <a href="${privacy_policy_link}">
-          ${translations.privacy_policy}
-        </a>
+        ${
+          [
+            `<a href="${imprint_link}">${translations.imprint}</a>`,
+            `<a href="${privacy_policy_link}">${translations.privacy_policy}</a>`,
+            (logged_in ? `<a href="https://volt.link/logout?redirect_to=${encodeURIComponent(canonical)}">${translations.logout}</a>` : false),
+          ]
+          .filter(Boolean)
+          .join('&nbsp; • &nbsp;')
+        }
       </footer>
     </body>
   </html>
