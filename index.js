@@ -650,11 +650,13 @@ app.get('/:code', (req, res) => {
           && (useAs === 'linklist' || !hasUseAs)
         ) {
         } else {
-          res.redirect('/')
           res.send(build({ code, ...content_parsed, acceptLanguage: req.headers['accept-language'] }))
+          } else {
+            res.status(404).send(generateErrorPage(error))
+          }
         }
       } else {
-        res.redirect('/')
+        res.status(404).send(generateErrorPage(error))
       }
     })
     .catch(error => res.status(404).send(generateErrorPage(error)))

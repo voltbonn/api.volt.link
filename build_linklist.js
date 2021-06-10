@@ -61,6 +61,7 @@ function fluentByAny(any = '', userLocales = ['en'], fallback = '') {
   return any
 }
 
+        <main class="contentWrapper">
 function build({
   code = '',
   locales,
