@@ -635,7 +635,7 @@ app.get('/:code', (req, res) => {
         const hasRedirect = !!content_parsed.redirect && content_parsed.redirect !== ''
         const hasLinktree = !!content_parsed.items
 
-        const needsToLogin = false
+        let needsToLogin = false
         if (!req.logged_in) {
           if (
             !!content_parsed.permissions
