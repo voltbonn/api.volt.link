@@ -622,8 +622,8 @@ app.get('/:code', (req, res) => {
   let code = req.params.code
   code = code.toLowerCase()
   getFileContentLocal(code)
-    .then(content => {
-      if (!!content) {
+    .then((content = '') => {
+      // if (!!content) {
         const content_parsed = yaml.load(content) || {}
 
         let useAs = null
@@ -668,9 +668,9 @@ app.get('/:code', (req, res) => {
             res.status(404).send(generateErrorPage(error))
           }
         }
-      } else {
-        res.status(404).send(generateErrorPage(error))
-      }
+      // } else {
+      //   res.status(404).send(generateErrorPage(error))
+      // }
     })
     .catch(error => res.status(404).send(generateErrorPage(error)))
 })
