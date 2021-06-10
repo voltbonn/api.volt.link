@@ -222,7 +222,7 @@ app.get(
   function (req, res) {
     const redirect_to = req.session.redirect_to
     req.session.redirect_to = null
-    res.redirect(redirect_to || '/')
+    res.redirect(typeof redirect_to === 'string' ? redirect_to : '/')
   }
 )
 app.get('/auth/failure', function (req, res) {
@@ -265,9 +265,9 @@ app.get('/logout', function (req, res) {
     if (error) {
       console.error(error)
     } else {
-      const redirect_to = req.session.redirect_to + '' // TODO: Why does this need to be converted to a string? To need pass a pointer but the value?
+      const redirect_to = req.session.redirect_to
       req.session.redirect_to = null
-      res.redirect(redirect_to || '/') // send the updated cookie to the user and go to the start page
+      res.redirect(typeof redirect_to === 'string' ? redirect_to : '/') // send the updated cookie to the user and go to the start page
     }
   })
 })
