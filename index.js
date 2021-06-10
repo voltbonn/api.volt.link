@@ -503,8 +503,6 @@ app.get('/delete/:code', (req, res) => {
   } else {
     const code = (req.params.code || '').toLowerCase()
 
-    console.log('code', code)
-
     getFileContentLocal(code)
       .then(async content => {
         content = content.toString() || ''
@@ -648,8 +646,6 @@ app.get('/:code', (req, res) => {
           }
         }
 
-        console.log('needsToLogin', needsToLogin)
-
         if (needsToLogin) {
           res.send(buildLoginPage({ code, acceptLanguage: req.headers['accept-language'] }))
         } else {
@@ -674,7 +670,6 @@ app.get('/:code', (req, res) => {
               acceptLanguage: req.headers['accept-language'],
             }))
           } else {
-            console.log('else')
             res.status(404).send(generateErrorPage(error))
           }
         }
@@ -682,10 +677,7 @@ app.get('/:code', (req, res) => {
       //   res.status(404).send(generateErrorPage(error))
       // }
     })
-    .catch(error => {
-      console.log('catch-error', error)
-      res.status(404).send(generateErrorPage(error))
-    })
+    .catch(error => res.status(404).send(generateErrorPage(error)))
 })
 
 const port = 4000
