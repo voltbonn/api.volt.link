@@ -325,6 +325,7 @@ app.get('/', (req, res) => {
 </head>
 <body>
 <div class="app spine_aligned" dir="auto">
+<main class="contentWrapper">
   <h1>Linklist and Redirect Server for Volt Europa</h1>
   <p>
   <!--sse-->Contact: <a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a><br><!--/sse-->
@@ -341,7 +342,8 @@ app.get('/', (req, res) => {
     `
   }
   </p>
-  </div>
+</main>
+</div>
 </body>
 </html>
 `)
@@ -611,14 +613,13 @@ function generateErrorPage(error) {
 </head>
 <body>
 <div class="app spine_aligned" dir="auto">
+<main class="contentWrapper">
   <h1>This is an error page!</h1>
   <p>
     There was a problem or we couldn't find the page associated with this url.<br>
     Please contact <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a><!--/sse--> for further information.
   </p>
   <p>Go to <a href="https://volteuropa.org">volteuropa.org</a> for information about the Pan-European Political Movement.</p>
-  <br />
-  <br />
   <br />
   <h3>Here's a meme for your entertainment:</h3>
   ${
@@ -627,10 +628,9 @@ function generateErrorPage(error) {
     : ''
   }
   <br />
-  <br />
-  <br />
   <h3>Detailed error message:</h3>
   <pre><code>${JSON.stringify(error, null, 2)}</code></pre>
+  </main>
 </div>
 </body>
 </html>
