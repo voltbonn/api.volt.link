@@ -61,7 +61,80 @@ function fluentByAny(any = '', userLocales = ['en'], fallback = '') {
   return any
 }
 
-function buildLoginPage({
+function renderErrorPage(error) {
+  let memeFilename = null
+
+  try {
+    let files = fs.readdirSync('./public/public/memes/')
+    files = files
+      .filter(file => path.extname(file).toLowerCase() === '.jpg')
+      .filter(Boolean)
+
+    memeFilename = files[Math.floor(Math.random() * files.length)]
+  } catch (error) {
+    console.error(error)
+  }
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="/volt-logo-white-64.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#502379" />
+  <link rel="apple-touch-icon" href="/volt-logo-white-192.png" />
+  <link rel="manifest" href="/manifest.json" />
+
+  <script
+    async
+    defer
+    data-website-id="becf9dc6-db9a-42a7-bc64-9637bd885bff"
+    src="https://umami.qiekub.org/umami.js"
+    data-domains="volt.link"
+  ></script>
+
+  <link rel="stylesheet" href="/index.css" type="text/css">
+  <link rel="stylesheet" href="/index-overwrites.css" type="text/css">
+  <link rel="stylesheet" href="/Ubuntu/index.css" type="text/css">
+
+  <title>volt.link Error</title>
+
+  <style>
+  .meme {
+    width: 400px;
+    max-width: 100%;
+    margin: 32px 0;
+    border: 10px solid #502379;
+  }
+  </style>
+</head>
+<body>
+<div class="app spine_aligned" dir="auto">
+<main class="contentWrapper">
+  <h1>This is an error page!</h1>
+  <p>
+    There was a problem or we couldn't find the page associated with this url.<br>
+    Please contact <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a><!--/sse--> for further information.
+  </p>
+  <p>Go to <a href="https://volteuropa.org">volteuropa.org</a> for information about the Pan-European Political Movement.</p>
+  <br />
+  <h3>Here's a meme for your entertainment:</h3>
+  ${!!memeFilename
+      ? `<a href="https://volt.link/memes/"><img class="meme" src="/public/memes/${memeFilename}" /></a>`
+      : ''
+    }
+  <br />
+  <h3>Detailed error message:</h3>
+  <pre><code>${JSON.stringify(error, null, 2)}</code></pre>
+  </main>
+</div>
+</body>
+</html>
+    `
+}
+
+function renderLoginPage({
   code = '',
   acceptLanguage = 'en'
 }) {
@@ -149,7 +222,7 @@ function buildLoginPage({
   `
 }
 
-function build({
+function renderMicropage({
   code = '',
   locales,
   title: title_text = '',
@@ -373,6 +446,7 @@ function build({
 }
 
 module.exports = {
-  build,
-  buildLoginPage
+  renderErrorPage,
+  renderLoginPage,
+  renderMicropage,
 }
