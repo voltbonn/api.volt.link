@@ -302,34 +302,46 @@ app.get('/', (req, res) => {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>volt.link • Linklist and Redirect Server for Volt Europa</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-body {
-  font-family: Ubuntu, sans-serif;
-  color: #502379;
-  padding: 32px;
-}
-a,
-a:visited {
-  color: #502379;
-}
-a:hover {
-  opacity: 0.7;
-}
-</style>
-<script
-  async
-  defer
-  data-website-id="becf9dc6-db9a-42a7-bc64-9637bd885bff"
-  src="https://umami.qiekub.org/umami.js"
-  data-domains="volt.link"
-></script>
+  <meta charset="utf-8" />
+  <link rel="icon" href="/volt-logo-white-64.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#502379" />
+  <link rel="apple-touch-icon" href="/volt-logo-white-192.png" />
+  <link rel="manifest" href="/manifest.json" />
+
+  <script
+    async
+    defer
+    data-website-id="becf9dc6-db9a-42a7-bc64-9637bd885bff"
+    src="https://umami.qiekub.org/umami.js"
+    data-domains="volt.link"
+  ></script>
+
+  <link rel="stylesheet" href="/index.css" type="text/css">
+  <link rel="stylesheet" href="/index-overwrites.css" type="text/css">
+  <link rel="stylesheet" href="/Ubuntu/index.css" type="text/css">
+
+  <title>volt.link • Linklist and Redirect Server for Volt Europa</title>
 </head>
 <body>
+<div class="app spine_aligned" dir="auto">
   <h1>Linklist and Redirect Server for Volt Europa</h1>
-  <!--sse-->Contact: <a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a></br><!--/sse-->
-  Example: <a href="https://volt.link/bonn">volt.link/bonn</a>
+  <p>
+  <!--sse-->Contact: <a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a><br><!--/sse-->
+  <br>
+  Example Micropage: <a href="https://volt.link/bonn">volt.link/bonn</a><br>
+  Example Redirect: <a href="https://volt.link/🇪🇺">volt.link/🇪🇺</a><br>
+  ${
+    req.logged_in
+    ? ''
+    : `
+    <br>
+    <a href="https://edit.volt.link/">Edit volt.link</a><br>
+    <a href="https://volt.link/logout">Logout</a>
+    `
+  }
+  </p>
+  </div>
 </body>
 </html>
 `)
@@ -567,43 +579,48 @@ function generateErrorPage(error) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>volt.link Error</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-body {
-  font-family: Ubuntu, sans-serif;
-  color: #502379;
-  padding: 32px;
-}
-a,
-a:visited {
-  color: #502379;
-}
-a:hover {
-  opacity: 0.7;
-}
-.meme {
-  width: 400px;
-  max-width: 100%;
-  margin: 32px 0;
-  border: 10px solid #502379;
-}
-</style>
-<script
-  async
-  defer
-  data-website-id="becf9dc6-db9a-42a7-bc64-9637bd885bff"
-  src="https://umami.qiekub.org/umami.js"
-  data-domains="volt.link"
-></script>
+  <meta charset="utf-8" />
+  <link rel="icon" href="/volt-logo-white-64.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#502379" />
+  <link rel="apple-touch-icon" href="/volt-logo-white-192.png" />
+  <link rel="manifest" href="/manifest.json" />
+
+  <script
+    async
+    defer
+    data-website-id="becf9dc6-db9a-42a7-bc64-9637bd885bff"
+    src="https://umami.qiekub.org/umami.js"
+    data-domains="volt.link"
+  ></script>
+
+  <link rel="stylesheet" href="/index.css" type="text/css">
+  <link rel="stylesheet" href="/index-overwrites.css" type="text/css">
+  <link rel="stylesheet" href="/Ubuntu/index.css" type="text/css">
+
+  <title>volt.link Error</title>
+
+  <style>
+  .meme {
+    width: 400px;
+    max-width: 100%;
+    margin: 32px 0;
+    border: 10px solid #502379;
+  }
+  </style>
 </head>
 <body>
+<div class="app spine_aligned" dir="auto">
   <h1>This is an error page!</h1>
-  <p>There was a problem or we couldn't find the page associated with this url. Please contact <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a><!--/sse--> for further information.</p>
+  <p>
+    There was a problem or we couldn't find the page associated with this url.<br>
+    Please contact <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a><!--/sse--> for further information.
+  </p>
   <p>Go to <a href="https://volteuropa.org">volteuropa.org</a> for information about the Pan-European Political Movement.</p>
   <br />
   <br />
-  <strong>Here's a meme for your entertainment:</strong><br/>
+  <br />
+  <h3>Here's a meme for your entertainment:</h3>
   ${
     !!memeFilename
     ? `<a href="https://volt.link/memes/"><img class="meme" src="/public/memes/${memeFilename}" /></a>`
@@ -611,8 +628,10 @@ a:hover {
   }
   <br />
   <br />
-  <strong>Detailed error message:</strong><br />
+  <br />
+  <h3>Detailed error message:</h3>
   <pre><code>${JSON.stringify(error, null, 2)}</code></pre>
+</div>
 </body>
 </html>
     `
