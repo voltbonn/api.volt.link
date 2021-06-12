@@ -127,10 +127,11 @@ function renderErrorPage(error) {
   <p>Go to <a href="https://volteuropa.org">volteuropa.org</a> for information about the Pan-European Political Movement.</p>
   <br />
   <h3>Here's a meme for your entertainment:</h3>
-  ${!!memeFilename
-      ? `<a href="https://volt.link/memes/"><img class="meme" src="/public/memes/${memeFilename}" /></a>`
-      : ''
-    }
+  ${
+    memeFilename !== null
+    ? `<a href="https://volt.link/memes/"><img class="meme" src="/public/memes/${memeFilename}" /></a>`
+    : ''
+  }
   <br />
   <h3>Detailed error message:</h3>
   <pre><code>${JSON.stringify(error, null, 2)}</code></pre>
