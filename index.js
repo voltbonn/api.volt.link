@@ -42,6 +42,7 @@ pull
 exists
 get
 set
+list
 `
   .split('\n')
   .filter(Boolean),
