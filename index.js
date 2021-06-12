@@ -14,6 +14,7 @@ const {
   renderErrorPage,
   renderLoginPage,
   renderMicropage,
+  renderOverview,
 } = require('./render.js')
 const yaml = require('js-yaml')
 
@@ -569,6 +570,12 @@ app.get('/get/:code', (req, res) => {
   }
 })
 
+app.get('/list', async (req, res) => {
+  res.redirect('/list/micropages')
+})
+app.get('/list/:filter', async (req, res) => {
+  res.send(await renderOverview({ query: req.query, acceptLanguage: req.headers['accept-language'], filter: req.params.filter }))
+})
 
 app.get('/:code', (req, res) => {
   let code = req.params.code

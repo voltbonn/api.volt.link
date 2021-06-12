@@ -1,5 +1,9 @@
 const { negotiateLanguages, acceptedLanguages } = require('@fluent/langneg')
 
+const {
+  readCache,
+} = require('./git_functions.js')
+
 function fluentByObject(object = {}, userLocales = ['en']){
   const supportedLocales = Object.keys(object)
 
@@ -445,8 +449,229 @@ function renderMicropage({
   `
 }
 
+async function renderOverviewItems({ items, translations, userLocales }){
+  return `<div class="items">
+    ${items
+      .map(entry => {
+        const code = entry[0]
+        let {
+          use_as,
+          title,
+          description,
+          permissions,
+          last_modified,
+        } = entry[1]
+
+        title = fluentByAny(title, userLocales, '')
+        if (title === '') {
+          title = code
+        }
+
+        description = fluentByAny(description, userLocales, '')
+
+        return `<div>
+          <a href="https://volt.link/${code}"><h2 dir="auto" tabindex="0" style="display: inline-block;">${title}</h2></a>
+          ${description !== '' ? `<p dir="auto">${description.replace(/\n+/g, '\n').split('\n').join('<br>')}</p>` : ''}
+          <p>${[
+            // (use_as === 'redirect' || use_as === 'linklist' ? translations[use_as] : ''),
+            new Date(last_modified).toUTCString(),
+            '/' + code,
+          ]
+            .join(' • ')
+          }</p>
+        </div>`
+      })
+      .filter(Boolean)
+      .join('')
+    }
+  </div>`
+}
+
+async function renderOverview({
+  acceptLanguage = 'en',
+  logged_in = false,
+  query = {},
+  filter = '',
+}) {
+  if (typeof acceptLanguage !== 'string' || acceptLanguage === '') {
+    acceptLanguage = 'en'
+  }
+
+  const userLocales = acceptedLanguages(acceptLanguage)
+
+  const translations = {
+    title: fluentByObject({
+      en: 'All Micropages and Redirects',
+      de: 'All Microseiten und Weiterleitungen'
+    }, userLocales),
+    description: fluentByObject({
+      en: '',
+    }, userLocales),
+
+    imprint: fluentByObject({
+      en: 'Imprint',
+      de: 'Impressum'
+    }, userLocales),
+    privacy_policy: fluentByObject({
+      en: 'Privacy Policy',
+      de: 'Datenschutz'
+    }, userLocales),
+    logout: fluentByObject({
+      en: 'Logout',
+      de: 'Abmelden'
+    }, userLocales),
+
+    linklist: fluentByObject({
+      en: 'Micropage',
+      de: 'Microseite'
+    }, userLocales),
+    redirect: fluentByObject({
+      en: 'Redirect',
+      de: 'Weiterleitung'
+    }, userLocales),
+
+    micropages: fluentByObject({
+      en: 'Micropages',
+      de: 'Microseiten'
+    }, userLocales),
+    redirects: fluentByObject({
+      en: 'Redirects',
+      de: 'Weiterleitungen'
+    }, userLocales),
+    people: fluentByObject({
+      en: 'People',
+      de: 'Personen'
+    }, userLocales),
+  }
+
+  const locales = ['en', 'de']
+  let global_locale = negotiateLanguages(
+    userLocales,
+    locales,
+    {
+      defaultLocale: locales[0],
+      strategy: 'lookup'
+    }
+  )
+
+  const items = Object.entries(await readCache())
+
+  let the_list = null
+
+  if (typeof filter !== 'string' || filter === '') {
+    filter = 'micropages'
+  }
+
+  switch (filter) {
+    case 'micropages':
+      the_list = items.filter(entry => !entry[0].includes('.') && (entry[1].use_as === 'micropage' || entry[1].use_as === 'linklist'))
+      break
+    case 'redirects':
+      the_list = items.filter(entry => !entry[0].includes('.') && entry[1].use_as === 'redirect')
+      break
+    case 'people':
+      the_list = items.filter(entry => entry[0].includes('.'))
+      break
+  }
+
+  if (the_list !== null) {
+    let filters = ['micropages', 'redirects', 'people']
+    the_list = `
+      <br>
+      <div class="buttonRow usesLinks">
+      ${
+        filters
+        .map(filter_name => {
+          if (filter_name === filter) {
+            return `<a><button class="choosen">${translations[filter_name]}</button></a>`
+          }
+          return `<a href="/list/${filter_name}"><button>${translations[filter_name]}</button></a>`
+        })
+        .join(' ')
+      }
+      </div>
+      ${await renderOverviewItems({ items: the_list, translations, userLocales })}
+    `
+  } else {
+    the_list = ''
+  }
+
+  const canonical = 'https://volt.link/list'
+
+  return `
+  <!DOCTYPE html>
+  <html lang="${global_locale}">
+    <head>
+      <meta charset="utf-8" />
+      <link rel="icon" href="/volt-logo-white-64.png" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <meta name="theme-color" content="#502379" />
+      <link rel="apple-touch-icon" href="/volt-logo-white-192.png" />
+      <link rel="manifest" href="/manifest.json" />
+
+      <script
+        async
+        defer
+        data-website-id="becf9dc6-db9a-42a7-bc64-9637bd885bff"
+        src="https://umami.qiekub.org/umami.js"
+        data-domains="volt.link"
+      ></script>
+
+      <link rel="stylesheet" href="/index.css" type="text/css">
+      <link rel="stylesheet" href="/index-overwrites.css" type="text/css">
+      <link rel="stylesheet" href="/Ubuntu/index.css" type="text/css">
+      <title>${translations.title}</title>
+
+      <link rel="canonical" href="${canonical}" />
+      <link rel="me" href="https://twitter.com/volteuropa" />
+      <meta name="description" content="${translations.description}" />
+      <meta itemprop="name" content="${translations.title}" />
+      <meta itemprop="description" content="${translations.description}" />
+
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "url": "${canonical}"
+        }
+      </script>
+
+      <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
+      <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-700.woff2" as="font" type="font/woff2" crossorigin/>
+
+      <style>
+        :root {
+          --basis: 0.4rem;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="app spine_aligned" dir="auto">
+        <main class="contentWrapper">
+          <h1>${translations.title}</h1>
+          <p>${translations.description}</p>
+          ${the_list}
+        </main>
+      </div>
+      <footer>
+        ${
+          [
+            `<a href="https://www.volteuropa.org/legal">${translations.imprint}</a>`,
+            `<a href="https://www.volteuropa.org/privacy">${translations.privacy_policy}</a>`,
+            (logged_in ? `<a href="https://volt.link/logout?redirect_to=${encodeURIComponent(canonical)}">${translations.logout}</a>` : false),
+          ]
+          .filter(Boolean)
+          .join('&nbsp; • &nbsp;')
+        }
+      </footer>
+    </body>
+  </html>
+  `
+}
+
 module.exports = {
   renderErrorPage,
   renderLoginPage,
   renderMicropage,
+  renderOverview,
 }
