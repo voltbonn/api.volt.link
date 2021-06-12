@@ -1,3 +1,6 @@
+const fs = require('fs')
+const path = require('path')
+
 const { negotiateLanguages, acceptedLanguages } = require('@fluent/langneg')
 
 const {
