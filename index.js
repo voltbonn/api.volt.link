@@ -334,12 +334,12 @@ app.get('/', (req, res) => {
   <link rel="stylesheet" href="/index-overwrites.css" type="text/css">
   <link rel="stylesheet" href="/Ubuntu/index.css" type="text/css">
 
-  <title>volt.link • Linklist and Redirect Server for Volt Europa</title>
+  <title>volt.link • Micropage and Redirect Server for Volt Europa</title>
 </head>
 <body>
 <div class="app spine_aligned" dir="auto">
 <main class="contentWrapper">
-  <h1>Linklist and Redirect Server for Volt Europa</h1>
+  <h1>Micropage and Redirect Server for Volt Europa</h1>
   <p>
   <!--sse-->Contact: <a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a><br><!--/sse-->
   <br>
