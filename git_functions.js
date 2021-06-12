@@ -3,6 +3,7 @@ require('dotenv').config()
 const execShPromise = require('exec-sh').promise
 
 const fs = require('fs')
+const yaml = require('js-yaml')
 const { Octokit } = require('@octokit/core')
 // const { restEndpointMethods } = require('@octokit/plugin-rest-endpoint-methods')
 // const crypto = require('crypto')
@@ -194,12 +195,80 @@ async function gitPull() {
         cwd: tree_data_path,
         stdio: null // "stdio: null" for no output
       })
+      await writeCache()
     } catch (error) {
       console.error('Error: ', error)
       console.error('Stderr: ', error.stderr)
       console.error('Stdout: ', error.stdout)
     }
   }
+}
+
+async function rebuildCache() {
+  return new Promise((resolve, reject) => {
+    fs.readdir(tree_data_path + 'paths/', async (error, files) => {
+      if (error) {
+        reject(error)
+      } else {
+        files = (
+          await Promise.all(
+            files.map(filename => new Promise((resolve) => {
+              if (!filename.endsWith('.yml')) {
+                resolve(false)
+              } else {
+                fs.readFile(tree_data_path + 'paths/' + filename, (error, content) => {
+                  if (error) {
+                    resolve(false)
+                  } else {
+                    content = content.toString() || ''
+                    if (content.length > 0) {
+                      content = yaml.load(content) || false
+                      if (!!content) {
+                        filename = filename.substring(0, filename.length - 4)
+                        resolve({filename, content})
+                      } else {
+                        resolve(false)
+                      }
+                    } else {
+                      resolve(false)
+                    }
+                  }
+                })
+              }
+            }))
+          )
+        )
+        .filter(Boolean)
+        .reduce((obj, {filename, content}) => {
+          obj[filename] = content
+          return obj
+        }, {})
+
+        resolve(files)
+      }
+    })
+  })
+}
+
+const cacheFolderPath = './cache/'
+const cacheFilePath = cacheFolderPath + 'paths.json'
+
+async function writeCache() {
+  try {
+    await fs.promises.access(cacheFolderPath)
+  } catch (error) {
+    try {
+      await fs.promises.mkdir(cacheFolderPath)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  return await fs.promises.writeFile(cacheFilePath, JSON.stringify(await rebuildCache()), 'utf-8')
+}
+
+async function readCache() {
+  return JSON.parse(await fs.promises.readFile(cacheFilePath, 'utf-8'))
 }
 
 module.exports = {
@@ -209,4 +278,7 @@ module.exports = {
   doesFileExist,
   saveFile,
   removeFile,
+  rebuildCache,
+  writeCache,
+  readCache,
 }

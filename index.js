@@ -10,6 +10,7 @@ const {
   saveFile,
   gitPull,
   removeFile,
+  writeCache,
 } = require('./git_functions.js')
 const {
   renderErrorPage,
@@ -456,6 +457,9 @@ app.get('/pull', async (req, res) => {
     await gitPull()
     res.json({ done: true })
   }
+})
+app.get('/writeCache', async (req, res) => {
+  writeCache()
 })
 
 app.get('/rename/:code_old/:code_new', (req, res) => {
