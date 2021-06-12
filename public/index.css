@@ -38,7 +38,7 @@
   --font-add: 1rem;
 }
 
-*{
+* {
   margin: 0;
   padding: 0;
   font-family: 'Ubuntu', 'Noto Kufi Arabic', 'Geeza Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
@@ -90,7 +90,7 @@ html[lang="ar"] { /* for arabic */
   letter-spacing: 0 !important;
 }
 
-body{
+body {
   background: var(--background);
   color: var(--on-background);
 
@@ -98,12 +98,17 @@ body{
   --body2-font-size: calc(var(--font-add) + var(--basis_x0_5));
   font-size: var(--body-font-size);
 }
+
+code {
+  font-family: 'Ubuntu Mono', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
 a,
-a:visited{
+a:visited {
   color: var(--on-background);
 }
 a:hover,
-a:focus{
+a:focus {
   color: var(--on-background-contrast);
 }
 
@@ -112,37 +117,46 @@ footer {
   text-align: center;
 }
 
-h1{
+h1 {
   font-size: calc(var(--font-add) + var(--basis_x4));
   line-height: 0.9;
   /* margin: 0 0 var(--basis) 0; */
   margin: var(--basis_x4) 0 var(--basis) 0;
+  text-decoration: inherit;
 }
 
-h2{
+h2 {
   font-size: calc(var(--font-add) + var(--basis_x2));
   margin: var(--basis_x4) 0 var(--basis) 0;
+  text-decoration: inherit;
 }
 
-h3{
+h3 {
   font-size: calc(var(--font-add) + var(--basis));
   margin: var(--basis_x2) 0 var(--basis) 0;
+  text-decoration: inherit;
 }
 
-p{
+p {
   /* width: calc(var(--basis_x16) + var(--basis_x8)); */
   max-width: 100%;
   margin: var(--basis) 0;
+  text-decoration: inherit;
 }
 
-.body2{
+ul {
+  margin-inline-start: var(--basis_x4);
+  max-width: calc(100% - var(--basis_x4));
+}
+
+.body2 {
   font-size: var(--body2-font-size);
 }
 
 button,
 textarea,
 input[type="text"],
-select{
+select {
   min-width: 0px;
   outline: none;
   border: none;
@@ -150,21 +164,21 @@ select{
   font-size: var(--body-font-size);
 }
 textarea,
-input[type="text"]{
+input[type="text"] {
   padding: var(--basis);
   background: var(--input-background);
   color: var(--on-background);
   box-shadow: inset 0 0 0 calc(0.2 * var(--basis)) var(--on-background);
 }
 textarea.inverted,
-input[type="text"].inverted{
+input[type="text"].inverted {
   background: var(--on-background);
   color: var(--input-background);
   box-shadow: inset 0 0 0 calc(0.2 * var(--basis)) var(--on-background);
 }
 
 textarea:focus,
-input[type="text"]:focus{
+input[type="text"]:focus {
   background: var(--input-background);
   color: var(--on-background);
   box-shadow: inset 0 0 0 calc(0.2 * var(--basis)) var(--on-background-contrast);
@@ -177,7 +191,7 @@ textarea {
 }
 
 button,
-select{
+select {
   font-weight: bold;
   transition: transform 0.2s ease;
   background: var(--on-background);
@@ -245,10 +259,17 @@ button:focus.choosen:after {
     box-shadow: 0 0 0 var(--basis_x0_5) var(--on-background-contrast);
 }
 
-.buttonRow button{
-  margin: var(--basis) calc(var(--basis) * 1.5) calc(var(--basis) * .5) 0;
+.buttonRow button {
+  --margin-right: calc(var(--basis) * 1.5);
+  margin: var(--basis) var(--margin-right) calc(var(--basis) * .5) 0;
 }
-.buttonRow button:last-of-type{
+.buttonRow button:last-of-type {
+  margin-right: 0;
+}
+.buttonRow.usesLinks button:last-of-type {
+  margin-right: var(--margin-right);
+}
+.buttonRow.usesLinks a:last-of-type button {
   margin-right: 0;
 }
 
