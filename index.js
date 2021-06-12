@@ -343,7 +343,7 @@ app.get('/', (req, res) => {
   <p>
   <!--sse-->Contact: <a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a><br><!--/sse-->
   <br>
-  <p>A list of all links can be found here: <a href="https://volt.link/list">volt.link/list</a><p>
+  <p>A list of all micropages and redirects can be found here: <a href="https://volt.link/list">volt.link/list</a><p>
   <br>
   Example Micropage: <a href="https://volt.link/bonn">volt.link/bonn</a><br>
   Example Redirect: <a href="https://volt.link/🇪🇺">volt.link/🇪🇺</a><br>
