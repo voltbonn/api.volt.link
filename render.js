@@ -449,9 +449,36 @@ function renderMicropage({
   `
 }
 
-async function renderOverviewItems({ items, translations, userLocales }){
+async function renderOverviewItems({ items, userLocales, logged_in }) {
+  // const translations = {
+  //   linklist: fluentByObject({
+  //     en: 'Micropage',
+  //     de: 'Microseite'
+  //   }, userLocales),
+  //   redirect: fluentByObject({
+  //     en: 'Redirect',
+  //     de: 'Weiterleitung'
+  //   }, userLocales),
+  // }
+
   return `<div class="items">
     ${items
+      .filter(entry => {
+        let { permissions } = entry[1]
+
+        let needsToLogin = false
+        if (!logged_in) {
+          if (
+            !!permissions
+            && Array.isArray(permissions)
+            && permissions.length > 0
+          ) {
+            needsToLogin = permissions.filter(p => p.role === 'viewer' && p.value === '@volteuropa.org').length > 0
+          }
+        }
+
+        return !needsToLogin
+      })
       .map(entry => {
         const code = entry[0]
         let {
@@ -472,13 +499,10 @@ async function renderOverviewItems({ items, translations, userLocales }){
         return `<div>
           <a href="https://volt.link/${code}"><h2 dir="auto" tabindex="0" style="display: inline-block;">${title}</h2></a>
           ${description !== '' ? `<p dir="auto">${description.replace(/\n+/g, '\n').split('\n').join('<br>')}</p>` : ''}
-          <p>${[
-            // (use_as === 'redirect' || use_as === 'linklist' ? translations[use_as] : ''),
-            new Date(last_modified).toUTCString(),
-            '/' + code,
-          ]
-            .join(' • ')
-          }</p>
+          <p><code>
+            ${new Date(last_modified).toISOString().replace('T', ' ').replace(/\..+/, '')}
+            <a href="https://volt.link/${code}" style="text-decoration: none;"><code>/${code}</code></a>
+          </code></p>
         </div>`
       })
       .filter(Boolean)
@@ -493,6 +517,8 @@ async function renderOverview({
   query = {},
   filter = '',
 }) {
+  const canonical = `https://volt.link/list/${filter}`
+
   if (typeof acceptLanguage !== 'string' || acceptLanguage === '') {
     acceptLanguage = 'en'
   }
@@ -505,7 +531,13 @@ async function renderOverview({
       de: 'All Microseiten und Weiterleitungen'
     }, userLocales),
     description: fluentByObject({
-      en: '',
+      en: 'Here you can view a list of all micropages and redirect hosted on volt.link.',
+      de: 'Hier kannst Du eine Liste aller auf volt.link gehosteten Micropages und Redirects einsehen.',
+    }, userLocales),
+
+    hidden_links_info: fluentByObject({
+      en: `Some links are hidden. <a href="https://volt.link/login?redirect_to=${encodeURIComponent(canonical)}">Login with your Volt Europa account</a> to view them.`,
+      de: `Einige Links sind ausgeblendet. <a href="https://volt.link/login?redirect_to=${encodeURIComponent(canonical)}">Melde Dich mit Deinem Volt Europa-Konto an</a>, um sie zu sehen.`,
     }, userLocales),
 
     imprint: fluentByObject({
@@ -519,15 +551,6 @@ async function renderOverview({
     logout: fluentByObject({
       en: 'Logout',
       de: 'Abmelden'
-    }, userLocales),
-
-    linklist: fluentByObject({
-      en: 'Micropage',
-      de: 'Microseite'
-    }, userLocales),
-    redirect: fluentByObject({
-      en: 'Redirect',
-      de: 'Weiterleitung'
     }, userLocales),
 
     micropages: fluentByObject({
@@ -557,6 +580,7 @@ async function renderOverview({
   const items = Object.entries(await readCache())
 
   let the_list = null
+  let the_menu = ''
 
   if (typeof filter !== 'string' || filter === '') {
     filter = 'micropages'
@@ -576,11 +600,9 @@ async function renderOverview({
 
   if (the_list !== null) {
     let filters = ['micropages', 'redirects', 'people']
-    the_list = `
-      <br>
+    the_menu = `
       <div class="buttonRow usesLinks">
-      ${
-        filters
+      ${filters
         .map(filter_name => {
           if (filter_name === filter) {
             return `<a><button class="choosen">${translations[filter_name]}</button></a>`
@@ -590,13 +612,11 @@ async function renderOverview({
         .join(' ')
       }
       </div>
-      ${await renderOverviewItems({ items: the_list, translations, userLocales })}
     `
+    the_list = await renderOverviewItems({ items: the_list, userLocales, logged_in })
   } else {
     the_list = ''
   }
-
-  const canonical = 'https://volt.link/list'
 
   return `
   <!DOCTYPE html>
@@ -649,7 +669,11 @@ async function renderOverview({
       <div class="app spine_aligned" dir="auto">
         <main class="contentWrapper">
           <h1>${translations.title}</h1>
+          <br>
           <p>${translations.description}</p>
+          ${!logged_in ? `<p>${translations.hidden_links_info}</p>` : ''}
+          <br>
+          ${the_menu}
           ${the_list}
         </main>
       </div>
