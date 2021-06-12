@@ -105,6 +105,14 @@ function hasEditPermission(permissions, userEmail) {
     )
   )
 }
+
+// function getUserLocales(){
+//     const localesByCounty = {
+//       de: ['de'],
+//     }
+//   // https://get.geojs.io/v1/ip/geo/{ip address}.json
+// }
+
 const app = express()
 app.use(express.json())
 
@@ -575,7 +583,7 @@ app.get('/list', async (req, res) => {
   res.redirect('/list/micropages')
 })
 app.get('/list/:filter', async (req, res) => {
-  res.send(await renderOverview({ query: req.query, acceptLanguage: req.headers['accept-language'], filter: req.params.filter }))
+  res.send(await renderOverview({ query: req.query, acceptLanguage: req.headers['accept-language'], filter: req.params.filter, logged_in: req.logged_in }))
 })
 
 app.get('/:code', (req, res) => {
