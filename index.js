@@ -583,7 +583,12 @@ app.get('/list', async (req, res) => {
   res.redirect('/list/micropages')
 })
 app.get('/list/:filter', async (req, res) => {
-  res.send(await renderOverview({ query: req.query, acceptLanguage: req.headers['accept-language'], filter: req.params.filter, logged_in: req.logged_in }))
+  res.send(await renderOverview({
+    query: req.query,
+    acceptLanguage: req.headers['accept-language'],
+    filter: req.params.filter,
+    logged_in: req.logged_in,
+  }))
 })
 
 app.get('/:code', (req, res) => {
