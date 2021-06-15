@@ -124,8 +124,8 @@ app.use(express.static('public'))
 async function session_middleware(req, res, next) {
 
   const origin = req.header('Origin')
-  if (typeof origin === 'string' && origin.endsWith('localhost:3000')) { // allow for localhost
-    req.headers['-x-session'] = 's%3AOiY6jEc4tS-jkKeuIuB2ubAW9Vpgkij4.HT1EkmpOPB3MxNCmGvxvLeENzyxsxJkXYq%2FmY1QafDw'
+  if (typeof origin === 'string' && origin.endsWith('localhost:3000') && origin.endsWith('localhost:4000')) { // allow for localhost
+    req.headers['-x-session'] = 's%3ACQVVgUS2NBtN5mo0QAdCCy1axq4J1joq.P4NuOzQxvxnuE9Ndqw5PBbLDWvqRQt3RYYHgGqDkmCE'
   }
 
   if (!!req.headers['-x-session']) {
