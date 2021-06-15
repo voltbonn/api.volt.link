@@ -86,7 +86,7 @@ function quickcheckCode(code, { userEmail = '' }) {
 
 const admin_addresses = (process.env.admin_addresses || '').split(',')
 
-function hasEditPermission(permissions, userEmail) {
+function hasEditPermission(permissions, userEmail, strict = false) {
   const permissions_array_has_content = (
     typeof permissions === 'object'
     && permissions !== null
@@ -98,7 +98,10 @@ function hasEditPermission(permissions, userEmail) {
     typeof userEmail === 'string'
     && userEmail !== ''
     && (
-      admin_addresses.includes(userEmail)
+      (
+        strict !== true
+        && admin_addresses.includes(userEmail)
+      )
       || !permissions_array_has_content
       || (
         permissions_array_has_content
