@@ -105,7 +105,10 @@ function hasEditPermission(permissions, userEmail, strict = false) {
       || !permissions_array_has_content
       || (
         permissions_array_has_content
-        && permissions.map(e => e.value).includes(userEmail)
+        && permissions
+          .filter(p => !p.hasOwnProperty('role') || p.role !== 'viewer')
+          .map(e => e.value)
+          .includes(userEmail)
       )
     )
   )
