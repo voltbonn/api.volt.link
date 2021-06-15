@@ -144,6 +144,27 @@ h3 {
   text-decoration: inherit;
 }
 
+h1.yellow,
+h2.yellow,
+h3.yellow {
+  color: var(--yellow);
+}
+h1.green,
+h2.green,
+h3.green {
+  color: var(--green);
+}
+h1.blue,
+h2.blue,
+h3.blue {
+  color: var(--blue);
+}
+h1.red,
+h2.red,
+h3.red {
+  color: var(--red);
+}
+
 p {
   /* width: calc(var(--basis_x16) + var(--basis_x8)); */
   max-width: 100%;
