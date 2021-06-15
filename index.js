@@ -1,5 +1,7 @@
 require('dotenv').config()
 
+const isDevEnvironment = false
+
 const { sendInitialStats } = require('./stats.js')
 
 const {
@@ -138,7 +140,7 @@ async function session_middleware(req, res, next) {
     cookie: {
       httpOnly: false,
       // domain: false, // for localhost
-      domain: 'volt.link',
+      domain: (isDevEnvironment ? 'localhost' : 'volt.link'),
       sameSite: 'lax',
       secure: false, // somehow doesnt work when its true
       maxAge: 1000 * sessionTTL,
@@ -165,8 +167,7 @@ passport.deserializeUser(function (id, done) {
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  // callbackURL: 'http://localhost:4000/auth/google/callback', // for localhost
-  callbackURL: 'https://volt.link/auth/google/callback',
+  callbackURL: (isDevEnvironment ? 'http://localhost:4000/auth/google/callback' : 'https://volt.link/auth/google/callback'),
 },
   function (accessToken, refreshToken, profile, done) {
     if (
@@ -631,7 +632,7 @@ app.get('/:code', (req, res) => {
             sendInitialStats({
               url: '/' + code,
               website: (process.env.umami_volt_link_id || ''),
-              hostname: 'volt.link'
+              hostname: (isDevEnvironment ? 'localhost' : 'volt.link'),
             }, req.headers)
             res.redirect(content_parsed.redirect)
           } else if (
