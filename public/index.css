@@ -133,7 +133,7 @@ h2 {
 
 h3 {
   font-size: calc(var(--font-add) + var(--basis));
-  margin: var(--basis_x2) 0 var(--basis) 0;
+  margin: var(--basis_x4) 0 var(--basis) 0;
   text-decoration: inherit;
 }
 
