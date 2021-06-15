@@ -11,6 +11,7 @@ const {
   gitPull,
   removeFile,
   writeCache,
+  readCache,
 } = require('./git_functions.js')
 const {
   renderErrorPage,
@@ -308,8 +309,26 @@ app.options("/*", function (req, res, next) {
   }
 })
 
-app.get('/user.json', (req, res) => {
-  res.json({ user: req.user })
+app.get('/user.json', async (req, res) => {
+  if (req.logged_in) {
+    const editable_links = Object.entries(await readCache() || [])
+    .filter(entry => {
+      const content = entry[1] || {}
+      return hasEditPermission(content.permissions || null, req.user.email, true)
+    })
+    .map(entry => ({slug: entry[0]}))
+
+    res.json({
+      user: {
+        ...req.user,
+        editable: editable_links,
+      },
+    })
+  } else {
+    res.json({
+      user: null
+    })
+  }
 })
 
 app.get('/login', (req, res) => {
