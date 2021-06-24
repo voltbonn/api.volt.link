@@ -607,6 +607,14 @@ app.get('/get/:code', (req, res) => {
   }
 })
 
+app.get('/edit/:code', (req, res) => {
+  if (typeof req.params.code === 'string' && req.params.code.length > 0) {
+    res.redirect(`${isDevEnvironment ? 'http://localhost:4000/' : 'https://edit.volt.link/'}edit/${req.params.code}`)
+  } else {
+    res.redirect(isDevEnvironment ? 'http://localhost:4000/' : 'https://edit.volt.link/')
+  }
+})
+
 app.get('/list', async (req, res) => {
   res.redirect('/list/micropages')
 })
