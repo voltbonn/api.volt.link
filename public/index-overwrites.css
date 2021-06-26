@@ -33,8 +33,7 @@
   align-items: flex-start;
 }
 
-
-.coverphoto {
+.app .coverphoto {
   position: relative;
   display: block;
   width: 100%;
@@ -45,39 +44,61 @@
   margin-bottom: var(--basis_x4);
 }
 @media (max-width: 1000px) {
-  .coverphoto{
+  .app .coverphoto{
     height: 16rem;
   }
 }
 @media (max-width: 800px) {
-  .coverphoto{
+  .app .coverphoto{
     height: 10rem;
   }
 }
 @media (max-width: 500px) {
-  .coverphoto{
+  .app .coverphoto{
     height: 7rem;
   }
 }
 
-.contentWrapper{
+.app.person .coverphoto {
+  display: inline-block;
+  width: auto;
+  height: auto;
+  font-size: 0;
+  border-radius: 100%;
+}
+.app.person .coverphoto:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-image: url(/public/profile_frame.png);
+  background-size: cover;
+  border-radius: 100%;
+}
+.app.person .coverphoto img {
+  width: 20rem;
+}
+
+.app .contentWrapper{
   width: auto;
   margin: 0 auto;
 }
 
-.items button {
+.app .items button {
   margin-right: 0;
   margin-bottom: 0;
   margin-left: 0;
   text-align: unset;
 }
-.items p {
+.app .items p {
   margin-bottom: 0;
 }
 @media (max-width: 800px) {
-  .contentWrapper,
-  .items,
-  .items button{
+  .app .contentWrapper,
+  .app .items,
+  .app .items button{
     width: 100%;
   }
 }

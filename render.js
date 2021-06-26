@@ -233,6 +233,7 @@ function renderLoginPage({
 function renderMicropage({
   code = '',
   locales,
+  layout = '',
   title: title_text = '',
   description: description_text = '',
   coverphoto: coverphoto_url = '',
@@ -280,12 +281,27 @@ function renderMicropage({
     )
   }
 
-  coverphoto_url = coverphoto_url || ''
-  const coverphoto = (
-    coverphoto_url !== ''
-      ? `<div style="background-image: url(${coverphoto_url});" class="coverphoto"></div>`
-      : ''
+  layout = (
+    (layout === 'default' || layout === 'person')
+      ? layout
+      : (
+        code.includes('.')
+          ? 'person'
+            : 'default'
+      )
   )
+
+  coverphoto_url = coverphoto_url || ''
+  let coverphoto = ''
+  if (coverphoto_url !== '') {
+    if (layout === 'default') {
+      coverphoto = `<div style="background-image: url(${coverphoto_url});" class="coverphoto"></div>`
+    } else {
+      coverphoto = `<div style="background-image: url(${coverphoto_url});" class="coverphoto">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" />
+      </div>`
+    }
+  }
 
   const default_title_text = 'Volt Europa'
   title_text = fluentByAny(title_text, userLocales, default_title_text)
@@ -429,9 +445,10 @@ function renderMicropage({
       <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-700.woff2" as="font" type="font/woff2" crossorigin/>
     </head>
     <body>
-      <div class="app spine_aligned" dir="auto">
-        ${coverphoto}
+      <div class="app spine_aligned ${layout}" dir="auto">
+        ${layout === 'default' ? coverphoto : ''}
         <main class="contentWrapper">
+          ${layout === 'person' ? coverphoto : ''}
           ${title}
           ${description}
           ${items}
