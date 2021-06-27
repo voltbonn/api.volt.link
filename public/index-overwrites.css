@@ -65,6 +65,7 @@
   height: auto;
   font-size: 0;
   border-radius: 100%;
+  margin-bottom: 0;
 }
 .app.person .coverphoto:after {
   content: '';
