@@ -70,14 +70,14 @@ function quickcheckCode(code, { userEmail = '' }) {
   ) {
     allowed_to_edit = false
   } else if (code.includes('.')) {
-    if (
-      (username !== '' && code === username)
-      || (userEmail !== '' && admin_addresses.includes(userEmail))
-    ) {
+    // if (
+    //   (username !== '' && code === username)
+    //   || (userEmail !== '' && admin_addresses.includes(userEmail))
+    // ) {
       allowed_to_edit = true
-    } else {
-      allowed_to_edit = false
-    }
+    // } else {
+    //   allowed_to_edit = false
+    // }
   } else {
     allowed_to_edit = true
   }
