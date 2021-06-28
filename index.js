@@ -55,8 +55,11 @@ list
 const forbidden_letters_splitted = forbidden.letters.split('')
 
 function quickcheckCode(code, { userEmail = '' }) {
+  // Info: quickcheckCode is there to check a code without opening the file or checking it's permissions.
 
-  const username = (userEmail || '').split('@')[0]
+  // const username = (userEmail || '').split('@')[0]
+  // (userEmail !== '' && admin_addresses.includes(userEmail))
+
   const code_split = code.split('')
 
   let allowed_to_edit = false
@@ -69,15 +72,6 @@ function quickcheckCode(code, { userEmail = '' }) {
     || forbidden_letters_splitted.filter(value => !code_split.includes(value)).length < forbidden_letters_splitted.length
   ) {
     allowed_to_edit = false
-  } else if (code.includes('.')) {
-    // if (
-    //   (username !== '' && code === username)
-    //   || (userEmail !== '' && admin_addresses.includes(userEmail))
-    // ) {
-      allowed_to_edit = true
-    // } else {
-    //   allowed_to_edit = false
-    // }
   } else {
     allowed_to_edit = true
   }
