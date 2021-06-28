@@ -70,7 +70,7 @@ html {
   --on-background-contrast: var(--purple-dark);
 
   --input-background: var(--background);
-  --button-color: var(--background);
+  --constant-button-color: var(--background);
 }
 @media (prefers-color-scheme: dark) {
   html {
@@ -82,7 +82,7 @@ html {
     --on-background-contrast: var(--dark-grey);
 
     --input-background: var(--background);
-    --button-color: var(--background-contrast);
+    --constant-button-color: var(--background-contrast);
   }
 }
 
@@ -222,11 +222,14 @@ button,
 select {
   font-weight: bold;
   transition: transform 0.2s ease;
-  background: var(--on-background);
-  color: var(--button-color);
   position: relative;
   cursor: pointer;
   padding: var(--basis) var(--basis_x2);
+
+  --button-background: var(--on-background);
+  --button-color: var(--constant-button-color);
+  background: var(--button-background);
+  color: var(--button-color);
 }
 
 select {
@@ -247,28 +250,28 @@ select {
 }
 
 button.yellow {
-  background: var(--yellow);
-  color: var(--on-yellow);
+  --button-background: var(--yellow);
+  --button-color: var(--on-yellow);
 }
 button.green {
-  background: var(--green);
-  color: var(--on-green);
+  --button-background: var(--green);
+  --button-color: var(--on-green);
 }
 button.blue {
-  background: var(--blue);
-  color: var(--on-blue);
+  --button-background: var(--blue);
+  --button-color: var(--on-blue);
 }
 button.red {
-  background: var(--red);
-  color: var(--on-red);
+  --button-background: var(--red);
+  --button-color: var(--on-red);
 }
 button.text {
-  background: transparent;
-  color: var(--on-background);
+  --button-background: transparent;
+  --button-color: var(--on-background);
 }
 button:focus {
-  background: var(--background-contrast);
-  color: var(--on-background);
+  --button-background: var(--background-contrast);
+  --button-color: var(--on-background);
 }
 button:hover{
   transform-origin: center center;
@@ -299,6 +302,13 @@ button:focus.choosen:after {
 }
 .buttonRow.usesLinks a:last-of-type button {
   margin-right: 0;
+}
+
+.buttonRow button.hasIcon{
+  padding-left: var(--basis);
+}
+.buttonRow button.hasIcon span {
+  margin-left: var(--basis_x2);
 }
 
 hr {
