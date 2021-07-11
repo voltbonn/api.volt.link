@@ -7,6 +7,8 @@ const {
   readCache,
 } = require('./git_functions.js')
 
+const frontend_path = path.join(__dirname, '../frontend/')
+
 function fluentByObject(object = {}, userLocales = ['en']){
   const supportedLocales = Object.keys(object)
 
@@ -72,7 +74,7 @@ function renderErrorPage(error) {
   let memeFilename = null
 
   try {
-    let files = fs.readdirSync('./public/public/memes/')
+    let files = fs.readdirSync(path.join(frontend_path, './public/memes/'))
     files = files
       .filter(file => path.extname(file).toLowerCase() === '.jpg')
       .filter(Boolean)

@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 const execShPromise = require('exec-sh').promise
 
 const fs = require('fs')
