@@ -8,6 +8,12 @@
 		},
 		{
 			"path": "../edit.volt.link"
+		},
+		{
+			"path": "../qrcode.volt.link"
+		},
+		{
+			"path": "../design-system"
 		}
 	],
 	"settings": {}
