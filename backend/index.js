@@ -359,24 +359,50 @@ app.get('/', (req, res) => {
 <body>
 <div class="app spine_aligned" dir="auto">
 <main class="contentWrapper">
-  <h1>Micropage and Redirect Server for Volt Europa</h1>
-  <p>
-  <!--sse-->Contact: <a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a><br><!--/sse-->
-  <br>
-  <p>A list of all micropages and redirects can be found here: <a href="https://volt.link/list">volt.link/list</a><p>
-  <br>
-  Example Micropage: <a href="https://volt.link/bonn">volt.link/bonn</a><br>
-  Example Redirect: <a href="https://volt.link/🇪🇺">volt.link/🇪🇺</a><br>
-  ${
-    req.logged_in
-    ? ''
-    : `
-    <br>
-    <a href="https://edit.volt.link/">Edit volt.link</a><br>
-    <a href="https://volt.link/logout">Logout</a>
-    `
-  }
-  </p>
+  <h1>Microservices for Volt Europa</h1>
+
+  <h3>volt.link</h3>
+  <ul>
+    ${
+      req.logged_in
+      ? `<li>Create a micropage/linktree or redirect: <a href="https://edit.volt.link/">edit.volt.link</a></li>`
+      : `<li>Create a micropage/linktree or redirect: <a href="https://volt.link/login?redirect_to=https%3A%2F%2Fedit.volt.link%2F">Login and edit volt.link</a></li>`
+    }
+    <li>All volt.link micropages and redirects: <a href="https://volt.link/list">volt.link/list</a></li>
+    <li>Contact <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">Thomas Rosen</a><!--/sse--> for help with volt.link.</li>
+  </ul>
+
+  <h3>Tools</h3>
+  <ul>
+    <li>QR-Code Generator: <a href="https://qrcode.volt.link">qrcode.volt.link</a></li>
+    <li>Social Media Profile Picture Generator: <a href="https://www.profile-volt.org/">profile-volt.org</a></li>
+    <li>All tools Volt uses: <a href="https://volt.link/tools">volt.link/tools</a></li>
+  </ul>
+
+  <h3>Other Shortcuts</h3>
+  <ul>
+    <li>Volt Merch Shops: <a href="https://volt.link/merch">volt.link/merch</a></li>
+    <li>Volt related meme pages: <a href="https://volt.link/memes">volt.link/memes</a></li>
+  </ul>
+
+  <!--
+  <h3>Examples</h3>
+  <ul>
+    <li>Micropage: <a href="https://volt.link/bonn">volt.link/bonn</a></li>
+    <li>Redirect: <a href="https://volt.link/🇪🇺">volt.link/🇪🇺</a></li>
+  </ul>
+  -->
+
+  <footer>
+    <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">Contact</a><!--/sse-->
+    ${
+      req.logged_in
+      ? `&nbsp; • &nbsp;<a href="https://volt.link/logout">Logout</a>`
+      : `&nbsp; • &nbsp;<a href="https://volt.link/login">Login</a>`
+    }
+    &nbsp; • &nbsp;<a href="https://www.volteuropa.org/legal">Imprint</a>
+    &nbsp; • &nbsp;<a href="https://www.volteuropa.org/privacy">Privacy Policy</a>
+  </footer>
 </main>
 </div>
 </body>
