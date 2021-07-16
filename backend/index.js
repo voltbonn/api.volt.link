@@ -668,7 +668,7 @@ app.get('/:code', (req, res) => {
   let code = req.params.code
   code = code.toLowerCase()
   getFileContentLocal(code)
-    .then((content = '') => {
+    .then(async (content = '') => {
       // if (!!content) {
         const content_parsed = yaml.load(content) || {}
 
@@ -693,7 +693,7 @@ app.get('/:code', (req, res) => {
         }
 
         if (needsToLogin) {
-          res.send(renderLoginPage({ code, acceptLanguage: req.headers['accept-language'] }))
+          res.send(await renderLoginPage({ code, acceptLanguage: req.headers['accept-language'] }))
         } else {
           if (
             hasRedirect
@@ -709,21 +709,21 @@ app.get('/:code', (req, res) => {
             hasLinktree
             && (useAs === 'linklist' || !hasUseAs)
           ) {
-            res.send(renderMicropage({
+            res.send(await renderMicropage({
               ...content_parsed,
               code,
               logged_in: req.logged_in,
               acceptLanguage: req.headers['accept-language'],
             }))
           } else {
-            res.status(404).send(renderErrorPage(error))
+            res.status(404).send(await renderErrorPage(error))
           }
         }
       // } else {
-      //   res.status(404).send(renderErrorPage(error))
+      //   res.status(404).send(await renderErrorPage(error))
       // }
     })
-    .catch(error => res.status(404).send(renderErrorPage(error)))
+    .catch(async error => res.status(404).send(await renderErrorPage(error)))
 })
 
 const port = 4000

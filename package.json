@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@fluent/bundle": "^0.16.1",
     "@fluent/langneg": "^0.5.2",
     "@octokit/core": "^3.4.0",
     "@octokit/plugin-rest-endpoint-methods": "^5.1.1",

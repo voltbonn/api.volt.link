@@ -7,6 +7,7 @@ const {
   readCache,
 } = require('./git_functions.js')
 
+const { loadFluentBundles, getMessage } = require('../fluent/l10n.js')
 const frontend_path = path.join(__dirname, '../frontend/')
 
 function fluentByObject(object = {}, userLocales = ['en']){
@@ -70,7 +71,7 @@ function fluentByAny(any = '', userLocales = ['en'], fallback = '') {
   return any
 }
 
-function renderErrorPage(error) {
+async function renderErrorPage(error) {
   let memeFilename = null
 
   try {
@@ -144,7 +145,7 @@ function renderErrorPage(error) {
     `
 }
 
-function renderLoginPage({
+async function renderLoginPage({
   code = '',
   acceptLanguage = 'en'
 }) {
@@ -153,17 +154,11 @@ function renderLoginPage({
   }
 
   const userLocales = acceptedLanguages(acceptLanguage)
-
+  const bundles = await loadFluentBundles({ acceptLanguage })
   const translations = {
-    title: fluentByObject({
-      en: 'This page is Volt only!'
-    }, userLocales),
-    description: fluentByObject({
-      en: 'You need to login with a Volt Europa account to view this page.<br/>Contact your local community lead if you are unsure about your Volt Europa account.'
-    }, userLocales),
-    login_button: fluentByObject({
-      en: 'Login',
-    }, userLocales)
+    login: getMessage(bundles, 'login'),
+    title: getMessage(bundles, 'login_title'),
+    description: getMessage(bundles, 'login_description'),
   }
 
   const locales = ['en']
@@ -223,7 +218,7 @@ function renderLoginPage({
           <br />
           <p>${translations.description}</p>
           <a href="https://volt.link/login?redirect_to=${encodeURIComponent(canonical)}">
-            <button style="margin-left: 0; margin-right: 0;">${translations.login_button}</button>
+            <button style="margin-left: 0; margin-right: 0;">${translations.login}</button>
           </a>
         </main>
       </div>
@@ -232,7 +227,7 @@ function renderLoginPage({
   `
 }
 
-function renderMicropage({
+async function renderMicropage({
   code = '',
   locales,
   layout = '',
@@ -255,20 +250,11 @@ function renderMicropage({
   } = overwrites
 
   const userLocales = acceptedLanguages(acceptLanguage)
-
+  const bundles = await loadFluentBundles({ acceptLanguage })
   const translations = {
-    imprint: fluentByObject({
-      en: 'Imprint',
-      de: 'Impressum'
-    }, userLocales),
-    privacy_policy: fluentByObject({
-      en: 'Privacy Policy',
-      de: 'Datenschutz'
-    }, userLocales),
-    logout: fluentByObject({
-      en: 'Logout',
-      de: 'Abmelden'
-    }, userLocales),
+    imprint: getMessage(bundles, 'imprint'),
+    privacy_policy: getMessage(bundles, 'privacy_policy'),
+    logout: getMessage(bundles, 'logout'),
   }
 
   let global_locale = 'en'
@@ -473,17 +459,6 @@ function renderMicropage({
 }
 
 async function renderOverviewItems({ items, userLocales, logged_in }) {
-  // const translations = {
-  //   linklist: fluentByObject({
-  //     en: 'Micropage',
-  //     de: 'Microseite'
-  //   }, userLocales),
-  //   redirect: fluentByObject({
-  //     en: 'Redirect',
-  //     de: 'Weiterleitung'
-  //   }, userLocales),
-  // }
-
   return `<div class="items">
     ${items
       .filter(entry => {
@@ -547,47 +522,20 @@ async function renderOverview({
   }
 
   const userLocales = acceptedLanguages(acceptLanguage)
-
+  const bundles = await loadFluentBundles({ acceptLanguage })
   const translations = {
-    title: fluentByObject({
-      en: 'All Micropages and Redirects',
-      de: 'All Microseiten und Weiterleitungen'
-    }, userLocales),
-    description: fluentByObject({
-      en: 'Here you can view a list of all micropages and redirect hosted on volt.link.',
-      de: 'Hier kannst Du eine Liste aller auf volt.link gehosteten Micropages und Redirects einsehen.',
-    }, userLocales),
+    imprint: getMessage(bundles, 'imprint'),
+    privacy_policy: getMessage(bundles, 'privacy_policy'),
+    logout: getMessage(bundles, 'logout'),
 
-    hidden_links_info: fluentByObject({
-      en: `Some links are hidden. <a href="https://volt.link/login?redirect_to=${encodeURIComponent(canonical)}">Login with your Volt Europa account</a> to view them.`,
-      de: `Einige Links sind ausgeblendet. <a href="https://volt.link/login?redirect_to=${encodeURIComponent(canonical)}">Melde Dich mit Deinem Volt Europa-Konto an</a>, um sie zu sehen.`,
-    }, userLocales),
+    micropages: getMessage(bundles, 'list_micropages'),
+    redirects: getMessage(bundles, 'list_redirects'),
+    people: getMessage(bundles, 'list_people'),
 
-    imprint: fluentByObject({
-      en: 'Imprint',
-      de: 'Impressum'
-    }, userLocales),
-    privacy_policy: fluentByObject({
-      en: 'Privacy Policy',
-      de: 'Datenschutz'
-    }, userLocales),
-    logout: fluentByObject({
-      en: 'Logout',
-      de: 'Abmelden'
-    }, userLocales),
+    title: getMessage(bundles, 'list_title'),
+    description: getMessage(bundles, 'list_description'),
 
-    micropages: fluentByObject({
-      en: 'Micropages',
-      de: 'Microseiten'
-    }, userLocales),
-    redirects: fluentByObject({
-      en: 'Redirects',
-      de: 'Weiterleitungen'
-    }, userLocales),
-    people: fluentByObject({
-      en: 'People',
-      de: 'Personen'
-    }, userLocales),
+    hidden_links_info: getMessage(bundles, 'list_hidden_links_info', { redirect_to: encodeURIComponent(canonical) }),
   }
 
   const locales = ['en', 'de']
