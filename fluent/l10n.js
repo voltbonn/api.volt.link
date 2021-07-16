@@ -8,11 +8,11 @@ const { negotiateLanguages, acceptedLanguages } = require('@fluent/langneg')
 const locales = {
   de: 'Deutsch',
   en: 'English',
-  // es: 'Español',
+  es: 'Español',
   // pt: 'Português',
-  // fr: 'Français',
-  // it: 'Italiano',
-  // nl: 'Dutch',
+  fr: 'Français',
+  it: 'Italiano',
+  nl: 'Dutch',
   // pl: 'Polska',
   // ru: 'Pусский',
 }
