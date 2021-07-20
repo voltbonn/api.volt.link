@@ -71,7 +71,10 @@ function fluentByAny(any = '', userLocales = ['en'], fallback = '') {
   return any
 }
 
-async function renderErrorPage(error) {
+async function renderErrorPage({
+  error = '',
+  acceptLanguage = 'en',
+}) {
   let memeFilename = null
 
   try {

@@ -656,15 +656,19 @@ app.get('/list', async (req, res) => {
   res.redirect('/list/micropages')
 })
 app.get('/list/:filter', async (req, res) => {
+   const userLocalesString = req.query.l || req.headers['accept-language']
+
   res.send(await renderOverview({
     query: req.query,
-    acceptLanguage: req.headers['accept-language'],
+    acceptLanguage: userLocalesString,
     filter: req.params.filter,
     logged_in: req.logged_in,
   }))
 })
 
 app.get('/:code', (req, res) => {
+  const userLocalesString = req.query.l || req.headers['accept-language']
+
   let code = req.params.code
   code = code.toLowerCase()
   getFileContentLocal(code)
@@ -693,7 +697,7 @@ app.get('/:code', (req, res) => {
         }
 
         if (needsToLogin) {
-          res.send(await renderLoginPage({ code, acceptLanguage: req.headers['accept-language'] }))
+          res.send(await renderLoginPage({ code, acceptLanguage: userLocalesString }))
         } else {
           if (
             hasRedirect
@@ -713,17 +717,28 @@ app.get('/:code', (req, res) => {
               ...content_parsed,
               code,
               logged_in: req.logged_in,
-              acceptLanguage: req.headers['accept-language'],
+              acceptLanguage: userLocalesString,
             }))
           } else {
-            res.status(404).send(await renderErrorPage(error))
+            res.status(404).send(await renderErrorPage({
+              error,
+              acceptLanguage: userLocalesString,
+            }))
           }
         }
       // } else {
-      //   res.status(404).send(await renderErrorPage(error))
+      //   res.status(404).send(await renderErrorPage({
+      //     error,
+      //     acceptLanguage: userLocalesString,
+      //   }))
       // }
     })
-    .catch(async error => res.status(404).send(await renderErrorPage(error)))
+    .catch(async error => res.status(404).send(
+      await renderErrorPage({
+        error,
+        acceptLanguage: userLocalesString,
+      })
+    ))
 })
 
 const port = 4000
