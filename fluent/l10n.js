@@ -111,7 +111,7 @@ module.exports = {
 loadFluentBundles({ acceptLanguage: 'en,de' })
 .then(bundles => {
   let msg = getMessage(bundles, 'test')
-  console.log(msg)
+  console.info(msg)
 })
 .catch(error => console.error(error))
 
