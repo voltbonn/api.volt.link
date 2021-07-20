@@ -6,6 +6,7 @@ const { negotiateLanguages, acceptedLanguages } = require('@fluent/langneg')
 const {
   readCache,
 } = require('./git_functions.js')
+const { header } = require('./html.js')
 
 const { locales, loadFluentBundles, getMessage } = require('../fluent/l10n.js')
 const frontend_path = path.join(__dirname, '../frontend/')
@@ -110,10 +111,6 @@ async function renderErrorPage({
     data-domains="volt.link"
   ></script>
 
-  <link rel="stylesheet" href="/index.css" type="text/css">
-  <link rel="stylesheet" href="/index-overwrites.css" type="text/css">
-  <link rel="stylesheet" href="/Ubuntu/index.css" type="text/css">
-
   <title>volt.link Error</title>
 
   <style>
@@ -187,24 +184,8 @@ async function renderLoginPage({
   <!DOCTYPE html>
   <html lang="${global_locale}">
     <head>
-      <meta charset="utf-8" />
-      <link rel="icon" href="/volt-logo-white-64.png" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <meta name="theme-color" content="#502379" />
-      <link rel="apple-touch-icon" href="/volt-logo-white-192.png" />
-      <link rel="manifest" href="/manifest.json" />
+      ${header}
 
-      <script
-        async
-        defer
-        data-website-id="becf9dc6-db9a-42a7-bc64-9637bd885bff"
-        src="https://umami.qiekub.org/umami.js"
-        data-domains="volt.link"
-      ></script>
-
-      <link rel="stylesheet" href="/index.css" type="text/css">
-      <link rel="stylesheet" href="/index-overwrites.css" type="text/css">
-      <link rel="stylesheet" href="/Ubuntu/index.css" type="text/css">
       <title>${translations.title}</title>
 
       <link rel="canonical" href="${canonical}" />
@@ -217,9 +198,6 @@ async function renderLoginPage({
           "url": "${canonical}"
         }
       </script>
-
-      <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
-      <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-700.woff2" as="font" type="font/woff2" crossorigin/>
     </head>
     <body>
       <div class="app spine_aligned" dir="auto">
@@ -380,24 +358,8 @@ async function renderMicropage({
   <!DOCTYPE html>
   <html lang="${global_locale}">
     <head>
-      <meta charset="utf-8" />
-      <link rel="icon" href="/volt-logo-white-64.png" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <meta name="theme-color" content="#502379" />
-      <link rel="apple-touch-icon" href="/volt-logo-white-192.png" />
-      <link rel="manifest" href="/manifest.json" />
+      ${header}
 
-      <script
-        async
-        defer
-        data-website-id="becf9dc6-db9a-42a7-bc64-9637bd885bff"
-        src="https://umami.qiekub.org/umami.js"
-        data-domains="volt.link"
-      ></script>
-
-      <link rel="stylesheet" href="/index.css" type="text/css">
-      <link rel="stylesheet" href="/index-overwrites.css" type="text/css">
-      <link rel="stylesheet" href="/Ubuntu/index.css" type="text/css">
       <title>${title_text}</title>
 
       <link rel="canonical" href="${canonical}" />
@@ -457,9 +419,6 @@ async function renderMicropage({
           ]
         }
       </script>
-
-      <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
-      <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-700.woff2" as="font" type="font/woff2" crossorigin/>
     </head>
     <body>
       <div class="app spine_aligned ${layout}" dir="auto">
@@ -632,24 +591,8 @@ async function renderOverview({
   <!DOCTYPE html>
   <html lang="${global_locale}">
     <head>
-      <meta charset="utf-8" />
-      <link rel="icon" href="/volt-logo-white-64.png" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <meta name="theme-color" content="#502379" />
-      <link rel="apple-touch-icon" href="/volt-logo-white-192.png" />
-      <link rel="manifest" href="/manifest.json" />
+      ${header}
 
-      <script
-        async
-        defer
-        data-website-id="becf9dc6-db9a-42a7-bc64-9637bd885bff"
-        src="https://umami.qiekub.org/umami.js"
-        data-domains="volt.link"
-      ></script>
-
-      <link rel="stylesheet" href="/index.css" type="text/css">
-      <link rel="stylesheet" href="/index-overwrites.css" type="text/css">
-      <link rel="stylesheet" href="/Ubuntu/index.css" type="text/css">
       <title>${translations.title}</title>
 
       <link rel="canonical" href="${canonical}" />
@@ -665,9 +608,6 @@ async function renderOverview({
           "url": "${canonical}"
         }
       </script>
-
-      <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
-      <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-700.woff2" as="font" type="font/woff2" crossorigin/>
     </head>
     <body class="basis_0_4">
       <div class="app spine_aligned" dir="auto">
