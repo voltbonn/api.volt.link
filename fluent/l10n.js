@@ -92,7 +92,7 @@ function getMessage_inner(bundles, id, properties) {
     if (message) {
       return bundle.value.formatPattern(message.value, properties)
     } else {
-      return getMessage(bundles, id)
+      return getMessage_inner(bundles, id, properties)
     }
   }
 }
