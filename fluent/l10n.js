@@ -6,15 +6,28 @@ const { FluentBundle, FluentResource } = require('@fluent/bundle')
 const { negotiateLanguages, acceptedLanguages } = require('@fluent/langneg')
 
 const locales = {
-  de: 'Deutsch',
   en: 'English',
+  de: 'Deutsch',
   es: 'Español',
-  // pt: 'Português',
+  pt: 'Português',
   fr: 'Français',
   it: 'Italiano',
-  nl: 'Dutch',
-  // pl: 'Polska',
-  // ru: 'Pусский',
+  nl: 'Nederlands', // Dutch
+  da: 'Dansk', // Danish
+  sv: 'Svenska', // Swedish
+  nb: 'Norsk bokmål', // Norwegian
+  fi: 'Suomi', // Finish
+  mt: 'Malti', // Maltese
+  // pl: 'Język polski', // Polish
+  ru: 'русский язык', // Russian
+  // bg: 'български език', // Bulgarian
+  tr: 'Türkçe',
+  ar: 'اَلْعَرَبِيَّة', // Arabic
+  // el: 'ελληνικά', // Greek
+  // ro: 'limba română', // Romanian
+  // sl: 'slovenščina', // Slovenian
+  // uk: 'украї́нська мо́ва', // Ukrainian
+  // cy: 'Cymraeg', // Welsh
 }
 
 const _supportedLocales_ = Object.keys(locales)

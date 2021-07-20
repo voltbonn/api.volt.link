@@ -1,5 +1,5 @@
 imprint = Imprimir
-privacy_policy = Política de privacidad
+privacy_policy = Política de Privacidad
 logout = Cerrar sesión
 login = Acceso
 
