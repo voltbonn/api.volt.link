@@ -7,8 +7,11 @@ const {
   readCache,
 } = require('./git_functions.js')
 
-const { loadFluentBundles, getMessage } = require('../fluent/l10n.js')
+const { locales, loadFluentBundles, getMessage } = require('../fluent/l10n.js')
 const frontend_path = path.join(__dirname, '../frontend/')
+
+const default_imprint_link = 'https://www.volteuropa.org/legal'
+const default_privacy_policy_link = 'https://www.volteuropa.org/privacy'
 
 function fluentByObject(object = {}, userLocales = ['en']){
   const supportedLocales = Object.keys(object)
@@ -162,17 +165,21 @@ async function renderLoginPage({
     login: getMessage(bundles, 'login'),
     title: getMessage(bundles, 'login_title'),
     description: getMessage(bundles, 'login_description'),
+
+    imprint: getMessage(bundles, 'imprint'),
+    privacy_policy: getMessage(bundles, 'privacy_policy'),
   }
 
-  const locales = ['en']
-  const global_locale = negotiateLanguages(
+  let locales_array = Object.keys(locales)
+  let global_locale = negotiateLanguages(
     userLocales,
-    locales,
+    locales_array || ['en'],
     {
-      defaultLocale: locales[0],
+      defaultLocale: locales_array[0] || 'en',
       strategy: 'lookup'
     }
   )
+  global_locale = (global_locale.length > 0 ? global_locale[0] : 'en')
 
   const canonical = !!code && code !== '' ? `https://volt.link/${code}` : 'https://volt.link/'
 
@@ -224,6 +231,26 @@ async function renderLoginPage({
             <button style="margin-left: 0; margin-right: 0;">${translations.login}</button>
           </a>
         </main>
+        <footer>
+          ${
+            [
+              `<a href="${default_imprint_link}">${translations.imprint}</a>`,
+              `<a href="${default_privacy_policy_link}">${translations.privacy_policy}</a>`,
+              (logged_in ? `<a href="https://volt.link/logout?redirect_to=${encodeURIComponent(canonical)}">${translations.logout}</a>` : false),
+            ]
+            .filter(Boolean)
+            .join('&nbsp; • &nbsp;')
+          }
+          <br />
+          <br />
+          <div class="buttonRow usesLinks basis_0_4">
+            ${
+              Object.entries(locales)
+              .map(([key, value]) => `<a href="?l=${key}"><button class="${key === global_locale ? 'choosen' : ''}">${value}</button></a>`)
+              .join(' ')
+            }
+          </div>
+        </footer>
       </div>
     </body>
   </html>
@@ -232,7 +259,6 @@ async function renderLoginPage({
 
 async function renderMicropage({
   code = '',
-  locales,
   layout = '',
   title: title_text = '',
   description: description_text = '',
@@ -243,6 +269,7 @@ async function renderMicropage({
   acceptLanguage = 'en',
   logged_in = false,
 }) {
+
   if (typeof acceptLanguage !== 'string' || acceptLanguage === '') {
     acceptLanguage = 'en'
   }
@@ -260,17 +287,16 @@ async function renderMicropage({
     logout: getMessage(bundles, 'logout'),
   }
 
-  let global_locale = 'en'
-  if (!!locales && Array.isArray(locales) && locales.length > 0) {
-    global_locale = negotiateLanguages(
-      userLocales,
-      locales,
-      {
-        defaultLocale: locales[0],
-        strategy: 'lookup'
-      }
-    )
-  }
+  let locales_array = Object.keys(locales)
+  let global_locale = negotiateLanguages(
+    userLocales,
+    locales_array || ['en'],
+    {
+      defaultLocale: locales_array[0] || 'en',
+      strategy: 'lookup'
+    }
+  )
+  global_locale = (global_locale.length > 0 ? global_locale[0] : 'en')
 
   layout = (
     (layout === 'default' || layout === 'person')
@@ -337,13 +363,13 @@ async function renderMicropage({
   const imprint_link = (
     !!imprint && !!imprint !== ''
       ? imprint
-      : 'https://www.volteuropa.org/legal'
+      : default_imprint_link
   )
 
   const privacy_policy_link = (
     !!privacy_policy && !!privacy_policy !== ''
       ? privacy_policy
-      : 'https://www.volteuropa.org/privacy'
+      : default_privacy_policy_link
   )
 
   const canonical = !!code && code !== '' ? `https://volt.link/${code}` : 'https://volt.link/'
@@ -455,6 +481,15 @@ async function renderMicropage({
           .filter(Boolean)
           .join('&nbsp; • &nbsp;')
         }
+        <br />
+        <br />
+        <div class="buttonRow usesLinks basis_0_4">
+          ${
+            Object.entries(locales)
+            .map(([key, value]) => `<a href="?l=${key}"><button class="${key === global_locale ? 'choosen' : ''}">${value}</button></a>`)
+            .join(' ')
+          }
+        </div>
       </footer>
     </body>
   </html>
@@ -541,15 +576,16 @@ async function renderOverview({
     hidden_links_info: getMessage(bundles, 'list_hidden_links_info', { redirect_to: encodeURIComponent(canonical) }),
   }
 
-  const locales = ['en', 'de']
+  let locales_array = Object.keys(locales)
   let global_locale = negotiateLanguages(
     userLocales,
-    locales,
+    locales_array || ['en'],
     {
-      defaultLocale: locales[0],
+      defaultLocale: locales_array[0] || 'en',
       strategy: 'lookup'
     }
   )
+  global_locale = (global_locale.length > 0 ? global_locale[0] : 'en')
 
   const items = Object.entries(await readCache())
 
@@ -632,14 +668,8 @@ async function renderOverview({
 
       <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
       <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-700.woff2" as="font" type="font/woff2" crossorigin/>
-
-      <style>
-        :root {
-          --basis: 0.4rem;
-        }
-      </style>
     </head>
-    <body>
+    <body class="basis_0_4">
       <div class="app spine_aligned" dir="auto">
         <main class="contentWrapper">
           <h1>${translations.title}</h1>
@@ -661,6 +691,15 @@ async function renderOverview({
           .filter(Boolean)
           .join('&nbsp; • &nbsp;')
         }
+        <br />
+        <br />
+        <div class="buttonRow usesLinks">
+          ${
+            Object.entries(locales)
+            .map(([key, value]) => `<a href="?l=${key}"><button class="${key === global_locale ? 'choosen' : ''}">${value}</button></a>`)
+            .join(' ')
+          }
+        </div>
       </footer>
     </body>
   </html>
