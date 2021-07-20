@@ -14,9 +14,9 @@ const header = `
     data-domains="volt.link"
   ></script>
 
-  <link rel="stylesheet" href="/index.css" type="text/css" />
-  <link rel="stylesheet" href="/index-overwrites.css" type="text/css" />
-  <link rel="stylesheet" href="/Ubuntu/index.css" type="text/css" />
+  <link rel="stylesheet" href="/index-1.css" type="text/css" />
+  <link rel="stylesheet" href="/index-overwrites-1.css" type="text/css" />
+  <link rel="stylesheet" href="/Ubuntu/index-1.css" type="text/css" />
 
   <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/Ubuntu/ubuntu-v15-latin-700.woff2" as="font" type="font/woff2" crossorigin/>
