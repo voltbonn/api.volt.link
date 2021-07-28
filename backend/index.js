@@ -1,6 +1,8 @@
 const isDevEnvironment = false
 const path = require('path')
 
+const { v4: uuidv4 } = require('uuid')
+
 const { sendInitialStats } = require('./stats.js')
 
 const {
@@ -107,6 +109,19 @@ function hasEditPermission(permissions, userEmail, strict = false) {
       )
     )
   )
+}
+
+function generateRandomCode(){
+  return new Promise((resolve) => {
+    const newCode = '!' + Math.random().toString(36).substr(2, 5)
+    doesFileExist(newCode, async does_exist => {
+      if (does_exist) {
+        resolve(generateRandomCode())
+      } else {
+        resolve(newCode)
+      }
+    })
+  })
 }
 
 // function getUserLocales(){
@@ -485,6 +500,43 @@ app.post('/set/:code', (req, res) => {
       })
     } else {
       res.json({ error: 'Please provide a valid code.', saved: false })
+    }
+  }
+})
+
+app.post('/set_redirect/', async (req, res) => {
+  if (!req.logged_in) {
+    res.json({ error: 'You are not logged in.' })
+  } else {
+
+    let new_content = req.body
+
+    if (!!new_content && new_content.redirect) {
+      const code = await generateRandomCode()
+
+      new_content = {
+        ...new_content,
+        last_modified: new Date(),
+        last_modified_by: req.user.email || '',
+        permissions: [{
+            _id: uuidv4(),
+            value: req.user.email || '',
+        }],
+      }
+      new_content = yaml.dump(new_content, {
+        indent: 2,
+        sortKeys: false,
+        lineWidth: -1,
+      })
+
+      saveFile(code, new_content)
+        .then(async () => {
+          await gitPull()
+          res.json({ error: null, saved: true, code: code })
+        })
+        .catch(error => res.status(200).json({ error, saved: false }))
+    } else {
+      res.status(200).json({ error: 'please_provide_url', saved: false })
     }
   }
 })
