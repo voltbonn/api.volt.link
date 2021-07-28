@@ -96,20 +96,7 @@ async function renderErrorPage({
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <link rel="icon" href="/volt-logo-white-64.png" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#502379" />
-  <link rel="apple-touch-icon" href="/volt-logo-white-192.png" />
-  <link rel="manifest" href="/manifest.json" />
-
-  <script
-    async
-    defer
-    data-website-id="becf9dc6-db9a-42a7-bc64-9637bd885bff"
-    src="https://umami.qiekub.org/umami.js"
-    data-domains="volt.link"
-  ></script>
+  ${header}
 
   <title>volt.link Error</title>
 
