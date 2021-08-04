@@ -99,7 +99,10 @@ function hasEditPermission(permissions, userEmail, strict = false) {
         strict !== true
         && admin_addresses.includes(userEmail)
       )
-      || !permissions_array_has_content
+      || (
+        strict !== true
+        && !permissions_array_has_content
+      )
       || (
         permissions_array_has_content
         && permissions
