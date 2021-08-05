@@ -109,7 +109,7 @@ async function renderErrorPage({
   }
   </style>
 </head>
-<body>
+<body class="basis_0_4">
 <div class="app spine_aligned" dir="auto">
 <main class="contentWrapper">
   <h1>This is an error page!</h1>

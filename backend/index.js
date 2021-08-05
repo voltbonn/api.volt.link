@@ -357,7 +357,7 @@ app.get('/', (req, res) => {
   ${header}
   <title>volt.link • Micropage and Redirect Server for Volt Europa</title>
 </head>
-<body>
+<body class="basis_0_4">
 <div class="app spine_aligned" dir="auto">
 <main class="contentWrapper">
   <h1>Microservices for Volt Europa</h1>
