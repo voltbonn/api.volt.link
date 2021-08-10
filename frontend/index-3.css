@@ -346,6 +346,24 @@ hr {
   background: var(--on-background);
 }
 
+blockquote {
+  position: relative;
+  padding-left: var(--basis);
+}
+blockquote::before {
+  /* content: "”"; */
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(-1 * var(--basis_x4));
+  font-size: var(--basis_x4);
+  border-right: var(--basis_x0_2) solid currentColor;
+  width: var(--basis_x4);
+  text-align: right;
+  padding-right: var(--basis_x0_5);
+  box-sizing: border-box;
+}
 @media (max-width: 1000px) {
   .hideOnSmallScreen {
     display: none;

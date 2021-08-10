@@ -1,6 +1,13 @@
 const fs = require('fs')
 const path = require('path')
 
+const md = require('markdown-it')({
+  html: true,
+  linkify: true,
+  typographer: true,
+  breaks: true,
+  linkify: true,
+})
 const { negotiateLanguages, acceptedLanguages } = require('@fluent/langneg')
 
 const {
@@ -314,7 +321,7 @@ async function renderMicropage({
               }
             } else if (type === 'text' && !!text) {
               text = fluentByAny(text, userLocales, '')
-              return `<p dir="auto">${text.split('\n').join('<br/>')}</p>`
+              return `<div dir="auto">${md.render(text)}</div>`
             }
             return null
           })
