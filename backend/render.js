@@ -9,6 +9,9 @@ const md = require('markdown-it')({
   linkify: true,
 })
 
+const kbd = require('markdown-it-kbd')
+md.use(kbd)
+
 const emoji = require('markdown-it-emoji')
 const twemoji = require('twemoji')
 md.use(emoji)

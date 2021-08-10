@@ -13,6 +13,7 @@
     "js-yaml": "^4.1.0",
     "markdown-it": "^12.2.0",
     "markdown-it-emoji": "^2.0.0",
+    "markdown-it-kbd": "^2.2.2",
     "passport": "^0.4.1",
     "passport-google-oauth": "^2.0.0",
     "session-file-store": "^1.5.0",

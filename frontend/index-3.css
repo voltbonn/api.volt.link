@@ -112,12 +112,15 @@ body {
 code {
   font-family: 'Ubuntu Mono', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
-code.filled{
-  padding: var(--basis_x0_2);
+code.filled,
+kbd {
+  padding: var(--basis_x0_2) var(--basis_x0_5);
   margin: 0 var(--basis_x0_2);
   border-radius: var(--basis_x0_5);
   background: var(--on-background);
   color: var(--background);
+  font-weight: bold;
+}
 }
 
 a,
