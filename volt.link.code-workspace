@@ -16,5 +16,7 @@
 			"path": "../design-system"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"git.ignoreLimitWarning": true
+	}
 }
