@@ -493,7 +493,10 @@ app.post('/set/:code', (req, res) => {
               res.json({ error: null, saved: true })
               await gitPull()
             })
-              .catch(error => res.status(200).json({ error, saved: false }))
+              .catch(error => {
+                console.error('error', error)
+                res.status(200).json({ error, saved: false })
+              })
           } else {
             res.status(200).json({ error: 'no_edit_permission', saved: false })
           }
