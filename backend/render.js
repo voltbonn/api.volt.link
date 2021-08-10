@@ -8,6 +8,27 @@ const md = require('markdown-it')({
   breaks: true,
   linkify: true,
 })
+
+const emoji = require('markdown-it-emoji')
+const twemoji = require('twemoji')
+md.use(emoji)
+md.renderer.rules.emoji = function(token, idx) {
+  return twemoji.parse(token[idx].content, {
+    folder: 'svg',
+    ext: '.svg',
+    base: '/public/twemoji/assets/',
+    // callback: function(icon, options, variant) {
+    //   // switch ( icon ) {
+    //   //   case 'a9':      // © copyright
+    //   //   case 'ae':      // ® registered trademark
+    //   //   case '2122':    // ™ trademark
+    //   //     return false
+    //   // }
+    //   return ''.concat(options.base, options.size, '/', icon, options.ext)
+    // }
+  })
+}
+
 const { negotiateLanguages, acceptedLanguages } = require('@fluent/langneg')
 
 const {

@@ -364,6 +364,14 @@ blockquote::before {
   padding-right: var(--basis_x0_5);
   box-sizing: border-box;
 }
+
+img.emoji {
+   height: 1em;
+   width: 1em;
+   margin: 0 .05em 0 .1em;
+   vertical-align: -0.1em;
+}
+
 @media (max-width: 1000px) {
   .hideOnSmallScreen {
     display: none;
