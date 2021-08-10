@@ -570,7 +570,7 @@ app.post('/pull', async (req, res) => {
   }
 })
 app.get('/writeCache', async (req, res) => {
-  writeCache()
+  res.json( await writeCache() )
 })
 
 app.get('/rename/:code_old/:code_new', (req, res) => {
