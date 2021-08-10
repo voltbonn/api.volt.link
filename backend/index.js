@@ -553,7 +553,6 @@ app.get('/pull', async (req, res) => {
   }
 })
 app.post('/pull', async (req, res) => {
-  console.log('req.body', req.body)
   const gotten_github_webhook_secret = req.body.hook.config.secret || null
 
   if (
