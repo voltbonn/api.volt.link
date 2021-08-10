@@ -1,0 +1,100 @@
+:root {
+  --white: #fff;
+  --white-rgb: 255, 255, 255;
+  --grey: #ede8f1;
+  --grey-rgb: 237, 232, 241;
+  --dark-grey: #aa94c0;
+  --dark-grey-rgb: 170, 148, 192;
+
+  --purple: #502379;
+  --purple-rgb: 80, 35, 121;
+  --purple-dark: #140022;
+  --purple-dark-rgb: 20, 0, 34;
+
+  --alpha-more: 0.8;
+  --alpha-less: 0.12;
+
+  --blur: 20px;
+
+  --yellow: #FDC220;
+  --on-yellow: #fff;
+  --green: #1BBE6F;
+  --on-green: #fff;
+  --blue: #82D0F4;
+  --blue-dark: #388fb7;
+  --on-blue: #fff;
+  --red: #E63E12;
+  --on-red: #fff;
+}
+
+pre code.hljs{
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
+}
+code.hljs{
+  padding: 3px 5px;
+}
+
+/*!
+  Theme: a11y-dark
+  Author: @ericwbailey
+  Maintainer: @ericwbailey
+
+  Based on the Tomorrow Night Eighties theme: https://github.com/isagalaev/highlight.js/blob/master/src/styles/tomorrow-night-eighties.css
+*/
+
+.hljs{
+  background: var(--white);
+  color: var(--purple);
+}
+.hljs-comment,.hljs-quote{
+  color: var(--dark-grey);
+}
+.hljs-deletion,.hljs-regexp,.hljs-selector-class,.hljs-selector-id,.hljs-tag,.hljs-template-variable,.hljs-variable{
+  color: var(--purple);
+}
+.hljs-built_in,.hljs-link,.hljs-literal,.hljs-meta,.hljs-number,.hljs-params,.hljs-type{
+  color: var(--yellow);
+}
+.hljs-attribute{
+  color: var(--yellow);
+}
+.hljs-addition,.hljs-bullet,.hljs-string,.hljs-symbol{
+  color: var(--green);
+}
+.hljs-section,.hljs-title,.hljs-name{
+  color: var(--blue-dark);
+}
+.hljs-keyword,.hljs-selector-tag{
+  color: var(--red);
+}
+.hljs-emphasis{
+  font-style: italic;
+}
+.hljs-strong{
+  font-weight: 700;
+}
+@media screen and (-ms-high-contrast:active){
+  .hljs-addition,.hljs-attribute,.hljs-built_in,.hljs-bullet,.hljs-comment,.hljs-link,.hljs-literal,.hljs-meta,.hljs-number,.hljs-params,.hljs-quote,.hljs-string,.hljs-symbol,.hljs-type{
+    color: highlight;
+  }
+  .hljs-keyword,.hljs-selector-tag{
+    font-weight: 700;
+  }
+}
+
+
+
+@media screen and (prefers-color-scheme: dark) {
+  .hljs{
+    background: var(--purple-dark);
+    color: var(--white);
+  }
+  .hljs-deletion,.hljs-regexp,.hljs-selector-class,.hljs-selector-id,.hljs-tag,.hljs-template-variable,.hljs-variable{
+    color: var(--white);
+  }
+  .hljs-section,.hljs-title,.hljs-name{
+    color: var(--blue);
+  }
+}

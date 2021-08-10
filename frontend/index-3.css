@@ -109,7 +109,8 @@ body {
   font-size: var(--body-font-size);
 }
 
-code {
+code,
+code * {
   font-family: 'Ubuntu Mono', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 code.filled,
@@ -121,6 +122,9 @@ kbd {
   color: var(--background);
   font-weight: bold;
 }
+
+pre.hljs {
+  margin: var(--basis) 0;
 }
 
 a,

@@ -1,12 +1,30 @@
 const fs = require('fs')
 const path = require('path')
 
+var hljs = require('highlight.js') // https://highlightjs.org/
+// console.log('hljs', hljs)
 const md = require('markdown-it')({
   html: true,
   linkify: true,
   typographer: true,
   breaks: true,
   linkify: true,
+  highlight: function (str, lang) {
+    const language_obj = hljs.getLanguage(lang)
+    if (lang && language_obj) {
+      const language = language_obj.aliases[0]
+      return '<pre class="hljs language-'+language+'"><code>' +
+        hljs.highlight(str, { language, ignoreIllegals: true }).value +
+      '</code></pre>';
+    } else {
+      const html = hljs.highlightAuto(str, { ignoreIllegals: true })
+      return '<pre class="hljs language-'+html.language+'"><code>' +
+        html.value +
+      '</code></pre>';
+    }
+
+    return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
+  }
 })
 
 const kbd = require('markdown-it-kbd')

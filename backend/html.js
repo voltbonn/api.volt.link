@@ -15,6 +15,7 @@ const header = `
   ></script>
 
   <link rel="stylesheet" href="/index-3.css" type="text/css" />
+  <link rel="stylesheet" href="/public/highlightjs-volt-theme.css" type="text/css" />
   <link rel="stylesheet" href="/index-overwrites-1.css" type="text/css" />
   <link rel="stylesheet" href="/Ubuntu/index-1.css" type="text/css" />
 
