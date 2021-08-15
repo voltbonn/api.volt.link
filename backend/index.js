@@ -159,8 +159,8 @@ function checkOrigin(origin){
 async function session_middleware(req, res, next) {
 
   const origin = req.header('Origin')
-    req.headers['-x-session'] = 's%3ACQVVgUS2NBtN5mo0QAdCCy1axq4J1joq.P4NuOzQxvxnuE9Ndqw5PBbLDWvqRQt3RYYHgGqDkmCE'
   if (typeof origin === 'string' && checkOrigin(origin)) {
+    req.headers['-x-session'] = 's%3AKocCWIRURsza12otNmXKA44wBGNWazFF.yBRd1bHTb63MGAWmUhUC%2BjbaTavXZz1g%2FoTL71R9uJQ'
   }
 
   if (!!req.headers['-x-session']) {
