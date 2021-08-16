@@ -161,11 +161,6 @@ function checkOrigin(origin){
 // START AUTH
 async function session_middleware(req, res, next) {
 
-  const origin = req.header('Origin')
-  if (checkOrigin(origin)) {
-    req.headers['-x-session'] = 's%3AKocCWIRURsza12otNmXKA44wBGNWazFF.yBRd1bHTb63MGAWmUhUC%2BjbaTavXZz1g%2FoTL71R9uJQ'
-  }
-
   if (!!req.headers['-x-session']) {
     req.headers.cookie = '__session=' + req.headers['-x-session']
   }
