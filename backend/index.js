@@ -312,6 +312,7 @@ app.get('/logout', function (req, res) {
   req.session.save(error => { // save the above setting
     if (error) {
       console.error(error)
+      res.send(error)
     } else {
       const redirect_to = req.query.redirect_to
       res.redirect(typeof redirect_to === 'string' && redirect_to.length > 0 ? redirect_to : '/') // send the updated cookie to the user and go to the initally page
