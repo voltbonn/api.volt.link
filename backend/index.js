@@ -361,7 +361,10 @@ app.get('/user.json', async (req, res) => {
 })
 
 app.get('/login', (req, res) => {
-  res.redirect('/auth/google')
+  res.redirect(url.format({
+    pathname: '/auth/google',
+    query: req.query,
+  }))
 })
 
 app.get('/', (req, res) => {
