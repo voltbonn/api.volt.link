@@ -273,6 +273,7 @@ app.get(
   '/auth/google/callback',
   passport.authenticate('google', { failureFlash: true, failureRedirect: '/auth/failure' }),
   function (req, res) {
+    console.log('req.session.redirect_to', req.session.redirect_to)
     const redirect_to = req.session.redirect_to
     req.session.redirect_to = null
     res.redirect(typeof redirect_to === 'string' ? redirect_to : '/')
