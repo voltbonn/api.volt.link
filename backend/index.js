@@ -243,6 +243,7 @@ app.use(function (req, res, next) {
     req.session.redirect_to = req.query.redirect_to + '' // TODO: Why does this need to be converted to a string? To need pass a pointer but the value?
   }
 
+  console.log('req.user', req.user)
   if (!!req.user && !!req.user.id && req.user.id !== null) {
     req.logged_in = true
   } else {
@@ -338,6 +339,7 @@ app.options("/*", function (req, res, next) {
 })
 
 app.get('/user.json', async (req, res) => {
+  console.log('req.logged_in', req.logged_in)
   if (req.logged_in) {
     const editable_links = Object.entries(await readCache() || [])
     .filter(entry => {
