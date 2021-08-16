@@ -25,6 +25,7 @@ const {
 const yaml = require('js-yaml')
 
 const express = require('express')
+const RateLimit = require('express-rate-limit')
 const session = require('express-session')
 const FileStore = require('session-file-store')(session)
 const passport = require('passport')
@@ -136,6 +137,14 @@ function generateRandomCode(){
 // }
 
 const app = express()
+
+// set up rate limiter: maximum of 100 requests per minute
+var limiter = new RateLimit({
+  windowMs: 1*60*1000, // 1 minute
+  max: 100, // requests per minute
+})
+app.use(limiter) // apply rate limiter to all requests
+
 app.use(express.json())
 
 // app.use(express.static('../frontend/'))
