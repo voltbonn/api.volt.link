@@ -217,7 +217,9 @@ passport.use(new GoogleStrategy({
         status: 'internal',
         id: profile.id,
         displayName: profile.displayName,
+        name: profile.name || {},
         email: profile.emails[0].value,
+        picture: (profile.photos && profile.photos.length > 0 && profile.photos[0].value ? profile.photos[0].value : ''),
       })
     } else {
       done(null, {
