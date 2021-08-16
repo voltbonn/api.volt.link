@@ -141,6 +141,7 @@ app.use(express.json())
 app.use(express.static(path.join(__dirname, '../frontend/')))
 
 function checkOrigin(origin){
+  console.log(`checkOrigin: ${origin}`)
   return (
     typeof origin === 'string'
     && (
