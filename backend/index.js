@@ -141,7 +141,6 @@ app.use(express.json())
 app.use(express.static(path.join(__dirname, '../frontend/')))
 
 function checkOrigin(origin){
-  console.log(`checkOrigin: ${origin}`)
   return (
     typeof origin === 'string'
     && (
@@ -244,10 +243,11 @@ app.use(function (req, res, next) {
     req.session.redirect_to = req.query.redirect_to + '' // TODO: Why does this need to be converted to a string? To need pass a pointer but the value?
   }
 
-  console.log('req.user', req.user)
   if (!!req.user && !!req.user.id && req.user.id !== null) {
+    console.log('req.user', req.user.displayName)
     req.logged_in = true
   } else {
+    console.log('req.user', false)
     req.logged_in = false
   }
 
