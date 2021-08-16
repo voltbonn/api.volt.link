@@ -1,5 +1,6 @@
 const isDevEnvironment = false
 const path = require('path')
+const url = require('url')
 
 const { v4: uuidv4 } = require('uuid')
 
@@ -231,13 +232,6 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.use(function (req, res, next) {
-  if (
-    typeof req.query.redirect_to === 'string'
-    && req.query.redirect_to !== ''
-  ) {
-    req.session.redirect_to = req.query.redirect_to + '' // TODO: Why does this need to be converted to a string? To need pass a pointer but the value?
-  }
-
   if (!!req.user && !!req.user.id && req.user.id !== null) {
     req.logged_in = true
   } else {
@@ -258,21 +252,30 @@ app.use(function (req, res, next) {
   next()
 })
 
-app.get('/auth/google', passport.authenticate('google', { scope: [
-  'https://www.googleapis.com/auth/userinfo.email'
-] }))
+app.get('/auth/google', function (req, res) {
+  passport.authenticate('google', {
+    scope: [
+      'https://www.googleapis.com/auth/userinfo.email',
+    ],
+    state: JSON.stringify({
+      redirect_to: req.query.redirect_to || ''
+    }),
+  })(req, res)
+})
 
 app.get(
   '/auth/google/callback',
-  passport.authenticate('google', { failureFlash: true, failureRedirect: '/auth/failure' }),
+  passport.authenticate('google', { failureFlash: false, failureRedirect: '/auth/failure' }),
   function (req, res) {
-    const redirect_to = req.session.redirect_to
-    req.session.redirect_to = null
-    res.redirect(typeof redirect_to === 'string' ? redirect_to : '/')
+    let redirect_to = null
+    if (req.query.state) {
+      const state = JSON.parse(req.query.state)
+      redirect_to = state.redirect_to
+    }
+    res.redirect(typeof redirect_to === 'string' && redirect_to.length > 0 ? redirect_to : '/')
   }
 )
 app.get('/auth/failure', function (req, res) {
-    const redirect_to = req.session.redirect_to
   res.send(`
 <!DOCTYPE html>
 <html lang="en">
@@ -297,11 +300,6 @@ a:hover {
   <h1>Login Error</h1>
   <p>You need to use a Volt Europa account to log in.</p>
   <!--sse-->Contact: <a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a></br><!--/sse-->
-  ${
-    redirect_to !== null
-    ? `Go back to: <a href="${redirect_to}">${redirect_to}</a>`
-    : ''
-  }
 </body>
 </html>
 `)
@@ -315,9 +313,8 @@ app.get('/logout', function (req, res) {
     if (error) {
       console.error(error)
     } else {
-      const redirect_to = req.session.redirect_to
-      req.session.redirect_to = null
-      res.redirect(typeof redirect_to === 'string' ? redirect_to : '/') // send the updated cookie to the user and go to the start page
+      const redirect_to = req.query.redirect_to
+      res.redirect(typeof redirect_to === 'string' && redirect_to.length > 0 ? redirect_to : '/') // send the updated cookie to the user and go to the initally page
     }
   })
 })
