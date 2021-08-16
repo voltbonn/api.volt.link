@@ -353,11 +353,13 @@ app.get('/user.json', async (req, res) => {
       user: {
         ...req.user,
         editable: editable_links,
+        logged_in: true,
       },
     })
   } else {
     res.json({
-      user: null
+      user: null,
+      logged_in: false,
     })
   }
 })
