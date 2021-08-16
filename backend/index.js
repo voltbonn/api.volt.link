@@ -304,7 +304,11 @@ a:hover {
   <h1>Login Error</h1>
   <p>You need to use a Volt Europa account to log in.</p>
   <!--sse-->Contact: <a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a></br><!--/sse-->
-  Go back to: <a href="${redirect_to}">${redirect_to}</a>
+  ${
+    redirect_to !== null
+    ? `Go back to: <a href="${redirect_to}">${redirect_to}</a>`
+    : ''
+  }
 </body>
 </html>
 `)
