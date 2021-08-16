@@ -142,16 +142,19 @@ app.use(express.static(path.join(__dirname, '../frontend/')))
 
 function checkOrigin(origin){
   return (
-    // allow from subdomains
-    origin.endsWith('.volt.link')
+    typeof origin === 'string'
+    && (
+      // allow from subdomains
+      origin.endsWith('.volt.link')
 
-    // allow for localhost
-    || origin.endsWith('localhost:3000')
-    || origin.endsWith('localhost:4000')
-    || origin.endsWith('0.0.0.0:3000')
-    || origin.endsWith('0.0.0.0:4000')
-    || origin.endsWith('192.168.0.105:3000')
-    || origin.endsWith('192.168.0.105:4000')
+      // allow for localhost
+      || origin.endsWith('localhost:3000')
+      || origin.endsWith('localhost:4000')
+      || origin.endsWith('0.0.0.0:3000')
+      || origin.endsWith('0.0.0.0:4000')
+      || origin.endsWith('192.168.0.105:3000')
+      || origin.endsWith('192.168.0.105:4000')
+    )
   )
 }
 
@@ -159,7 +162,7 @@ function checkOrigin(origin){
 async function session_middleware(req, res, next) {
 
   const origin = req.header('Origin')
-  if (typeof origin === 'string' && checkOrigin(origin)) {
+  if (checkOrigin(origin)) {
     req.headers['-x-session'] = 's%3AKocCWIRURsza12otNmXKA44wBGNWazFF.yBRd1bHTb63MGAWmUhUC%2BjbaTavXZz1g%2FoTL71R9uJQ'
   }
 
@@ -248,7 +251,7 @@ app.use(function (req, res, next) {
 
   // const origin = req.get('origin')
   const origin = req.header('Origin')
-  if (typeof origin === 'string' && checkOrigin(origin)) {
+  if (checkOrigin(origin)) {
     req.is_subdomain = true
     req.origin = origin
     res.setHeader('Access-Control-Allow-Origin', origin)
