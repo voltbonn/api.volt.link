@@ -189,7 +189,8 @@ p {
   text-decoration: inherit;
 }
 
-ul {
+ul,
+ol {
   margin-inline-start: var(--basis_x4);
   max-width: calc(100% - var(--basis_x4));
 }
