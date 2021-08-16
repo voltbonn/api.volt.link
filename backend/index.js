@@ -239,10 +239,8 @@ app.use(function (req, res, next) {
   }
 
   if (!!req.user && !!req.user.id && req.user.id !== null) {
-    console.log('req.user', req.user.displayName)
     req.logged_in = true
   } else {
-    console.log('req.user', false)
     req.logged_in = false
   }
 
@@ -268,7 +266,6 @@ app.get(
   '/auth/google/callback',
   passport.authenticate('google', { failureFlash: true, failureRedirect: '/auth/failure' }),
   function (req, res) {
-    console.log('req.session.redirect_to', req.session.redirect_to)
     const redirect_to = req.session.redirect_to
     req.session.redirect_to = null
     res.redirect(typeof redirect_to === 'string' ? redirect_to : '/')
@@ -340,7 +337,6 @@ app.options("/*", function (req, res, next) {
 })
 
 app.get('/user.json', async (req, res) => {
-  console.log('req.logged_in', req.logged_in)
   if (req.logged_in) {
     const editable_links = Object.entries(await readCache() || [])
     .filter(entry => {
