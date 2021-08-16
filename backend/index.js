@@ -581,17 +581,27 @@ app.get('/pull', async (req, res) => {
   }
 })
 app.post('/pull', async (req, res) => {
-  const gotten_github_webhook_secret = req.body.hook.config.secret || null
-
-  if (
-    req.logged_in
-    || (
-      !!gotten_github_webhook_secret
-      && gotten_github_webhook_secret === process.env.github_webhook_secret
-    )
+  if ( // check for github secret
+    req
+    && req.body
+    && req.body.hook
+    && req.body.hook.config
+    && req.body.hook.config.secret
   ) {
-    await gitPull()
-    res.json({ done: true })
+    const gotten_github_webhook_secret = req.body.hook.config.secret || null
+
+    if (
+      req.logged_in
+      || (
+        !!gotten_github_webhook_secret
+        && gotten_github_webhook_secret === process.env.github_webhook_secret
+      )
+    ) {
+      await gitPull()
+      res.json({ done: true })
+    } else {
+      res.json({ error: 'You are not logged in.' })
+    }
   } else {
     res.json({ error: 'You are not logged in.' })
   }
