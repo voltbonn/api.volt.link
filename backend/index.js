@@ -382,10 +382,10 @@ app.get('/', (req, res) => {
   <ul>
     ${
       req.logged_in
-      ? `<li>Create a micropage/linktree or redirect: <a href="https://edit.volt.link/">edit.volt.link</a></li>`
-      : `<li>Create a micropage/linktree or redirect: <a href="https://volt.link/login?redirect_to=https%3A%2F%2Fedit.volt.link%2F">Login and edit volt.link</a></li>`
+      ? `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:3000' : 'https://edit.volt.link'}">edit.volt.link</a></li>`
+      : `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:4000' : 'https://volt.link'}/login?redirect_to=${isDevEnvironment ? 'http%3A%2F%2Flocalhost:3000' : 'https%3A%2F%2Fedit.volt.link'}">Login and edit volt.link</a></li>`
     }
-    <li>All volt.link micropages and redirects: <a href="https://volt.link/list">volt.link/list</a></li>
+    <li>All volt.link micropages and redirects: <a href="${isDevEnvironment ? 'http://localhost:4000' : 'https://volt.link'}/list">volt.link/list</a></li>
     <li>Contact <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">Thomas Rosen</a><!--/sse--> for help with volt.link.</li>
   </ul>
 
@@ -414,8 +414,8 @@ app.get('/', (req, res) => {
     <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">Contact</a><!--/sse-->
     ${
       req.logged_in
-      ? `&nbsp; • &nbsp;<a href="https://volt.link/logout">Logout</a>`
-      : `&nbsp; • &nbsp;<a href="https://volt.link/login">Login</a>`
+      ? `&nbsp; • &nbsp;<a href="${isDevEnvironment ? 'http://localhost:4000' : 'https://volt.link'}/logout">Logout</a>`
+      : `&nbsp; • &nbsp;<a href="${isDevEnvironment ? 'http://localhost:4000' : 'https://volt.link'}/login">Login</a>`
     }
     &nbsp; • &nbsp;<a href="https://www.volteuropa.org/legal">Imprint</a>
     &nbsp; • &nbsp;<a href="https://www.volteuropa.org/privacy">Privacy Policy</a>
