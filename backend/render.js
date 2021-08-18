@@ -456,11 +456,9 @@ async function renderPagesList({ pages, userLocales, logged_in }) {
       })
       .map(page => {
         let {
-          use_as,
           code,
           title,
           description,
-          permissions,
           last_modified,
         } = page
 
