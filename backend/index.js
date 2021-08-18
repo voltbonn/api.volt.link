@@ -15,13 +15,16 @@ const {
   writeCache,
   readCache,
 } = require('./git_functions.js')
+
 const { header } = require('./html.js')
+
 const {
   renderErrorPage,
   renderLoginPage,
   renderMicropage,
   renderOverview,
 } = require('./render.js')
+
 const yaml = require('js-yaml')
 
 const express = require('express')
