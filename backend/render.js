@@ -110,6 +110,7 @@ async function renderErrorPage({
     console.error(error)
   }
 
+
   return `
 <!DOCTYPE html>
 <html lang="en">
