@@ -1,3 +1,5 @@
+const isDevEnvironment = process.env.environment === 'dev' || false
+
 const fs = require('fs')
 const path = require('path')
 
@@ -80,6 +82,16 @@ async function renderErrorPage({
   acceptLanguage = 'en',
 }) {
   const userLocales = acceptedLanguages(acceptLanguage)
+  const bundles = await loadFluentBundles({ acceptLanguage })
+  const translations = {
+    login: getMessage(bundles, 'login'),
+    logout: getMessage(bundles, 'logout'),
+    imprint: getMessage(bundles, 'imprint'),
+    privacy_policy: getMessage(bundles, 'privacy_policy'),
+  }
+
+  const prefix = (isDevEnvironment ? 'http://localhost:4000' : 'https://volt.link')
+  const canonical = !!code && code !== '' ? `${prefix}/${code}` : `${prefix}/`
 
   const pages = await getSimilarCodes({ code, userLocales, logged_in })
   const the_list = await renderPagesList({ pages, userLocales, logged_in })
@@ -135,6 +147,21 @@ async function renderErrorPage({
   <br />
   <h3>Detailed error message:</h3>
   <pre><code>${JSON.stringify(error, null, 2)}</code></pre>
+  <footer>
+    ${
+      [
+        `<a href="${default_imprint_link}">${translations.imprint}</a>`,
+        `<a href="${default_privacy_policy_link}">${translations.privacy_policy}</a>`,
+        (
+          logged_in
+          ? `<a href="${isDevEnvironment ? 'http://localhost:4000' : 'https://volt.link'}/logout?redirect_to=${encodeURIComponent(canonical)}">${translations.logout}</a>`
+          : `<a href="${isDevEnvironment ? 'http://localhost:4000' : 'https://volt.link'}/login?redirect_to=${encodeURIComponent(canonical)}">${translations.login}</a>`
+        ),
+      ]
+      .filter(Boolean)
+      .join('&nbsp; • &nbsp;')
+    }
+  </footer>
   </main>
 </div>
 </body>
