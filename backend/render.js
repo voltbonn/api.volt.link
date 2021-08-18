@@ -134,11 +134,13 @@ async function renderErrorPage({
   <br>
   <p>Please contact <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a><!--/sse--> if you think this is an error.</p>
   <p>Go to <a href="https://volteuropa.org">volteuropa.org</a> for information about the Pan-European Political Movement.</p>
-  <br />
-  <h3>Here's a meme for your entertainment:</h3>
   <br>
   <h2>…but maybe one of these links is what you are looking for:</h2>
   ${the_list}
+  <br>
+  <hr>
+  <br>
+  <h2>Here's a meme for your entertainment:</h2>
   ${
     memeFilename !== null
     ? `<a href="https://volt.link/memes/"><img class="meme" src="/public/memes/${memeFilename}" /></a>`
