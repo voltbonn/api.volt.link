@@ -53,6 +53,11 @@ md.renderer.rules.emoji = function(token, idx) {
 const { negotiateLanguages, acceptedLanguages } = require('@fluent/langneg')
 
 const {
+  filterPagesByPermission,
+  getSimilarCodes,
+} = require('./functions.js')
+
+const {
   fluentByAny,
 } = require('./fluent_functions.js')
 
@@ -69,9 +74,17 @@ const default_imprint_link = 'https://www.volteuropa.org/legal'
 const default_privacy_policy_link = 'https://www.volteuropa.org/privacy'
 
 async function renderErrorPage({
+  code = '',
   error = '',
+  logged_in = false,
   acceptLanguage = 'en',
 }) {
+  const userLocales = acceptedLanguages(acceptLanguage)
+
+  const pages = await getSimilarCodes({ code, userLocales, logged_in })
+  const the_list = await renderPagesList({ pages, userLocales, logged_in })
+
+
   let memeFilename = null
 
   try {
@@ -105,14 +118,15 @@ async function renderErrorPage({
 <body class="basis_0_4">
 <div class="app spine_aligned" dir="auto">
 <main class="contentWrapper">
-  <h1>This is an error page!</h1>
-  <p>
-    There was a problem or we couldn't find the page associated with this url.<br>
-    Please contact <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a><!--/sse--> for further information.
-  </p>
+  <h1>We could not find the requested URL…</h1>
+  <br>
+  <p>Please contact <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a><!--/sse--> if you think this is an error.</p>
   <p>Go to <a href="https://volteuropa.org">volteuropa.org</a> for information about the Pan-European Political Movement.</p>
   <br />
   <h3>Here's a meme for your entertainment:</h3>
+  <br>
+  <h2>…but maybe one of these links is what you are looking for:</h2>
+  ${the_list}
   ${
     memeFilename !== null
     ? `<a href="https://volt.link/memes/"><img class="meme" src="/public/memes/${memeFilename}" /></a>`

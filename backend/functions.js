@@ -1,3 +1,64 @@
+const levenshtein = require('damerau-levenshtein')
+
+const {
+  readCache,
+} = require('./git_functions.js')
+
+function filterPagesByPermission(pages, {
+  logged_in = false
+}) {
+  return pages.filter(page => {
+    let { permissions } = page
+
+    let needsToLogin = false
+    if (!logged_in) {
+      if (
+        !!permissions
+        && Array.isArray(permissions)
+        && permissions.length > 0
+      ) {
+        needsToLogin = permissions.filter(p => p.role === 'viewer' && p.value === '@volteuropa.org').length > 0
+      }
+    }
+
+    return !needsToLogin
+  })
+}
+
+async function getSimilarCodes({
+  code = '',
+  // userLocales = [],
+  logged_in = false,
+}){
+  let pages = Object.entries(await readCache())
+  .map(entry => ({
+    code: entry[0],
+    ...entry[1]
+  }))
+  .filter(page => page.code !== code)
+
+  pages = filterPagesByPermission(pages, { logged_in })
+  .map(page => {
+    const levenshtein_code = levenshtein(code, page.code)
+
+    const levenshtein_title_similarity = Math.max( // the highst similarity is the best match
+      ...
+      (page.title || [])
+      .map(({value}) => levenshtein(code, value).similarity) // get the levenstein-similarity of each title
+    ) * 1.5 // give the title-similarity a boost of 1.5
+
+    return {
+      ...page,
+      levenshtein_similarity: Math.max(levenshtein_code.similarity, levenshtein_title_similarity)
+    }
+  })
+  .filter(page => page.levenshtein_similarity > 0.3)
+  .sort((a, b) => b.levenshtein_similarity - a.levenshtein_similarity)
+  .slice(0, 6)
+
+  return pages
+}
+
 const forbidden = {
   codes: `
 undefined
@@ -116,6 +177,8 @@ function checkOrigin(origin){
 }
 
 module.exports = {
+  filterPagesByPermission,
+  getSimilarCodes,
   forbidden,
   quickcheckCode,
   hasEditPermission,

@@ -695,6 +695,8 @@ app.get('/:code', (req, res) => {
             }))
           } else {
             res.status(404).send(await renderErrorPage({
+              code,
+              logged_in: req.logged_in,
               error,
               acceptLanguage: userLocalesString,
             }))
@@ -709,6 +711,8 @@ app.get('/:code', (req, res) => {
     })
     .catch(async error => res.status(404).send(
       await renderErrorPage({
+        code,
+        logged_in: req.logged_in,
         error,
         acceptLanguage: userLocalesString,
       })
