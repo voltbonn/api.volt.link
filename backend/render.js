@@ -55,6 +55,7 @@ const { negotiateLanguages, acceptedLanguages } = require('@fluent/langneg')
 const {
   readCache,
 } = require('./git_functions.js')
+
 const { header } = require('./html.js')
 
 const { locales, loadFluentBundles, getMessage } = require('../fluent/l10n.js')
