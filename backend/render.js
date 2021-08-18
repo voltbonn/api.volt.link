@@ -477,24 +477,11 @@ async function renderMicropage({
 }
 
 async function renderPagesList({ pages, userLocales, logged_in }) {
+
+  pages = filterPagesByPermission(pages, { logged_in })
+
   return `<div class="items">
     ${pages
-      .filter(entry => {
-        let { permissions } = entry[1]
-
-        let needsToLogin = false
-        if (!logged_in) {
-          if (
-            !!permissions
-            && Array.isArray(permissions)
-            && permissions.length > 0
-          ) {
-            needsToLogin = permissions.filter(p => p.role === 'viewer' && p.value === '@volteuropa.org').length > 0
-          }
-        }
-
-        return !needsToLogin
-      })
       .map(page => {
         let {
           code,
@@ -566,6 +553,10 @@ async function renderOverview({
   global_locale = (global_locale.length > 0 ? global_locale[0] : 'en')
 
   const pages = Object.entries(await readCache())
+  .map(entry => ({
+    code: entry[0],
+    ...entry[1]
+  }))
 
   let the_list = null
   let the_menu = ''
