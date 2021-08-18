@@ -1,4 +1,4 @@
-const isDevEnvironment = false
+const isDevEnvironment = process.env.environment === 'dev' || false
 const path = require('path')
 const url = require('url')
 
