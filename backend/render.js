@@ -435,9 +435,9 @@ async function renderMicropage({
   `
 }
 
-async function renderOverviewItems({ items, userLocales, logged_in }) {
+async function renderPagesList({ pages, userLocales, logged_in }) {
   return `<div class="items">
-    ${items
+    ${pages
       .filter(entry => {
         let { permissions } = entry[1]
 
@@ -454,15 +454,15 @@ async function renderOverviewItems({ items, userLocales, logged_in }) {
 
         return !needsToLogin
       })
-      .map(entry => {
-        const code = entry[0]
+      .map(page => {
         let {
           use_as,
+          code,
           title,
           description,
           permissions,
           last_modified,
-        } = entry[1]
+        } = page
 
         title = fluentByAny(title, userLocales, '')
         if (title === '') {
@@ -526,7 +526,7 @@ async function renderOverview({
   )
   global_locale = (global_locale.length > 0 ? global_locale[0] : 'en')
 
-  const items = Object.entries(await readCache())
+  const pages = Object.entries(await readCache())
 
   let the_list = null
   let the_menu = ''
@@ -537,13 +537,13 @@ async function renderOverview({
 
   switch (filter) {
     case 'micropages':
-      the_list = items.filter(entry => !entry[0].includes('.') && (entry[1].use_as === 'micropage' || entry[1].use_as === 'linklist'))
+      the_list = pages.filter(page => !page.code.includes('.') && (page.use_as === 'micropage' || page.use_as === 'linklist'))
       break
     case 'redirects':
-      the_list = items.filter(entry => !entry[0].includes('.') && entry[1].use_as === 'redirect')
+      the_list = pages.filter(page => !page.code.includes('.') && page.use_as === 'redirect')
       break
     case 'people':
-      the_list = items.filter(entry => entry[0].includes('.'))
+      the_list = pages.filter(page => page.code.includes('.'))
       break
   }
 
@@ -562,7 +562,7 @@ async function renderOverview({
       }
       </div>
     `
-    the_list = await renderOverviewItems({ items: the_list, userLocales, logged_in })
+    the_list = await renderPagesList({ items: the_list, userLocales, logged_in })
   } else {
     the_list = ''
   }
