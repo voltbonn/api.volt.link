@@ -137,6 +137,8 @@ async function getSimilarCodes({
   // userLocales = [],
   logged_in = false,
 }){
+  code = code.toLowerCase()
+
   const code_without_diacritics = removeDiacritics(code)
   let pages = Object.entries(await readCache())
   .map(entry => ({
