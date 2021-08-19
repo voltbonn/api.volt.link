@@ -137,6 +137,7 @@ async function getSimilarCodes({
   // userLocales = [],
   logged_in = false,
 }){
+  const code_without_diacritics = removeDiacritics(code)
   let pages = Object.entries(await readCache())
   .map(entry => ({
     code: entry[0],
@@ -146,12 +147,12 @@ async function getSimilarCodes({
 
   pages = filterPagesByPermission(pages, { logged_in })
   .map(page => {
-    const levenshtein_code = levenshtein(code, page.code)
+    const levenshtein_code = levenshtein(code_without_diacritics, page.code) // Use the code without diacritics.
 
     const levenshtein_title_similarity = Math.max( // the highst similarity is the best match
       ...
       (page.title || [])
-      .map(({value}) => levenshtein(code, value).similarity) // get the levenstein-similarity of each title
+      .map(({value}) => levenshtein(code, value).similarity) // Use the originally entered code to get the levenstein-similarity of each title.
     ) * 1.5 // give the title-similarity a boost of 1.5
 
     return {
