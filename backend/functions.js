@@ -159,12 +159,12 @@ async function getSimilarCodes({
 
     return {
       ...page,
-      levenshtein_similarity: Math.max(levenshtein_code.similarity, levenshtein_title_similarity)
+      similarity: Math.max(levenshtein_code.similarity, levenshtein_title_similarity),
     }
   })
-  .filter(page => page.levenshtein_similarity > 0.3)
-  .sort((a, b) => b.levenshtein_similarity - a.levenshtein_similarity)
   .slice(0, 6)
+  .filter(page => page.similarity > 0.3)
+  .sort((a, b) => b.similarity - a.similarity)
 
   return pages
 }
