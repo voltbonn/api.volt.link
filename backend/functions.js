@@ -143,7 +143,7 @@ function ngramStringDistance(str1, str2, max_ngram_size) {
 
   let result = 0
 
-  if (max_ngram_size > 1) {
+  if (max_ngram_size > 0) {
     const n1 = [...ngrams(max_ngram_size, str1)]
     const n2 = [...ngrams(max_ngram_size, str2)]
 
