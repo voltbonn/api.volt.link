@@ -94,7 +94,7 @@ async function renderErrorPage({
   const canonical = !!code && code !== '' ? `${prefix}/${code}` : `${prefix}/`
 
   const pages = await getSimilarCodes({ code, userLocales, logged_in })
-  const the_list = await renderPagesList({ pages, userLocales, logged_in })
+  const the_list = pages.length > 0 ? await renderPagesList({ pages, userLocales, logged_in }) : null
 
 
   let memeFilename = null
@@ -135,11 +135,17 @@ async function renderErrorPage({
   <br>
   <p>Please contact <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">thomas.rosen@volteuropa.org</a><!--/sse--> if you think this is an error.</p>
   <p>Go to <a href="https://volteuropa.org">volteuropa.org</a> for information about the Pan-European Political Movement.</p>
-  <br>
-  <h2>…but maybe one of these links is what you are looking for:</h2>
-  ${the_list}
-  <br>
-  <hr>
+  ${
+    the_list
+      ? `
+        <br>
+        <h2>…but maybe one of these links is what you are looking for:</h2>
+        ${the_list}
+        <br>
+        <hr>
+        `
+      : ''
+  }
   <br>
   <h2>Here's a meme for your entertainment:</h2>
   ${
