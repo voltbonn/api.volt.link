@@ -317,8 +317,6 @@ function checkOrigin(origin){
       || origin.endsWith('localhost:4000')
       || origin.endsWith('0.0.0.0:3000')
       || origin.endsWith('0.0.0.0:4000')
-      || origin.endsWith('192.168.0.105:3000')
-      || origin.endsWith('192.168.0.105:4000')
     )
   )
 }
