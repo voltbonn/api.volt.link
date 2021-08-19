@@ -1,4 +1,5 @@
 const levenshtein = require('damerau-levenshtein')
+const ngrams = require('talisman/tokenizers/ngrams')
 
 const {
   readCache,
@@ -132,6 +133,32 @@ function filterPagesByPermission(pages, {
   })
 }
 
+function ngramStringDistance(str1, str2, max_ngram_size) {
+  if (!max_ngram_size) {
+    max_ngram_size = Math.min(str1.length, str2.length)
+    if (max_ngram_size > 3) {
+      max_ngram_size = 3
+    }
+  }
+
+  let result = 0
+
+  if (max_ngram_size > 1) {
+    const n1 = [...ngrams(max_ngram_size, str1)]
+    const n2 = [...ngrams(max_ngram_size, str2)]
+
+    const filteredArray = n1.filter(value => n2.includes(value))
+    result = filteredArray.length * max_ngram_size
+    if (max_ngram_size - 1 > 0) {
+      result += ngramStringDistance(str1, str2, max_ngram_size - 1)
+    }
+
+    return result / Math.max(str1.length, str2.length)
+  }
+
+  return result
+}
+
 async function getSimilarCodes({
   code = '',
   // userLocales = [],
@@ -150,23 +177,22 @@ async function getSimilarCodes({
 
   pages = filterPagesByPermission(pages, { logged_in })
   .map(page => {
-    const levenshtein_code = levenshtein(code_without_diacritics, page.code) // Use the code without diacritics.
+    const ngram_score = ngramStringDistance(code_without_diacritics, page.code)
 
-    const levenshtein_title_similarity = Math.max( // the highst similarity is the best match
+    const title_score = Math.max( // the highst similarity is the best match
       ...
       (page.title || [])
-      .map(({value}) => levenshtein(code, value).similarity) // Use the originally entered code to get the levenstein-similarity of each title.
+      .map(({value}) => ngramStringDistance(code, value)) // Use the originally entered code to get the levenstein-similarity of each title.
     ) * 1.5 // give the title-similarity a boost of 1.5
 
     return {
       ...page,
-      similarity: levenshtein_code.similarity,
-      // similarity: Math.max(levenshtein_code.similarity, levenshtein_title_similarity),
+      similarity: Math.max(ngram_score, title_score),
     }
   })
-  .filter(page => page.similarity > 0.3)
+  .filter(page => page.similarity > 0.1)
   .sort((a, b) => b.similarity - a.similarity)
-  // .slice(0, 6)
+  .slice(0, 6)
 
   return pages
 }
