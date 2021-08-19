@@ -140,6 +140,7 @@ async function getSimilarCodes({
   code = code.toLowerCase()
 
   const code_without_diacritics = removeDiacritics(code)
+
   let pages = Object.entries(await readCache())
   .map(entry => ({
     code: entry[0],
