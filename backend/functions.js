@@ -194,8 +194,13 @@ async function getSimilarCodes({
       similarity: Math.max(ngram_score, title_score),
     }
   })
-  .filter(page => page.similarity > 0.1)
   .sort((a, b) => b.similarity - a.similarity)
+
+  const highestScore = pages[0].similarity
+  const middleScore = pages[~~(pages.length * 0.5)].similarity
+  const third_quartile = (highestScore + middleScore) * 0.5
+
+  pages = pages.filter(page => page.similarity > third_quartile)
   .slice(0, 6)
 
   return pages
