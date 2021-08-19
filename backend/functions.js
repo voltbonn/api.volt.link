@@ -5,9 +5,9 @@ const {
   readCache,
 } = require('./git_functions.js')
 
-const {
-  fluentByAny,
-} = require('./fluent_functions.js')
+// const {
+//   fluentByAny,
+// } = require('./fluent_functions.js')
 
 function removeDiacritics(stringWithDiacritics){
   // "Remove diacritics (Umlauts, Accents, Special characters) in JavaScript."
@@ -174,6 +174,10 @@ async function getSimilarCodes({
     ...entry[1]
   }))
   .filter(page => page.code !== code)
+  // .map(page => ({
+  //   ...page,
+  //   title: fluentByAny(page.title, userLocales, page.code),
+  // }))
 
   pages = filterPagesByPermission(pages, { logged_in })
   .map(page => {
