@@ -162,9 +162,9 @@ async function getSimilarCodes({
       similarity: Math.max(levenshtein_code.similarity, levenshtein_title_similarity),
     }
   })
-  .slice(0, 6)
   .filter(page => page.similarity > 0.3)
   .sort((a, b) => b.similarity - a.similarity)
+  // .slice(0, 6)
 
   return pages
 }
