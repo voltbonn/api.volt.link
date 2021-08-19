@@ -14,7 +14,7 @@ const header = `
     data-domains="volt.link"
   ></script>
 
-  <link rel="stylesheet" href="/index-5.css" type="text/css" />
+  <link rel="stylesheet" href="/index-6.css" type="text/css" />
   <link rel="stylesheet" href="/public/highlightjs-volt-theme.css" type="text/css" />
   <link rel="stylesheet" href="/index-overwrites-1.css" type="text/css" />
   <link rel="stylesheet" href="/Ubuntu/index-1.css" type="text/css" />
