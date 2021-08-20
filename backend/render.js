@@ -4,7 +4,6 @@ const fs = require('fs')
 const path = require('path')
 
 var hljs = require('highlight.js') // https://highlightjs.org/
-// console.log('hljs', hljs)
 const md = require('markdown-it')({
   html: true,
   linkify: true,
