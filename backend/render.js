@@ -485,7 +485,6 @@ async function renderMicropage({
 }
 
 async function renderPagesList({ pages, userLocales, logged_in }) {
-
   pages = filterPagesByPermission(pages, { logged_in })
 
   return `<div class="items">
