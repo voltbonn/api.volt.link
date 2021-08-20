@@ -630,7 +630,7 @@ app.get('/list', async (req, res) => {
   res.redirect('/list/micropages')
 })
 app.get('/list/:filter', async (req, res) => {
-   const userLocalesString = req.query.l || req.headers['accept-language']
+  const userLocalesString = req.query.l || req.headers['accept-language']
 
   res.send(await renderOverview({
     query: req.query,
