@@ -599,7 +599,7 @@ async function renderOverview({
       }
       </div>
     `
-    the_list = await renderPagesList({ items: the_list, userLocales, logged_in })
+    the_list = await renderPagesList({ pages: the_list, userLocales, logged_in })
   } else {
     the_list = ''
   }
