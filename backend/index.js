@@ -7,6 +7,11 @@ const { v4: uuidv4 } = require('uuid')
 const { sendInitialStats } = require('./stats.js')
 
 const {
+  getTeams,
+  getTeamsSimple,
+} = require('./download_teams.js')
+
+const {
   forbidden,
   quickcheckCode,
   hasEditPermission,
@@ -638,6 +643,20 @@ app.get('/list/:filter', async (req, res) => {
     filter: req.params.filter,
     logged_in: req.logged_in,
   }))
+})
+app.get('/teams.json', async (req, res) => {
+  if (!req.logged_in) {
+    res.json({ error: 'You are not logged in.' })
+  } else {
+    res.json(await getTeams())
+  }
+})
+app.get('/teams_simple.json', async (req, res) => {
+  if (!req.logged_in) {
+    res.json({ error: 'You are not logged in.' })
+  } else {
+    res.json(await getTeamsSimple())
+  }
 })
 
 app.get('/:code', (req, res) => {
