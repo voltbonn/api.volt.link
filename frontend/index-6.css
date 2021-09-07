@@ -58,9 +58,13 @@
 .basis_0_4 {
   --basis: 0.4rem;
 }
+.basis_0_3 {
+  --basis: 0.3rem;
+}
 :root,
 .basis_0_8,
-.basis_0_4 {
+.basis_0_4,
+.basis_0_3 {
   --basis_x0_2: calc(0.2 * var(--basis));
   --basis_x0_5: calc(0.5 * var(--basis));
   --basis_x2: calc(2 * var(--basis));
@@ -149,7 +153,8 @@ h1 {
   text-decoration: inherit;
 }
 
-h2 {
+h2,
+.type_h2 {
   font-size: calc(var(--font-add) + var(--basis_x2));
   margin: var(--basis_x4) 0 var(--basis) 0;
   text-decoration: inherit;
@@ -182,7 +187,8 @@ h3.red {
   color: var(--red);
 }
 
-p {
+p,
+.type_p {
   /* width: calc(var(--basis_x16) + var(--basis_x8)); */
   max-width: 100%;
   margin: var(--basis) 0;
@@ -202,30 +208,42 @@ ol {
 
 textarea,
 div[contentEditable=true],
-input[type="text"],
+input[type="text"]:not(#react-select-3-input),
 input[type="email"],
 input[type="url"] {
   appearance: none;
   -webkit-appearance: none;
+  border-radius: 0;
 }
 
 button,
 textarea,
 div[contentEditable=true],
-input[type="text"],
+input[type="text"]:not(#react-select-3-input),
 input[type="email"],
 input[type="url"],
 select,
-.wrapped_select {
+.wrapped_select,
+.type_button {
   min-width: 0px;
   outline: none;
   border: none;
   margin: var(--basis);
+}
+
+button,
+textarea,
+input[type="text"]:not(#react-select-3-input),
+input[type="email"],
+input[type="url"],
+select,
+.wrapped_select,
+.type_button {
   font-size: var(--body-font-size);
 }
 textarea,
 div[contentEditable=true],
-input[type="text"],
+input[type="text"]:not(#react-select-3-input),
 input[type="email"],
 input[type="url"] {
   padding: var(--basis);
@@ -245,7 +263,7 @@ input[type="url"].inverted {
 
 textarea:focus,
 div[contentEditable=true]:focus,
-input[type="text"]:focus,
+input[type="text"]:not(#react-select-3-input):focus,
 input[type="email"]:focus,
 input[type="url"]:focus {
   background: var(--input-background);
@@ -262,7 +280,8 @@ div[contentEditable=true] {
 
 button,
 select,
-.wrapped_select {
+.wrapped_select,
+.type_button {
   font-weight: bold;
   transition: transform 0.2s ease;
   position: relative;
@@ -271,8 +290,11 @@ select,
 
   --button-background: var(--on-background);
   --button-color: var(--constant-button-color);
-  background: var(--button-background);
-  color: var(--button-color);
+  background: var(--button-background) !important;
+  color: var(--button-color) !important;
+}
+.type_button {
+  cursor: text;
 }
 
 select {
@@ -312,25 +334,26 @@ button.text {
   --button-background: transparent;
   --button-color: var(--on-background);
 }
-button:focus {
-  --button-background: var(--background-contrast);
-  --button-color: var(--on-background);
+button:focus,
+.type_button:focus {
+  --button-background: var(--background-contrast) !important;
+  --button-color: var(--on-background) !important;
 }
 button:hover{
   transform-origin: center center;
   transform: scale(1.05);
 }
 button.choosen:after {
-    content: "";
-    position: absolute;
-    top: calc(-1 * var(--basis_x0_5));
-    right: calc(-1 * var(--basis_x0_5));
-    bottom: calc(-1 * var(--basis_x0_5));
-    left: calc(-1 * var(--basis_x0_5));
-    box-shadow: 0 0 0 var(--basis_x0_5) var(--on-background);
+  content: "";
+  position: absolute;
+  top: calc(-1 * var(--basis_x0_5));
+  right: calc(-1 * var(--basis_x0_5));
+  bottom: calc(-1 * var(--basis_x0_5));
+  left: calc(-1 * var(--basis_x0_5));
+  box-shadow: 0 0 0 var(--basis_x0_5) var(--on-background);
 }
 button:focus.choosen:after {
-    box-shadow: 0 0 0 var(--basis_x0_5) var(--on-background-contrast);
+  box-shadow: 0 0 0 var(--basis_x0_5) var(--on-background-contrast);
 }
 
 .buttonRow button {
@@ -348,7 +371,7 @@ button:focus.choosen:after {
 }
 
 button.hasIcon .icon {
-  height: var(--basis_x4);
+  height: calc(1.25 * var(--body-font-size));
   width: auto;
   vertical-align: middle;
 
@@ -358,6 +381,10 @@ button.hasIcon .icon {
   --bg-color: var(--button-color);
   --fg-color: var(--button-background);
 }
+button.hasIcon .icon:first-child:last-child {
+  margin-right: 0;
+  margin-left: 0;
+}
 button.hasIcon .icon.big {
   height: var(--basis_x8);
   width: auto;
@@ -365,7 +392,10 @@ button.hasIcon .icon.big {
 
 button.hasIcon .icon.image {
   height: var(--basis_x16);
-  margin: calc(-1 * var(--basis)) calc(-2 * var(--basis));
+  margin-top: calc(-1 * var(--basis));
+  margin-right: calc(-2 * var(--basis)) !important;
+  margin-bottom: calc(-1 * var(--basis));
+  margin-left: calc(-2 * var(--basis)) !important;
 }
 
 hr {
@@ -406,6 +436,21 @@ img.emoji {
     display: none;
   }
 }
+@media (min-width: 1001px) {
+  .hideOnBigScreen {
+    display: none;
+  }
+}
+@media (max-width: 1200px) {
+  .hideOnScreenSmallerThan1200px {
+    display: none;
+  }
+}
+@media (min-width: 1201px) {
+  .hideOnScreenBiggerThan1200px {
+    display: none;
+  }
+}
 
 
 
@@ -440,11 +485,10 @@ img.emoji {
 .wrapped_select,
 .wrapped_select select{
   width: calc(12 * var(--basis));
-  height: calc(6 * var(--basis));
-  max-height: calc(6 * var(--basis));
+  padding: var(--basis) var(--basis_x2);
 }
 .wrapped_select select {
-  padding: var(--basis) var(--basis_x2);
+  margin: calc(-1 * var(--basis)) calc(-1 * var(--basis_x2));
 }
 .wrapped_select:before {
   z-index: 1;
