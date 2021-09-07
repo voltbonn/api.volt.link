@@ -157,7 +157,23 @@ async function getTeamsSimple () {
   }
 }
 
+async function getTeam (id, teams) {
+  id = id.toString()
+
+  if (!teams || teams.length === 0) {
+    teams = await getTeams()
+  }
+  teams = teams.filter(team => team.id.toString() === id)
+
+  if (teams.length > 0) {
+    return teams[0]
+  }
+
+  return {}
+}
+
 module.exports = {
+  getTeam,
   getTeams,
   getTeamsSimple,
 }
