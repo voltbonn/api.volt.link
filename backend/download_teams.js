@@ -1,5 +1,6 @@
 const fetch = require('node-fetch')
 const fs = require('fs')
+const path = require('path')
 
 require('dotenv').config({
   path: '../.env'
@@ -10,9 +11,9 @@ const url_infos = 'https://volt.team/volt-city-teams.json'
 const url_infos_vcp = 'https://www.voltdeutschland.org/_api/cities'
 const volt_team_api_key = process.env.volt_team_api_key
 const volt_team_cookie = process.env.volt_team_cookie
-const path_vl_cache = './cache/paths.json'
-const path_teams = './cache/teams.json'
-const path_simple_teams = '../cache/simple_teams.json'
+const path_vl_cache = path.join(__dirname, '../cache/paths.json')
+const path_teams = path.join(__dirname, '../cache/teams.json')
+const path_simple_teams = path.join(__dirname, '../cache/simple_teams.json')
 
 // fetch volt.team teams with api key as bearer
 const options = {
