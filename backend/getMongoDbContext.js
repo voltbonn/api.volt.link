@@ -1,3 +1,4 @@
+const isDevEnvironment = process.env.environment === 'dev' || false
 const { MongoClient, ObjectId } = require('mongodb')
 
 const _ContextChache_ = {}
@@ -7,7 +8,7 @@ function getMongoDbContext(){
 		if (_ContextChache_.mongodb) {
 			resolve(_ContextChache_.mongodb)
 		}else{
-			const mongodb_uri = encodeURI(process.env.mongodb_uri_prod) // test?retryWrites=true&w=majority
+			const mongodb_uri = encodeURI(isDevEnvironment ? process.env.mongodb_uri_dev : process.env.mongodb_uri_prod) // test?retryWrites=true&w=majority
 
 			if (!mongodb_uri) {
 				reject('probably no mongodb rights')
