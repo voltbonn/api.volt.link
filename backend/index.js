@@ -297,8 +297,8 @@ app.get('/', (req, res) => {
   <ul>
     ${
       req.logged_in
-      ? `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:3000' : 'https://edit.volt.link'}">edit.volt.link</a></li>`
-      : `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:4000' : 'https://volt.link'}/login?redirect_to=${isDevEnvironment ? 'http%3A%2F%2Flocalhost:3000' : 'https%3A%2F%2Fedit.volt.link'}">Login and edit volt.link</a></li>`
+      ? `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:3000' : 'https://beta.volt.link'}">beta.volt.link</a></li>`
+      : `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:4000' : 'https://volt.link'}/login?redirect_to=${isDevEnvironment ? 'http%3A%2F%2Flocalhost:3000' : 'https%3A%2F%2Fbeta.volt.link'}">Login and edit volt.link</a></li>`
     }
     <li>All volt.link micropages and redirects: <a href="${isDevEnvironment ? 'http://localhost:4000' : 'https://volt.link'}/list">volt.link/list</a></li>
     <li>Contact <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">Thomas Rosen</a><!--/sse--> for help with volt.link.</li>
@@ -627,9 +627,9 @@ app.get('/get/:code', (req, res) => {
 
 app.get('/edit/:code', (req, res) => {
   if (typeof req.params.code === 'string' && req.params.code.length > 0) {
-    res.redirect(`${isDevEnvironment ? 'http://localhost:4000/' : 'https://edit.volt.link/'}edit/${req.params.code}`)
+    res.redirect(`${isDevEnvironment ? 'http://localhost:4000/' : 'https://beta.volt.link/'}edit/${req.params.code}`)
   } else {
-    res.redirect(isDevEnvironment ? 'http://localhost:4000/' : 'https://edit.volt.link/')
+    res.redirect(isDevEnvironment ? 'http://localhost:4000/' : 'https://beta.volt.link/')
   }
 })
 
