@@ -755,7 +755,7 @@ app.get('/:code', (req, res) => {
 const httpServer = http.createServer(app)
 startApolloServer(app, httpServer)
 
-const port = 4000
+const port = 4004
 const host = '0.0.0.0' // Uberspace wants 0.0.0.0
 httpServer.listen({ port, host }, () =>
   console.info(`
