@@ -61,11 +61,10 @@ const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 const app = express()
 
 // set up rate limiter: maximum of 100 requests per minute
-var limiter = new RateLimit({
+app.use(new RateLimit({
   windowMs: 1*60*1000, // 1 minute
   max: 100, // requests per minute
-})
-app.use(limiter) // apply rate limiter to all requests
+})) // apply rate limiter to all requests
 
 app.use(express.json())
 
