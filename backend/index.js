@@ -6,7 +6,11 @@ const { v4: uuidv4 } = require('uuid')
 
 const { sendInitialStats } = require('./stats.js')
 
+const http = require('http')
+const startApolloServer = require('./graphql/expressApolloServer.js')
+
 const {
+  getTeam,
   getTeams,
   getTeamsSimple,
 } = require('./download_teams.js')
@@ -67,7 +71,6 @@ app.use(express.json())
 
 // app.use(express.static('../frontend/'))
 app.use(express.static(path.join(__dirname, '../frontend/')))
-
 
 // START AUTH
 async function session_middleware(req, res, next) {
@@ -644,6 +647,17 @@ app.get('/list/:filter', async (req, res) => {
     logged_in: req.logged_in,
   }))
 })
+app.get('/featured.json', async (req, res) => {
+  const lat = req.query.lat
+  const lng = req.query.lng
+
+  const items = Object.entries(await readCache())
+
+  const data = {
+    items
+  }
+  res.json(data)
+})
 app.get('/teams.json', async (req, res) => {
   if (!req.logged_in) {
     res.json({ error: 'You are not logged in.' })
@@ -738,12 +752,16 @@ app.get('/:code', (req, res) => {
     ))
 })
 
+const httpServer = http.createServer(app)
+startApolloServer(app, httpServer)
+
 const port = 4000
 const host = '0.0.0.0' // Uberspace wants 0.0.0.0
-app.listen({ port, host }, () =>
+httpServer.listen({ port, host }, () =>
   console.info(`
     🚀 Server ready
     View the API at http://${host}:${port}/
     http://${host}:${port}/:code
   `)
 )
+
