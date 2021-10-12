@@ -7,7 +7,7 @@ function getMongoDbContext(){
 		if (_ContextChache_.mongodb) {
 			resolve(_ContextChache_.mongodb)
 		}else{
-			const mongodb_uri = encodeURI(process.env.mongodb_uri) // test?retryWrites=true&w=majority
+			const mongodb_uri = encodeURI(process.env.mongodb_uri_prod) // test?retryWrites=true&w=majority
 
 			if (!mongodb_uri) {
 				reject('probably no mongodb rights')
