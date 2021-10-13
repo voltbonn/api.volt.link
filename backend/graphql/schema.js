@@ -18,6 +18,7 @@ const schema = gql`
 		blocks(_ids: [ID]!): [Block]
 		all_subblocks(_id: ID!): [Block]
 		blockBySlug(slug: ID!): Block
+		blocksByType(type: String!): [Block]
 	}
 
 	type Mutation {
