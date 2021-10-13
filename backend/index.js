@@ -113,7 +113,7 @@ passport.deserializeUser(function (id, done) {
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: (isDevEnvironment ? 'http://localhost:4000/auth/google/callback' : 'https://volt.link/auth/google/callback'),
+  callbackURL: (isDevEnvironment ? 'http://localhost:4004/auth/google/callback' : 'https://volt.link/auth/google/callback'),
 },
   function (accessToken, refreshToken, profile, done) {
     if (
@@ -298,9 +298,9 @@ app.get('/', (req, res) => {
     ${
       req.logged_in
       ? `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:3000' : 'https://beta.volt.link'}">beta.volt.link</a></li>`
-      : `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:4000' : 'https://volt.link'}/login?redirect_to=${isDevEnvironment ? 'http%3A%2F%2Flocalhost:3000' : 'https%3A%2F%2Fbeta.volt.link'}">Login and edit volt.link</a></li>`
+      : `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://volt.link'}/login?redirect_to=${isDevEnvironment ? 'http%3A%2F%2Flocalhost:3000' : 'https%3A%2F%2Fbeta.volt.link'}">Login and edit volt.link</a></li>`
     }
-    <li>All volt.link micropages and redirects: <a href="${isDevEnvironment ? 'http://localhost:4000' : 'https://volt.link'}/list">volt.link/list</a></li>
+    <li>All volt.link micropages and redirects: <a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://volt.link'}/list">volt.link/list</a></li>
     <li>Contact <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">Thomas Rosen</a><!--/sse--> for help with volt.link.</li>
   </ul>
 
@@ -329,8 +329,8 @@ app.get('/', (req, res) => {
     <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">Contact</a><!--/sse-->
     ${
       req.logged_in
-      ? `&nbsp; • &nbsp;<a href="${isDevEnvironment ? 'http://localhost:4000' : 'https://volt.link'}/logout">Logout</a>`
-      : `&nbsp; • &nbsp;<a href="${isDevEnvironment ? 'http://localhost:4000' : 'https://volt.link'}/login">Login</a>`
+      ? `&nbsp; • &nbsp;<a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://volt.link'}/logout">Logout</a>`
+      : `&nbsp; • &nbsp;<a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://volt.link'}/login">Login</a>`
     }
     &nbsp; • &nbsp;<a href="https://www.volteuropa.org/legal">Imprint</a>
     &nbsp; • &nbsp;<a href="https://www.volteuropa.org/privacy">Privacy Policy</a>
@@ -627,9 +627,9 @@ app.get('/get/:code', (req, res) => {
 
 app.get('/edit/:code', (req, res) => {
   if (typeof req.params.code === 'string' && req.params.code.length > 0) {
-    res.redirect(`${isDevEnvironment ? 'http://localhost:4000/' : 'https://beta.volt.link/'}edit/${req.params.code}`)
+    res.redirect(`${isDevEnvironment ? 'http://localhost:4004/' : 'https://beta.volt.link/'}edit/${req.params.code}`)
   } else {
-    res.redirect(isDevEnvironment ? 'http://localhost:4000/' : 'https://beta.volt.link/')
+    res.redirect(isDevEnvironment ? 'http://localhost:4004/' : 'https://beta.volt.link/')
   }
 })
 
