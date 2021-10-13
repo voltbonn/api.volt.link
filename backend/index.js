@@ -113,7 +113,7 @@ passport.deserializeUser(function (id, done) {
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: (isDevEnvironment ? 'http://localhost:4004/auth/google/callback' : 'https://volt.link/auth/google/callback'),
+  callbackURL: (isDevEnvironment ? 'http://localhost:4004/auth/google/callback' : 'https://api.volt.link/auth/google/callback'),
 },
   function (accessToken, refreshToken, profile, done) {
     if (
@@ -298,9 +298,9 @@ app.get('/', (req, res) => {
     ${
       req.logged_in
       ? `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:3000' : 'https://beta.volt.link'}">beta.volt.link</a></li>`
-      : `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://volt.link'}/login?redirect_to=${isDevEnvironment ? 'http%3A%2F%2Flocalhost:3000' : 'https%3A%2F%2Fbeta.volt.link'}">Login and edit volt.link</a></li>`
+      : `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://api.volt.link'}/login?redirect_to=${isDevEnvironment ? 'http%3A%2F%2Flocalhost:3000' : 'https%3A%2F%2Fbeta.volt.link'}">Login and edit volt.link</a></li>`
     }
-    <li>All volt.link micropages and redirects: <a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://volt.link'}/list">volt.link/list</a></li>
+    <li>All volt.link micropages and redirects: <a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://api.volt.link'}/list">volt.link/list</a></li>
     <li>Contact <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">Thomas Rosen</a><!--/sse--> for help with volt.link.</li>
   </ul>
 
@@ -308,20 +308,20 @@ app.get('/', (req, res) => {
   <ul>
     <li>QR-Code Generator: <a href="https://qrcode.volt.link">qrcode.volt.link</a></li>
     <li>Social Media Profile Picture Generator: <a href="https://www.profile-volt.org/">profile-volt.org</a></li>
-    <li>All tools Volt uses: <a href="https://volt.link/tools">volt.link/tools</a></li>
+    <li>All tools Volt uses: <a href="https://api.volt.link/tools">volt.link/tools</a></li>
   </ul>
 
   <h3>Other Shortcuts</h3>
   <ul>
-    <li>Volt Merch Shops: <a href="https://volt.link/merch">volt.link/merch</a></li>
-    <li>Volt related meme pages: <a href="https://volt.link/memes">volt.link/memes</a></li>
+    <li>Volt Merch Shops: <a href="https://api.volt.link/merch">volt.link/merch</a></li>
+    <li>Volt related meme pages: <a href="https://api.volt.link/memes">volt.link/memes</a></li>
   </ul>
 
   <!--
   <h3>Examples</h3>
   <ul>
-    <li>Micropage: <a href="https://volt.link/bonn">volt.link/bonn</a></li>
-    <li>Redirect: <a href="https://volt.link/🇪🇺">volt.link/🇪🇺</a></li>
+    <li>Micropage: <a href="https://api.volt.link/bonn">volt.link/bonn</a></li>
+    <li>Redirect: <a href="https://api.volt.link/🇪🇺">volt.link/🇪🇺</a></li>
   </ul>
   -->
 
@@ -329,8 +329,8 @@ app.get('/', (req, res) => {
     <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">Contact</a><!--/sse-->
     ${
       req.logged_in
-      ? `&nbsp; • &nbsp;<a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://volt.link'}/logout">Logout</a>`
-      : `&nbsp; • &nbsp;<a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://volt.link'}/login">Login</a>`
+      ? `&nbsp; • &nbsp;<a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://api.volt.link'}/logout">Logout</a>`
+      : `&nbsp; • &nbsp;<a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://api.volt.link'}/login">Login</a>`
     }
     &nbsp; • &nbsp;<a href="https://www.volteuropa.org/legal">Imprint</a>
     &nbsp; • &nbsp;<a href="https://www.volteuropa.org/privacy">Privacy Policy</a>
