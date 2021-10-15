@@ -11,6 +11,7 @@ const {
 const block = require('./resolvers/block.js')
 const blocks = require('./resolvers/blocks.js')
 const blockBySlug = require('./resolvers/blockBySlug.js')
+const blocksByIds = require('./resolvers/blocksByIds.js')
 const blocksByType = require('./resolvers/blocksByType.js')
 
 const saveBlock = require('./mutations/saveBlock.js')
@@ -60,6 +61,7 @@ module.exports = {
 		block,
 		blocks,
 		// all_subblocks,
+		blocksByIds, // (ids: [ID]): [Block]
 		blockBySlug,
 		blocksByType,
 	},
