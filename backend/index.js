@@ -2,6 +2,9 @@ const isDevEnvironment = process.env.environment === 'dev' || false
 const path = require('path')
 const url = require('url')
 
+const { fetch } = require('cross-fetch')
+const FileType = require('file-type')
+
 const { v4: uuidv4 } = require('uuid')
 
 const { sendInitialStats } = require('./stats.js')
@@ -669,6 +672,42 @@ app.get('/teams_simple.json', async (req, res) => {
     res.json({ error: 'You are not logged in.' })
   } else {
     res.json(await getTeamsSimple())
+  }
+})
+
+app.get('/download_url', async (req, res) => {
+  const url = req.query.url || null
+
+  if (typeof url === 'string' && url.length > 0) {
+    fetch(url)
+      .then(async response => {
+        const responseBuffer = await response.buffer()
+
+        const filename = url.split('/').pop() || ''
+        console.log('filename', filename)
+
+        let { mime } = await FileType.fromBuffer(responseBuffer) || {}
+
+        if (!mime) {
+          if (filename.endsWith('.svg')) {
+             mime = 'image/svg'
+          } else {
+            mime = ''
+          }
+        }
+
+        res
+        .set('Content-Disposition', `filename="${filename}"`)
+        .type(mime)
+        .status(200)
+        .send(responseBuffer)
+      })
+      .catch(error => {
+        console.log(error)
+        res.status(404).send(error)
+      })
+  } else {
+    res.status(404).send('')
   }
 })
 
