@@ -146,6 +146,19 @@ const sampleBlock1 = {
 				type: 'open_url',
 				url: 'https://www.example.org',
 			}
+		},
+		{
+			type: 'action',
+			properties: {
+				trigger: {
+					type: 'block_change', // this is like a hook
+					blockId: 'test_block_id', // triggered by the parent block if not provided
+				},
+				action: {
+					type: 'send_payload_to',
+					url: 'https://www.example.org',
+				}
+			}
 		}
 	]
 }
