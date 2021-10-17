@@ -686,7 +686,6 @@ app.get('/download_url', async (req, res) => {
         const responseBuffer = await response.buffer()
 
         const filename = url.split('/').pop() || ''
-        console.log('filename', filename)
 
         let { mime } = await FileType.fromBuffer(responseBuffer) || {}
 
