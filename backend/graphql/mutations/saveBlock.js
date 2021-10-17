@@ -1,8 +1,6 @@
 module.exports = (parent, args, context, info) => {
 	const mongodb = context.mongodb
 
-	console.log('args', args)
-
 	return new Promise((resolve,reject)=>{
 		const block = args.block
 
