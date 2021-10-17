@@ -61,6 +61,8 @@ const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 //   // https://get.geojs.io/v1/ip/geo/{ip address}.json
 // }
 
+const isAbsoluteUrlRegexp = new RegExp('^(?:[a-z]+:)?//', 'i')
+
 const app = express()
 
 // set up rate limiter: maximum of 100 requests per minute
@@ -678,7 +680,7 @@ app.get('/teams_simple.json', async (req, res) => {
 app.get('/download_url', async (req, res) => {
   const url = req.query.url || null
 
-  if (typeof url === 'string' && url.length > 0) {
+  if (typeof url === 'string' && url.length > 0 && isAbsoluteUrlRegexp.test(url)) {
     fetch(url)
       .then(async response => {
         const responseBuffer = await response.buffer()
