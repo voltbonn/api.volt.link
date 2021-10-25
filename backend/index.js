@@ -679,13 +679,13 @@ app.get('/:code', (req, res) => {
         const hasLinktree = !!content_parsed.items
 
         let needsToLogin = false
-        if (!req.logged_in) {
+        if (req.logged_in !== true) {
           if (
             !!content_parsed.permissions
             && Array.isArray(content_parsed.permissions)
             && content_parsed.permissions.length > 0
           ) {
-            needsToLogin = content_parsed.permissions.filter(p => p.role === 'viewer' && p.value === '@volteuropa.org').length > 0
+            needsToLogin = content_parsed.permissions.findIndex(p => p.role === 'viewer' && p.value === '@volteuropa.org') > -1
           }
         }
 
