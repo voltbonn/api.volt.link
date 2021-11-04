@@ -179,7 +179,8 @@ async function renderErrorPage({
 
 async function renderLoginPage({
   code = '',
-  acceptLanguage = 'en'
+  acceptLanguage = 'en',
+  logged_in = false,
 }) {
   if (typeof acceptLanguage !== 'string' || acceptLanguage === '') {
     acceptLanguage = 'en'

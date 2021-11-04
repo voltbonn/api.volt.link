@@ -690,7 +690,7 @@ app.get('/:code', (req, res) => {
         }
 
         if (needsToLogin) {
-          res.send(await renderLoginPage({ code, acceptLanguage: userLocalesString }))
+          res.send(await renderLoginPage({ code, acceptLanguage: userLocalesString, logged_in: req.logged_in }))
         } else {
           if (
             hasRedirect
