@@ -77,7 +77,7 @@ async function startApolloServer(app, httpServer) {
   ],
   })
   await apolloServer.start()
-  apolloServer.applyMiddleware({ app, path: '/graphql/v1', cors: true })
+  apolloServer.applyMiddleware({ app, path: '/graphql/v1', cors: false })
 }
 
 exports = module.exports = startApolloServer
