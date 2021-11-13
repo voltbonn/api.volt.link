@@ -63,8 +63,33 @@ function getFilterByLanguageFunction(graphqlKey){
   }
 }
 
+function getPermissionsQuery(context, roles = ['viewer', 'editor', 'owner']){
+	const or = [
+    {
+        email: '@public',
+        role: { $in: roles }
+    }
+	]
+
+	if (context.logged_in) {
+    or.push({
+      email: '@volteuropa.org',
+      role: { $in: roles }
+    })
+
+		if (context.user.email) {
+    	or.push({
+    	  email: context.user.email,
+    	  role: { $in: roles }
+    	})
+		}
+	}
+
+	return { permissions: { $elemMatch: { $or: or } } }
+}
 
 module.exports = {
   getFilterByKeysFunction,
   getFilterByLanguageFunction,
+  getPermissionsQuery,
 }

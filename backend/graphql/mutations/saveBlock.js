@@ -1,3 +1,5 @@
+const { getPermissionsQuery } = require('../functions.js')
+
 module.exports = (parent, args, context, info) => {
 	const mongodb = context.mongodb
 
@@ -31,21 +33,46 @@ module.exports = (parent, args, context, info) => {
 			block.parent = new mongodb.ObjectId(block.parent)
 		}
 
-		// save the block
-		mongodb.collections.blocks.updateOne(
-			{ _id: block._id },
-			{ $set: block },
-			{ upsert: true }
-		)
-		.then(result => {
-			if (result.upsertedCount > 0 && result.upsertedId) {
-				resolve(result.upsertedId)
-			} else if (result.acknowledged === true && (result.modifiedCount > 0 || result.matchedCount > 0)) {
-				resolve(block._id)
-			} else {
-				reject('Could not save the block.')
 			}
-		})
-		.catch(error => reject(error))
+
+	    // check if the block exists
+			mongodb.collections.blocks.findOne({
+	    	_id: block._id,
+	    })
+	    .then(resultDoc => {
+	    	if (!!resultDoc) {
+					// if it exists: check if the user has permission and update it
+					mongodb.collections.blocks.updateOne(
+						{
+							_id: block._id,
+							...getPermissionsQuery(context, ['editor', 'owner']),
+						},
+						{ $set: block },
+						{ upsert: false }
+					)
+					.then(result => {
+						if (result.upsertedCount > 0 && result.upsertedId) {
+							resolve(result.upsertedId)
+						} else if (result.acknowledged === true && (result.modifiedCount > 0 || result.matchedCount > 0)) {
+							resolve(block._id)
+						} else {
+							reject('Probably no permissions to save the block.')
+						}
+					})
+					.catch(reject)
+	    	}else{
+					// if it does not exist: create it
+					mongodb.collections.blocks.insertOne(block)
+					.then(result => {
+						if (result.insertedId) {
+							resolve(result.insertedId)
+						} else {
+							reject('Could not save the block.')
+						}
+					})
+					.catch(reject)
+	    	}
+	    })
+	    .catch(reject)
 	})
 }

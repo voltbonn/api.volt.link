@@ -1,3 +1,5 @@
+const { getPermissionsQuery } = require('../functions.js')
+
 module.exports = async (parent, args, context, info) => {
 	const mongodb = context.mongodb
 
@@ -11,6 +13,7 @@ module.exports = async (parent, args, context, info) => {
 
       mongodb.collections.blocks.findOne({
 	    	_id: blockID,
+        ...getPermissionsQuery(context),
 	    })
 	    .then(resultDoc => {
 	    	if (!!resultDoc) {

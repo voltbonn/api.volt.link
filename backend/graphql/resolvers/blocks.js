@@ -1,3 +1,5 @@
+const { getPermissionsQuery } = require('../functions.js')
+
 module.exports = async (parent, args, context, info) => {
 	const mongodb = context.mongodb
 
@@ -17,6 +19,7 @@ module.exports = async (parent, args, context, info) => {
 
 			const query = {
 				// deleted: false,
+				...getPermissionsQuery(context),
 			}
 
 			if (args._ids && Array.isArray(args._ids) && args._ids.length > 0) {
