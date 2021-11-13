@@ -4,35 +4,40 @@ module.exports = (parent, args, context, info) => {
 	const mongodb = context.mongodb
 
 	return new Promise((resolve,reject)=>{
-		const block = args.block
-
-		// _id
-		if (block._id && mongodb.ObjectId.isValid(block._id)) {
-			block._id = new mongodb.ObjectId(block._id)
+		if (!context.logged_in) {
+			reject('Not logged in.')
 		} else {
-			block._id = new mongodb.ObjectId()
-		}
 
-		// properties
-		block.properties = block.properties || {}
+			const block = args.block
 
-		// content
-		block.content = (block.content || [])
-		.filter(content_config => content_config.hasOwnProperty('blockId') && mongodb.ObjectId.isValid(content_config.blockId))
-		.map(content_config => ({
-			// ...content_config,
-			tmp_id: content_config.tmp_id || null,
-			blockId: new mongodb.ObjectId(content_config.blockId)
-		}))
+			// _id
+			if (block._id && mongodb.ObjectId.isValid(block._id)) {
+				block._id = new mongodb.ObjectId(block._id)
+			} else {
+				block._id = new mongodb.ObjectId()
+			}
 
-		// permissions
-		block.permissions = (block.permissions || [])
+			// properties
+			block.properties = block.properties || {}
 
-		// parent
-		if (mongodb.ObjectId.isValid(block.parent)) {
-			block.parent = new mongodb.ObjectId(block.parent)
-		}
+			// content
+			block.content = (block.content || [])
+			.filter(content_config => content_config.hasOwnProperty('blockId') && mongodb.ObjectId.isValid(content_config.blockId))
+			.map(content_config => ({
+				// ...content_config,
+				tmp_id: content_config.tmp_id || null,
+				blockId: new mongodb.ObjectId(content_config.blockId)
+			}))
 
+			// permissions
+			block.permissions = (block.permissions || [{
+				email: context.user.email,
+				role: 'owner',
+			}])
+
+			// parent
+			if (mongodb.ObjectId.isValid(block.parent)) {
+				block.parent = new mongodb.ObjectId(block.parent)
 			}
 
 	    // check if the block exists
@@ -74,5 +79,6 @@ module.exports = (parent, args, context, info) => {
 	    	}
 	    })
 	    .catch(reject)
+		}
 	})
 }
