@@ -52,6 +52,8 @@ async function startApolloServer(app, httpServer) {
 		context: async ({req}) => {
 			try {
 				return {
+					logged_in: req.logged_in,
+					user: req.user,
 					mongodb: await getMongoDbContext(),
 				}
 			} catch (error) {
