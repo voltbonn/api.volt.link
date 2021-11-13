@@ -15,11 +15,9 @@ const schema = gql`
 		id: ID
 
 		block(_id: ID!): Block
-		blocks(_ids: [ID]!): [Block]
+		blocks(ids: [ID], types: [String]): [Block]
 		all_subblocks(_id: ID!): [Block]
-		blocksByIds(ids: [ID]): [Block]
 		blockBySlug(slug: String!): Block
-		blocksByType(type: String!): [Block]
 	}
 
 	type Mutation {
@@ -155,7 +153,7 @@ const sampleBlock1 = {
 					blockId: 'test_block_id', // triggered by the parent block if not provided
 				},
 				action: {
-					type: 'send_payload_to',
+					type: 'send_payload',
 					url: 'https://www.example.org',
 				}
 			}

@@ -1,22 +1,43 @@
 module.exports = async (parent, args, context, info) => {
 	const mongodb = context.mongodb
 
-	return new Promise((resolve,reject)=>{
-		if (!args._ids) {
-			reject('No _id value')
-		} else if (!Array.isArray(args._ids)) {
-			reject('_ids needs to be an array')
-		} else {
-      const blockIDs = args._ids
-      .filter(_id => mongodb.ObjectID.isValid(_id))
-      .map(_id => mongodb.ObjectID(_id))
+  // const hasBlockSubQuery = info
+  // .operation
+  // .selectionSet
+  // .selections
+  // .find(s => s.name.value === 'blocksByIds')
+  // .selectionSet
+  // .selections
+  // .find(s => s.name.value === 'content')
+  // .selectionSet
+  // .selections
+  // .find(s => s.name.value === 'block')
 
-      const cursor = mongodb.collections.blocks.find({
-	    	// _id: new mongodb.ObjectID("6140656fd943b7a3d35343ee") // blockIDs,
-	    	_id: { $in: blockIDs },
-	    })
+	return new Promise((resolve,reject)=>{
+
+			const query = {
+				// deleted: false,
+			}
+
+			if (args._ids && Array.isArray(args._ids) && args._ids.length > 0) {
+      	const blockIDs = args._ids
+      		.filter(_id => mongodb.ObjectID.isValid(_id))
+      		.map(_id => mongodb.ObjectID(_id))
+
+				query._id = { $in: blockIDs }
+			}
+
+			if (args.types && Array.isArray(args.types) && args.types.length > 0) {
+				const types = args.types.filter(type => typeof type === 'string')
+				query.type = { $in: types }
+			}
+
+      const cursor = mongodb.collections.blocks.find(query)
+
+    	// const cursor = mongodb.collections.blocks.aggregate([
+    	//   {$match: query}
+    	// ])
 
       resolve(cursor.toArray())
-		}
 	})
 }
