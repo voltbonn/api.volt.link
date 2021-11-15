@@ -32,7 +32,7 @@ const schema = gql`
 	}
 
 	type Metadata {
-		lastModified: DateTime
+		modified: DateTime
 		created: DateTime
 	}
 
