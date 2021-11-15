@@ -53,7 +53,10 @@ module.exports = (parent, args, context, info) => {
 							_id: block._id,
 							...getPermissionsQuery(context, ['editor', 'owner'])
 						},
-						{ $set: block },
+						{ $set: {
+							...block,
+							'metadata.modified': new Date(),
+						},
 						{ upsert: false }
 					)
 					.then(result => {
