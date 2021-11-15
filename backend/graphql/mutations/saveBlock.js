@@ -56,7 +56,10 @@ module.exports = (parent, args, context, info) => {
 						{
 							$set: {
 								...block,
-								'metadata.modified': new Date(),
+								metadata: {
+									...resultDoc.metadata,
+									modified: new Date(),
+								}
 							}
 						},
 						{ upsert: false }
