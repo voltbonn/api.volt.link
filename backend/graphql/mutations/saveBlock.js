@@ -22,6 +22,7 @@ module.exports = (parent, args, context, info) => {
 
 			// content
 			block.content = (block.content || [])
+			.filter(content_config => typeof content_config === 'object' && content_config !== null)
 			.filter(content_config => content_config.hasOwnProperty('blockId') && mongodb.ObjectId.isValid(content_config.blockId))
 			.map(content_config => ({
 				// ...content_config,
