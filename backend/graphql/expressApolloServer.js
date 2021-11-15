@@ -51,7 +51,10 @@ async function startApolloServer(app, httpServer) {
 		tracing: true,
 		context: async ({req}) => {
 			try {
+				const locales = req.acceptsLanguages()
+
 				return {
+					locale: locales.length > 0 ? locales[0] : 'en',
 					logged_in: req.logged_in,
 					user: req.user,
 					mongodb: await getMongoDbContext(),
