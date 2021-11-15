@@ -5,47 +5,19 @@ const url = require('url')
 const { fetch } = require('cross-fetch')
 const FileType = require('file-type')
 
-const { v4: uuidv4 } = require('uuid')
-
-const { sendInitialStats } = require('./stats.js')
-
 const http = require('http')
 const startApolloServer = require('./graphql/expressApolloServer.js')
 
-const {
-  getTeam,
-  getTeams,
-  getTeamsSimple,
-} = require('./download_teams.js')
+// const {
+//   getTeams,
+//   getTeamsSimple,
+// } = require('./download_teams.js')
 
 const {
-  forbidden,
-  quickcheckCode,
-  hasEditPermission,
-  generateRandomCode,
   checkOrigin,
 } = require('./functions.js')
 
-const {
-  getFileContentLocal,
-  doesFileExist,
-  saveFile,
-  gitPull,
-  removeFile,
-  writeCache,
-  readCache,
-} = require('./git_functions.js')
-
 const { header } = require('./html.js')
-
-const {
-  renderErrorPage,
-  renderLoginPage,
-  renderMicropage,
-  renderOverview,
-} = require('./render.js')
-
-const yaml = require('js-yaml')
 
 const express = require('express')
 const RateLimit = require('express-rate-limit')
@@ -255,17 +227,9 @@ app.options("/*", function (req, res, next) {
 
 app.get('/user.json', async (req, res) => {
   if (req.logged_in) {
-    const editable_links = Object.entries(await readCache() || [])
-    .filter(entry => {
-      const content = entry[1] || {}
-      return hasEditPermission(content.permissions || null, req.user.email, true)
-    })
-    .map(entry => ({slug: entry[0]}))
-
     res.json({
       user: {
         ...req.user,
-        editable: editable_links,
         logged_in: true,
       },
     })
@@ -347,335 +311,20 @@ app.get('/', (req, res) => {
 `)
 })
 
-app.get('/exists/:code', (req, res) => {
-  if (!req.logged_in) {
-    res.json({ error: 'You are not logged in.' })
-  } else {
-    let code = req.params.code
-    if (!!code && code !== '') {
-      code = code.toLowerCase()
-      doesFileExist(code, result => res.json({ exists: result }))
-    } else {
-      res.json({ exists: false })
-    }
-  }
-})
-
-app.get('/quickcheck/:code', (req, res) => {
-  if (!req.logged_in) {
-    res.json({ error: 'You are not logged in.' })
-  } else {
-    const response_json = { exists: false, allowed: false }
-
-    const code = (req.params.code || '').toLowerCase()
-    const { allowed_to_edit } = quickcheckCode(code, { userEmail: req.user.email })
-    response_json.allowed = allowed_to_edit
-
-    doesFileExist(code, exists_result => {
-      response_json.exists = exists_result
-      res.json(response_json)
-    })
-  }
-})
-
-app.get('/forbidden_codes', (req, res) => {
-  if (!req.logged_in) {
-    res.json({ error: 'You are not logged in.' })
-  } else {
-    res.json(forbidden)
-  }
-})
-
-app.post('/set/:code', (req, res) => {
-  if (!req.logged_in) {
-    res.json({ error: 'You are not logged in.' })
-  } else {
-    const code = (req.params.code || '').toLowerCase()
-    const { allowed_to_edit } = quickcheckCode(code, { userEmail: req.user.email })
-
-    if (allowed_to_edit) {
-      doesFileExist(code, async does_exist => {
-        let content = ''
-
-        if (does_exist) {
-          try {
-            const content_tmp = await getFileContentLocal(code)
-            content = content_tmp.toString() || ''
-          } catch (error) {
-            console.error(error)
-          }
-        }
-
-        const old_content = yaml.load(content) || {}
-
-        let new_content = req.body
-
-        if (!!new_content) {
-          if (hasEditPermission(old_content.permissions || null, req.user.email)) {
-            delete new_content.last_modified
-            new_content = {
-              last_modified: new Date(),
-              last_modified_by: req.user.email || '',
-              ...new_content,
-            }
-            new_content = yaml.dump(new_content, {
-              indent: 2,
-              sortKeys: false,
-              lineWidth: -1,
-            })
-
-            saveFile(code, new_content)
-            .then(async () => {
-              res.json({ error: null, saved: true })
-              await gitPull()
-            })
-              .catch(error => {
-                console.error('error', error)
-                res.status(200).json({ error, saved: false })
-              })
-          } else {
-            res.status(200).json({ error: 'no_edit_permission', saved: false })
-          }
-        } else {
-          res.status(200).json({ error: 'Plase provide a valid content.', saved: false })
-        }
-      })
-    } else {
-      res.json({ error: 'Please provide a valid code.', saved: false })
-    }
-  }
-})
-
-app.post('/set_redirect/', async (req, res) => {
-  if (!req.logged_in) {
-    res.json({ error: 'You are not logged in.' })
-  } else {
-
-    let new_content = req.body
-
-    if (!!new_content && new_content.redirect) {
-      const code = await generateRandomCode()
-
-      new_content = {
-        ...new_content,
-        last_modified: new Date(),
-        last_modified_by: req.user.email || '',
-        permissions: [{
-            _id: uuidv4(),
-            value: req.user.email || '',
-        }],
-      }
-      new_content = yaml.dump(new_content, {
-        indent: 2,
-        sortKeys: false,
-        lineWidth: -1,
-      })
-
-      saveFile(code, new_content)
-        .then(async () => {
-          await gitPull()
-          res.json({ error: null, saved: true, code: code })
-        })
-        .catch(error => res.status(200).json({ error, saved: false }))
-    } else {
-      res.status(200).json({ error: 'please_provide_url', saved: false })
-    }
-  }
-})
-
-app.get('/pull', async (req, res) => {
-  if (!req.logged_in) {
-    res.json({ error: 'You are not logged in.' })
-  } else {
-    await gitPull()
-    res.json({ done: true })
-  }
-})
-app.post('/pull', async (req, res) => {
-  if ( // check for github secret
-    req
-    && req.body
-    && req.body.hook
-    && req.body.hook.config
-    && req.body.hook.config.secret
-  ) {
-    const gotten_github_webhook_secret = req.body.hook.config.secret || null
-
-    if (
-      req.logged_in
-      || (
-        !!gotten_github_webhook_secret
-        && gotten_github_webhook_secret === process.env.github_webhook_secret
-      )
-    ) {
-      await gitPull()
-      res.json({ done: true })
-    } else {
-      res.json({ error: 'You are not logged in.' })
-    }
-  } else {
-    res.json({ error: 'You are not logged in.' })
-  }
-})
-app.get('/writeCache', async (req, res) => {
-  res.json( await writeCache() )
-})
-
-app.get('/rename/:code_old/:code_new', (req, res) => {
-  if (!req.logged_in) {
-    res.json({ error: 'You are not logged in.' })
-  } else {
-    const code_old = (req.params.code_old || '').toLowerCase()
-    const code_new = (req.params.code_new || '').toLowerCase()
-    const { allowed_to_edit: allowed_to_edit_old_code } = quickcheckCode(code_old, { userEmail: req.user.email })
-    const { allowed_to_edit: allowed_to_edit_new_code } = quickcheckCode(code_new, { userEmail: req.user.email })
-
-    if (allowed_to_edit_old_code && allowed_to_edit_new_code) {
-      doesFileExist(code_new, does_exist => {
-        if (!does_exist) {
-          getFileContentLocal(code_old)
-            .then(content => {
-              content = content.toString() || ''
-              if (content === '') {
-                res.json({ error: 'content_is_empty', saved: false })
-              }else{
-                content = yaml.load(content)
-                if (hasEditPermission(content.permissions, req.user.email)) {
-                  delete content.last_modified
-                  content = {
-                    last_modified: new Date(),
-                    last_modified_by: req.user.email || '',
-                    ...content,
-                  }
-                  content = yaml.dump(content, {
-                    indent: 2,
-                    sortKeys: false,
-                    lineWidth: -1,
-                  })
-
-                  saveFile(code_new, content)
-                    .then(async () => {
-                      await removeFile(code_old)
-                      await gitPull()
-                      res.json({ error: null, saved: true })
-                    })
-                    .catch(error => res.json({ error: error+'', saved: false }))
-                } else {
-                  res.json({ error: 'no_edit_permission', saved: false })
-                }
-              }
-            })
-            .catch(error => res.json({ error: error+'', saved: false }))
-        } else {
-          res.json({ error: 'new_code_already_exists', saved: false })
-        }
-      })
-    } else {
-      res.json({ error: 'no_edit_permission', saved: false })
-    }
-  }
-})
-
-app.get('/delete/:code', (req, res) => {
-  req.logged_in = true
-  req.user = { email: 'thomas.rosen@volteuropa.org' }
-  if (!req.logged_in) {
-    res.json({ error: 'You are not logged in.' })
-  } else {
-    const code = (req.params.code || '').toLowerCase()
-
-    getFileContentLocal(code)
-      .then(async content => {
-        content = content.toString() || ''
-
-        let isAllowedToEdit = false
-        if (content === '') {
-          isAllowedToEdit = true
-        } else {
-          content = yaml.load(content)
-          if (hasEditPermission(content.permissions, req.user.email)) {
-            isAllowedToEdit = true
-          }
-        }
-
-        if (isAllowedToEdit) {
-          await removeFile(code)
-          await gitPull()
-          res.json({ error: null, deleted: true })
-        } else {
-          res.json({ error: 'no_edit_permission', deleted: false })
-        }
-      })
-      .catch(error => res.json({ error: error + '', deleted: false }))
-  }
-})
-
-app.get('/get/:code', (req, res) => {
-  if (!req.logged_in) {
-    res.json({ error: 'You are not logged in.' })
-  } else {
-    let code = req.params.code
-    code = code.toLowerCase()
-    getFileContentLocal(code)
-      .then(content => {
-        const content_parsed = yaml.load(content) || {}
-
-        if (hasEditPermission(content_parsed.permissions, req.user.email)) {
-          res.json(content_parsed)
-        } else {
-          res.status(403).json({ error: 'no_edit_permission' })
-        }
-      })
-      .catch(err => res.status(404).json(err))
-  }
-})
-
-app.get('/edit/:code', (req, res) => {
-  if (typeof req.params.code === 'string' && req.params.code.length > 0) {
-    res.redirect(`${isDevEnvironment ? 'http://localhost:4004/' : 'https://beta.volt.link/'}edit/${req.params.code}`)
-  } else {
-    res.redirect(isDevEnvironment ? 'http://localhost:4004/' : 'https://beta.volt.link/')
-  }
-})
-
-app.get('/list', async (req, res) => {
-  res.redirect('/list/micropages')
-})
-app.get('/list/:filter', async (req, res) => {
-  const userLocalesString = req.query.l || req.headers['accept-language']
-
-  res.send(await renderOverview({
-    query: req.query,
-    acceptLanguage: userLocalesString,
-    filter: req.params.filter,
-    logged_in: req.logged_in,
-  }))
-})
-app.get('/featured.json', async (req, res) => {
-  const lat = req.query.lat
-  const lng = req.query.lng
-
-  const items = Object.entries(await readCache())
-
-  const data = {
-    items
-  }
-  res.json(data)
-})
-app.get('/teams.json', async (req, res) => {
-  if (!req.logged_in) {
-    res.json({ error: 'You are not logged in.' })
-  } else {
-    res.json(await getTeams())
-  }
-})
-app.get('/teams_simple.json', async (req, res) => {
-  if (!req.logged_in) {
-    res.json({ error: 'You are not logged in.' })
-  } else {
-    res.json(await getTeamsSimple())
-  }
-})
+// app.get('/teams.json', async (req, res) => {
+//   if (!req.logged_in) {
+//     res.json({ error: 'You are not logged in.' })
+//   } else {
+//     res.json(await getTeams())
+//   }
+// })
+// app.get('/teams_simple.json', async (req, res) => {
+//   if (!req.logged_in) {
+//     res.json({ error: 'You are not logged in.' })
+//   } else {
+//     res.json(await getTeamsSimple())
+//   }
+// })
 
 app.get('/download_url', async (req, res) => {
   const url = req.query.url || null
@@ -712,85 +361,6 @@ app.get('/download_url', async (req, res) => {
   }
 })
 
-app.get('/:code', (req, res) => {
-  const userLocalesString = req.query.l || req.headers['accept-language']
-
-  let code = req.params.code
-  code = code.toLowerCase()
-  getFileContentLocal(code)
-    .then(async (content = '') => {
-      // if (!!content) {
-        const content_parsed = yaml.load(content) || {}
-
-        let useAs = null
-        if (content_parsed.hasOwnProperty('use_as')) {
-          useAs = content_parsed.use_as
-        }
-
-        const hasUseAs = useAs !== null
-        const hasRedirect = !!content_parsed.redirect && content_parsed.redirect !== ''
-        const hasLinktree = !!content_parsed.items
-
-        let needsToLogin = false
-        if (!req.logged_in) {
-          if (
-            !!content_parsed.permissions
-            && Array.isArray(content_parsed.permissions)
-            && content_parsed.permissions.length > 0
-          ) {
-            needsToLogin = content_parsed.permissions.filter(p => p.role === 'viewer' && p.value === '@volteuropa.org').length > 0
-          }
-        }
-
-        if (needsToLogin) {
-          res.send(await renderLoginPage({ code, acceptLanguage: userLocalesString }))
-        } else {
-          if (
-            hasRedirect
-            && (useAs === 'redirect' || !hasUseAs)
-          ) {
-            sendInitialStats({
-              url: '/' + code,
-              website: (process.env.umami_volt_link_id || ''),
-              hostname: (isDevEnvironment ? 'localhost' : 'volt.link'),
-            }, req.headers)
-            res.redirect(content_parsed.redirect)
-          } else if (
-            hasLinktree
-            && (useAs === 'linklist' || !hasUseAs)
-          ) {
-            res.send(await renderMicropage({
-              ...content_parsed,
-              code,
-              logged_in: req.logged_in,
-              acceptLanguage: userLocalesString,
-            }))
-          } else {
-            res.status(404).send(await renderErrorPage({
-              code,
-              logged_in: req.logged_in,
-              error,
-              acceptLanguage: userLocalesString,
-            }))
-          }
-        }
-      // } else {
-      //   res.status(404).send(await renderErrorPage({
-      //     error,
-      //     acceptLanguage: userLocalesString,
-      //   }))
-      // }
-    })
-    .catch(async error => res.status(404).send(
-      await renderErrorPage({
-        code,
-        logged_in: req.logged_in,
-        error,
-        acceptLanguage: userLocalesString,
-      })
-    ))
-})
-
 const httpServer = http.createServer(app)
 startApolloServer(app, httpServer)
 
@@ -803,4 +373,3 @@ httpServer.listen({ port, host }, () =>
     http://${host}:${port}/:code
   `)
 )
-
