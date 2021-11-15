@@ -277,20 +277,20 @@ app.get('/', (req, res) => {
   <ul>
     <li>QR-Code Generator: <a href="https://qrcode.volt.link">qrcode.volt.link</a></li>
     <li>Social Media Profile Picture Generator: <a href="https://www.profile-volt.org/">profile-volt.org</a></li>
-    <li>All tools Volt uses: <a href="https://api.volt.link/tools">volt.link/tools</a></li>
+    <li>All tools Volt uses: <a href="https://volt.link/tools">volt.link/tools</a></li>
   </ul>
 
   <h3>Other Shortcuts</h3>
   <ul>
-    <li>Volt Merch Shops: <a href="https://api.volt.link/merch">volt.link/merch</a></li>
-    <li>Volt related meme pages: <a href="https://api.volt.link/memes">volt.link/memes</a></li>
+    <li>Volt Merch Shops: <a href="https://volt.link/merch">volt.link/merch</a></li>
+    <li>Volt related meme pages: <a href="https://volt.link/memes">volt.link/memes</a></li>
   </ul>
 
   <!--
   <h3>Examples</h3>
   <ul>
-    <li>Micropage: <a href="https://api.volt.link/bonn">volt.link/bonn</a></li>
-    <li>Redirect: <a href="https://api.volt.link/🇪🇺">volt.link/🇪🇺</a></li>
+    <li>Micropage: <a href="https://volt.link/bonn">volt.link/bonn</a></li>
+    <li>Redirect: <a href="https://volt.link/🇪🇺">volt.link/🇪🇺</a></li>
   </ul>
   -->
 
