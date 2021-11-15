@@ -51,13 +51,13 @@ module.exports = (parent, args, context, info) => {
 					mongodb.collections.blocks.updateOne(
 						{
 							_id: block._id,
-							...getPermissionsQuery(context, ['editor', 'owner']),
-							'metadata.modified': new Date()
+							...getPermissionsQuery(context, ['editor', 'owner'])
 						},
 						{ $set: block },
 						{ upsert: false }
 					)
 					.then(result => {
+						console.log('result', result)
 						if (result.upsertedCount > 0 && result.upsertedId) {
 							resolve(result.upsertedId)
 						} else if (result.acknowledged === true && (result.modifiedCount > 0 || result.matchedCount > 0)) {
