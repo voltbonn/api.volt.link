@@ -8,7 +8,9 @@ module.exports = async (parent, args, context, info) => {
 			const slug = args.slug
 
       mongodb.collections.blocks.findOne({
-	    	'properties.slug': slug,
+	    	'properties.trigger.type': 'path',
+	    	'properties.trigger.path': slug,
+	    	'properties.action.type': 'render_block',
 	    })
 	    .then(resultDoc => {
 	    	if (!!resultDoc) {
