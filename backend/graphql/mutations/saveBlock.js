@@ -36,14 +36,6 @@ module.exports = (parent, args, context, info) => {
 				role: 'owner',
 			}])
 
-			if (!block.hasOwnProperty('metadata')) {
-				block.metadata = {}
-			}
-			if (!block.metadata.hasOwnProperty('created')) {
-				block.metadata.created = new Date()
-			}
-			block.metadata.modified = new Date()
-
 			// parent
 			if (mongodb.ObjectId.isValid(block.parent)) {
 				block.parent = new mongodb.ObjectId(block.parent)
@@ -60,6 +52,7 @@ module.exports = (parent, args, context, info) => {
 						{
 							_id: block._id,
 							...getPermissionsQuery(context, ['editor', 'owner']),
+							'metadata.modified': new Date()
 						},
 						{ $set: block },
 						{ upsert: false }
@@ -76,7 +69,13 @@ module.exports = (parent, args, context, info) => {
 					.catch(reject)
 	    	}else{
 					// if it does not exist: create it
-					mongodb.collections.blocks.insertOne(block)
+					mongodb.collections.blocks.insertOne({
+						...block,
+						metadata: {
+							created: new Date(),
+							modified: new Date(),
+						}
+					})
 					.then(result => {
 						if (result.insertedId) {
 							resolve(result.insertedId)
