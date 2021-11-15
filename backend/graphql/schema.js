@@ -18,10 +18,17 @@ const schema = gql`
 		blocks(ids: [ID], types: [String]): [Block]
 		all_subblocks(_id: ID!): [Block]
 		blockBySlug(slug: String!): Block
+		self: User
 	}
 
 	type Mutation {
 		saveBlock(block: InputBlock!): ID
+	}
+
+	type User {
+		user: JSONObject
+		logged_in: Boolean
+		blockId: ID
 	}
 
 	type Metadata {
