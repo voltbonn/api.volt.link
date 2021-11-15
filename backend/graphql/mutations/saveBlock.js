@@ -51,11 +51,13 @@ module.exports = (parent, args, context, info) => {
 					mongodb.collections.blocks.updateOne(
 						{
 							_id: block._id,
-							...getPermissionsQuery(context, ['editor', 'owner'])
+							...getPermissionsQuery(context, ['editor', 'owner']),
 						},
-						{ $set: {
-							...block,
-							'metadata.modified': new Date(),
+						{
+							$set: {
+								...block,
+								'metadata.modified': new Date(),
+							}
 						},
 						{ upsert: false }
 					)
