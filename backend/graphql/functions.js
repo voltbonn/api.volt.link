@@ -64,6 +64,14 @@ function getFilterByLanguageFunction(graphqlKey){
 }
 
 function getPermissionsQuery(context, roles = ['viewer', 'editor', 'owner']){
+  const admin_addresses = (process.env.admin_addresses || '').split(',')
+  if (
+    admin_addresses.length > 0
+    && admin_addresses.includes(context.user.email)
+  ) {
+    return {}
+  }
+
 	const or = [
     {
         email: '@public',
