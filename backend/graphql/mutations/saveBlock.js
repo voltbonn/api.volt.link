@@ -8,7 +8,7 @@ module.exports = (parent, args, context, info) => {
 			reject('Not logged in.')
 		} else {
 
-			const block = args.block
+			const block = args.block || {}
 
 			// _id
 			if (block._id && mongodb.ObjectId.isValid(block._id)) {

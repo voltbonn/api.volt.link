@@ -284,6 +284,7 @@ function hasEditPermission(permissions, userEmail, strict = false) {
       || (
         permissions_array_has_content
         && permissions
+          .filter(p => typeof p === 'object' && p !== null)
           .filter(p => !p.hasOwnProperty('role') || p.role !== 'viewer')
           .map(e => e.value)
           .includes(userEmail)

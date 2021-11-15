@@ -92,7 +92,7 @@ passport.use(new GoogleStrategy({
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: (isDevEnvironment ? 'http://localhost:4004/auth/google/callback' : 'https://api.volt.link/auth/google/callback'),
 },
-  function (accessToken, refreshToken, profile, done) {
+  function (accessToken, refreshToken, profile = {}, done) {
     if (
       !!accessToken
       && profile.hasOwnProperty('emails')
