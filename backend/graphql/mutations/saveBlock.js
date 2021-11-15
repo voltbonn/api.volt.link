@@ -35,6 +35,14 @@ module.exports = (parent, args, context, info) => {
 				role: 'owner',
 			}])
 
+			if (!block.hasOwnProperty('metadata')) {
+				block.metadata = {}
+			}
+			if (!block.metadata.hasOwnProperty('created')) {
+				block.metadata.created = new Date()
+			}
+			block.metadata.modified = new Date()
+
 			// parent
 			if (mongodb.ObjectId.isValid(block.parent)) {
 				block.parent = new mongodb.ObjectId(block.parent)
