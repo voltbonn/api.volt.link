@@ -23,19 +23,19 @@ module.exports = async (parent, args, context, info) => {
 
           const properties = {}
 
-          const displayName = context.user.displayName
-          if (displayName.length > 0) {
-            properties.trigger = {
-              type: 'path',
-              path: displayName.toLowerCase().replace(/\s/g, '.'),
-            }
-            properties.action = {
-              type: 'render_block',
-            }
-            properties.text = [
-              { value: context.user.displayName || '', locale: context.locale },
-            ]
+          const username = context.user.email.split('@')[0]
+          const displayName = context.user.displayName || username
+
+          properties.trigger = {
+            type: 'path',
+            path: username,
           }
+          properties.action = {
+            type: 'render_block',
+          }
+          properties.text = [
+            { value: displayName, locale: context.locale },
+          ]
 
           if (context.user.picture.length > 0) {
             properties.icon = context.user.picture
