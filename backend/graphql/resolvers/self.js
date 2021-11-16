@@ -37,7 +37,7 @@ module.exports = async (parent, args, context, info) => {
             { value: displayName, locale: context.locale },
           ]
 
-          if (context.user.picture.length > 0) {
+          if (context.user.picture.length > 0 && !context.user.picture.includes('default-user')) {
             properties.icon = context.user.picture
           }
 
