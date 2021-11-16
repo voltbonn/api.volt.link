@@ -65,7 +65,6 @@ module.exports = (parent, args, context, info) => {
 						{ upsert: false }
 					)
 					.then(result => {
-						console.log('result', result)
 						if (result.upsertedCount > 0 && result.upsertedId) {
 							resolve(result.upsertedId)
 						} else if (result.acknowledged === true && (result.modifiedCount > 0 || result.matchedCount > 0)) {
