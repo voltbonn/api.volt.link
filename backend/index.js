@@ -225,22 +225,6 @@ app.options("/*", function (req, res, next) {
   }
 })
 
-app.get('/user.json', async (req, res) => {
-  if (req.logged_in) {
-    res.json({
-      user: {
-        ...req.user,
-        logged_in: true,
-      },
-    })
-  } else {
-    res.json({
-      user: null,
-      logged_in: false,
-    })
-  }
-})
-
 app.get('/login', (req, res) => {
   res.redirect(url.format({
     pathname: '/auth/google',
