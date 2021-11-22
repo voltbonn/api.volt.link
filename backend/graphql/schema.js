@@ -19,6 +19,7 @@ const schema = gql`
 		all_subblocks(_id: ID!): [Block]
 		blockBySlug(slug: String!): Block
 		self: User
+		parentBlocks(_id: ID!): [Block]
 	}
 
 	type Mutation {
@@ -56,6 +57,7 @@ const schema = gql`
 		parent: ID
 		metadata: Metadata
 		permissions: [Permission]
+		computed: JSON
 	}
 
 	type Permission {
