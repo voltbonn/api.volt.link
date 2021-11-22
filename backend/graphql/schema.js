@@ -20,6 +20,7 @@ const schema = gql`
 		blockBySlug(slug: String!): Block
 		self: User
 		parentBlocks(_id: ID!): [Block]
+		siblingBlocks(_id: ID!): [Block]
 	}
 
 	type Mutation {
