@@ -37,10 +37,10 @@ const isAbsoluteUrlRegexp = new RegExp('^(?:[a-z]+:)?//', 'i')
 
 const app = express()
 
-// set up rate limiter: maximum of 100 requests per minute
+// set up rate limiter: maximum of 1000 requests per minute
 app.use(new RateLimit({
   windowMs: 1*60*1000, // 1 minute
-  max: 100, // requests per minute
+  max: 1000, // requests per minute
 })) // apply rate limiter to all requests
 
 app.use(express.json())
