@@ -14,6 +14,7 @@ const blockBySlug = require('./resolvers/blockBySlug.js')
 const parentBlocks = require('./resolvers/parentBlocks.js')
 const siblingBlocks = require('./resolvers/siblingBlocks.js')
 const self = require('./resolvers/self.js')
+const blockMatchesRoles = require('./resolvers/blockMatchesRoles.js')
 
 const saveBlock = require('./mutations/saveBlock.js')
 
@@ -66,6 +67,7 @@ module.exports = {
 		self,
 		parentBlocks,
 		siblingBlocks,
+		blockMatchesRoles,
 	},
 	Mutation: {
 		saveBlock,

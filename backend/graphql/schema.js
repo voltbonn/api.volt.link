@@ -21,6 +21,7 @@ const schema = gql`
 		self: User
 		parentBlocks(_id: ID!): [Block]
 		siblingBlocks(_id: ID!, types: [String]): [Block]
+		blockMatchesRoles(_id: ID!, roles: [String]): Boolean
 	}
 
 	type Mutation {
