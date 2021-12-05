@@ -26,6 +26,7 @@ const schema = gql`
 
 	type Mutation {
 		saveBlock(block: InputBlock!): ID
+		deleteBlock(_id: ID!): Boolean
 	}
 
 	type User {

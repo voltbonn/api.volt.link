@@ -17,6 +17,7 @@ const self = require('./resolvers/self.js')
 const blockMatchesRoles = require('./resolvers/blockMatchesRoles.js')
 
 const saveBlock = require('./mutations/saveBlock.js')
+const deleteBlock = require('./mutations/deleteBlock.js')
 
 // const { getFilterByKeysFunction, getFilterByLanguageFunction } = require('./functions.js')
 
@@ -71,6 +72,7 @@ module.exports = {
 	},
 	Mutation: {
 		saveBlock,
+		deleteBlock,
 	},
 
 	Block: {
