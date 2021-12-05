@@ -33,9 +33,10 @@ module.exports = async (parent, args, context, info) => {
           properties.action = {
             type: 'render_block',
           }
-          properties.text = [
-            { value: displayName, locale: context.locale },
-          ]
+          properties.text = displayName
+          // properties.text = [
+          //   { value: displayName, locale: context.locale },
+          // ]
 
           if (context.user.picture.length > 0 && !context.user.picture.includes('default-user')) {
             properties.icon = context.user.picture
