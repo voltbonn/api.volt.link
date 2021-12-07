@@ -19,14 +19,27 @@ module.exports = async (parent, args, context, info) => {
 						_id: new mongodb.ObjectID(args._id),
 						...getPermissionsQuery(context),
 					} },
-    			{ $lookup: {
-    			   from: 'blocks',
-    			   localField: 'parent',
-    			   foreignField: 'parent',
-    			   as: 'siblings',
-    			} },
-    			{ $unwind : '$siblings' },
-    			{ $replaceRoot: { newRoot: '$siblings' } },
+
+					{$lookup: {
+			      from: 'blocks',
+			      localField: '_id',
+			      foreignField: 'content.blockId',
+			      as: 'parents',
+			    }},
+
+			    {$unwind: '$parents' },
+			    {$unwind: '$parents.content' },
+			    { $replaceRoot: { newRoot: '$parents.content' } },
+
+			    {$lookup: {
+			      from: 'blocks',
+			      localField: 'blockId',
+			      foreignField: '_id',
+			      as: 'siblings',
+			    }},
+
+					{ $unwind : '$siblings' },
+					{ $replaceRoot: { newRoot: '$siblings' } },
 					{ $match: finalQuery },
     		])
 
