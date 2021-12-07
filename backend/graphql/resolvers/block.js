@@ -19,7 +19,7 @@ module.exports = async (parent, args, context, info) => {
 	    	if (!!resultDoc) {
 	    		resolve(resultDoc)
 	    	}else{
-	    		reject(new Error('could not find block'))
+	    		reject(new Error('Could not find the requested block or no sufficent permission.'))
 	    	}
 	    })
 	    .catch(reject)
