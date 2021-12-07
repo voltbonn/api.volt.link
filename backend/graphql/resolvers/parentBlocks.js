@@ -10,18 +10,20 @@ module.exports = async (parent, args, context, info) => {
 						_id: mongodb.ObjectID(args._id),
 						...getPermissionsQuery(context),
 					} },
-					{ $graphLookup: {
-						from: 'blocks',
-						startWith: '$parent',
-						connectFromField: 'parent',
-						connectToField: '_id',
-						as: 'parentBlocks',
-						maxDepth: 50,
-						depthField: "computed.sort",
-						// restrictSearchWithMatch: <document>
-					}},
-					{ $unwind : "$parentBlocks" },
-					{ $replaceRoot: { newRoot: "$parentBlocks" } },
+
+    			{ $graphLookup: {
+    			  from: 'blocks',
+    			  startWith: '$_id',
+    			  connectFromField: '_id',
+    			  connectToField: 'content.blockId',
+    			  as: 'parents',
+    			  maxDepth: 50,
+    			  depthField: 'computed.sort',
+    			  // restrictSearchWithMatch: <document>
+    			}},
+
+					{ $unwind : '$parents' },
+					{ $replaceRoot: { newRoot: '$parents' } },
 					{ $match: getPermissionsQuery(context) },
     		])
 
