@@ -24,6 +24,13 @@ module.exports = (parent, args, context, info) => {
 			block.content = (block.content || [])
 			.filter(content_config => typeof content_config === 'object' && content_config !== null)
 			.filter(content_config => content_config.hasOwnProperty('blockId') && mongodb.ObjectId.isValid(content_config.blockId))
+			.map(content_config => {
+				// remove client-side properties
+				delete content_config.__typename
+				delete content_config.tmp_id
+				delete content_config.block
+				return content_config
+			})
 
 			// permissions
 			block.permissions = (block.permissions || [{
@@ -37,21 +44,38 @@ module.exports = (parent, args, context, info) => {
 	    })
 	    .then(async resultDoc => {
 	    	if (!!resultDoc) {
+
 					// if it exists: check if the user has permission and update it
-					await mongodb.collections.blocks.aggregate([
+					const matchedBlocks = await mongodb.collections.blocks.aggregate([
 						{ $match: { _id: block._id }},
 						...getPermissionsAggregationQuery(context, ['editor', 'owner']),
-
-						{ $set: block},
-						{ $set: {
-							'metadata.created': { $toDate: '$metadata.created' },
-							'metadata.modified': new Date(),
-						}},
-
-						{ $merge: { into: 'blocks', on: '_id', whenMatched: 'replace', whenNotMatched: 'discard' } }
 					])
+					.toArray()
 
-					resolve(block._id)
+					if (matchedBlocks.length > 0) {
+						delete block.metadata.__typename
+
+						mongodb.collections.blocks.updateOne({
+							_id: block._id,
+						}, { $set: {
+							...block,
+							metadata: {
+								...block.metadata,
+								created: new Date(block.metadata.created), // TODO: move converting to date to graphql
+								modified: new Date(),
+							}
+						}})
+						.then(result => {
+							if (result.matchedCount > 0) {
+								resolve(block._id)
+							} else {
+								reject('Could not save the block.')
+							}
+						})
+						.catch(reject)
+					} else {
+						reject('You do not have permission to edit this block.')
+					}
 	    	}else{
 					// if it does not exist: create it
 					mongodb.collections.blocks.insertOne({
