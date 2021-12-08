@@ -26,9 +26,15 @@ module.exports = (parent, args, context, info) => {
 			.filter(content_config => content_config.hasOwnProperty('blockId') && mongodb.ObjectId.isValid(content_config.blockId))
 			.map(content_config => {
 				// remove client-side properties
-				delete content_config.__typename
-				delete content_config.tmp_id
-				delete content_config.block
+				if (content_config.__typename) {
+					delete content_config.__typename
+				}
+				if (content_config.tmp_id) {
+					delete content_config.tmp_id
+				}
+				if (content_config.block) {
+					delete content_config.block
+				}
 				return content_config
 			})
 
@@ -53,7 +59,9 @@ module.exports = (parent, args, context, info) => {
 					.toArray()
 
 					if (matchedBlocks.length > 0) {
-						delete block.metadata.__typename
+						if (block.metadata && block.metadata.__typename) {
+							delete block.metadata.__typename
+						}
 
 						mongodb.collections.blocks.updateOne({
 							_id: block._id,
