@@ -83,31 +83,26 @@ const schema = gql`
 
 
 
-	type Text {
-		text: String
-		locale: String
-	}
 
 	enum IconType {
 		url
 		emoji
+		file
 	}
 
 	type Icon {
 		type: IconType
-		text: String
-		link: String
+		emoji: String
+		url: String
+		fileId: ObjectID
 	}
 
 	type CommonProperties {
-		text: [Text]
-		link: String
-		slug: String
+		text: String
 		icon: Icon
 		coverphoto: String
   	imprint: String
   	privacy_policy: String
-		listenOnPath: String
 	}
 `
 
