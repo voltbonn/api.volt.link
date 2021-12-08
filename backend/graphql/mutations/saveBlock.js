@@ -36,7 +36,8 @@ module.exports = (parent, args, context, info) => {
 				role: 'owner',
 			}])
 
-			// parent
+			// change parent
+			// Parent is only used to check permissions.
 			if (mongodb.ObjectId.isValid(block.parent)) {
 				block.parent = new mongodb.ObjectId(block.parent)
 			}
