@@ -84,22 +84,31 @@ const schema = gql`
 
 
 
-	enum PhotoType {
+	enum IconType {
 		url
 		emoji
 		file
 	}
-
-	type Photo {
+	type Icon {
 		type: IconType
 		url: String
 		emoji: String
 		fileId: ObjectID
 	}
 
+	enum PhotoType {
+		url
+		file
+	}
+	type Photo {
+		type: PhotoType
+		url: String
+		fileId: ObjectID
+	}
+
 	type CommonProperties {
 		text: String
-		icon: Photo
+		icon: Icon
 		coverphoto: Photo
   	imprint: String
   	privacy_policy: String
