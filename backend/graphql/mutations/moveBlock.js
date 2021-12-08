@@ -1,7 +1,6 @@
 const { getPermissionsAggregationQuery } = require('../functions.js')
 
 function changeParent(context, newParentId, movingBlockId, newPositionInContent = 0) {
-	console.log('changeParent')
 	const mongodb = context.mongodb
 
 	return new Promise((resolve, reject) => {
@@ -56,9 +55,8 @@ function changeParent(context, newParentId, movingBlockId, newPositionInContent 
 
         				{ $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
     					])
-              .toArray() // TODO: find some other way to trigger a promise
-              .then(data=>{
-                console.log('data', data)
+              .explain() // TODO: find some other way to trigger a promise
+              .then(()=>{
     					  resolve()
               })
               .catch(reject)
