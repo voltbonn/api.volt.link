@@ -5,11 +5,9 @@ module.exports = async (parent, args, context, info) => {
 		if (!args.slug || args.slug === '') {
 			reject('No slug value')
 		} else {
-			const slug = args.slug
-
       mongodb.collections.blocks.findOne({
 	    	'properties.trigger.type': 'path',
-	    	'properties.trigger.path': slug,
+	    	'properties.trigger.path': args.slug,
 	    	'properties.action.type': 'render_block',
 	    })
 	    .then(resultDoc => {
