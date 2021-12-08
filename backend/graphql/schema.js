@@ -13,28 +13,28 @@ const schema = gql`
 	scalar ObjectID
 
 	type Query {
-		id: ID
+		id: ObjectID
 
-		block(_id: ID!): Block
-		blocks(ids: [ID], types: [String]): [Block]
-		all_subblocks(_id: ID!): [Block]
+		block(_id: ObjectID!): Block
+		blocks(ids: [ObjectID], types: [String]): [Block]
+		all_subblocks(_id: ObjectID!): [Block]
 		blockBySlug(slug: String!): Block
 		self: User
-		parentBlocks(_id: ID!): [Block]
-		siblingBlocks(_id: ID!, types: [String]): [Block]
-		blockMatchesRoles(_id: ID!, roles: [String]): Boolean
+		parentBlocks(_id: ObjectID!): [Block]
+		siblingBlocks(_id: ObjectID!, types: [String]): [Block]
+		blockMatchesRoles(_id: ObjectID!, roles: [String]): Boolean
 	}
 
 	type Mutation {
-		saveBlock(block: InputBlock!): ID
-		deleteBlock(_id: ID!): Boolean
+		saveBlock(block: InputBlock!): ObjectID
+		deleteBlock(_id: ObjectID!): Boolean
 		moveBlock(movingBlockId: ObjectID!, newParentId: ObjectID!, newIndex: Int!): Boolean
 	}
 
 	type User {
 		user: JSONObject
 		logged_in: Boolean
-		blockId: ID
+		blockId: ObjectID
 	}
 
 	type Metadata {
@@ -51,15 +51,15 @@ const schema = gql`
 	}
 
 	type ContentConfig {
-		blockId: ID
+		blockId: ObjectID
 	}
 
 	type Block {
-		_id: ID
+		_id: ObjectID
 		type: String
 		properties: JSON
 		content: [ContentConfig]
-		parent: ID
+		parent: ObjectID
 		metadata: Metadata
 		permissions: [Permission]
 		computed: JSON
@@ -71,11 +71,11 @@ const schema = gql`
 	}
 
 	input InputBlock {
-		_id: ID
+		_id: ObjectID
 		type: String!
 		properties: JSON
 		content: [JSON]
-		parent: ID
+		parent: ObjectID
 		metadata: JSON
 		permissions: JSON
 	}

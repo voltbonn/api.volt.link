@@ -1,7 +1,7 @@
 const { getPermissionsQuery } = require('../functions.js')
 
 module.exports = async (parent, args, context, info) => {
-	const mongodb = context.mongodb
+  const mongodb = context.mongodb
 
   // const hasBlockSubQuery = info
   // .operation
@@ -15,32 +15,28 @@ module.exports = async (parent, args, context, info) => {
   // .selections
   // .find(s => s.name.value === 'block')
 
-	return new Promise((resolve,reject)=>{
+  return new Promise(resolve => {
 
-			const query = {
-				// deleted: false,
-				...getPermissionsQuery(context),
-			}
+    const query = {
+      // deleted: false,
+      ...getPermissionsQuery(context),
+    }
 
-			if (args._ids && Array.isArray(args._ids) && args._ids.length > 0) {
-      	const blockIDs = args._ids
-      		.filter(_id => mongodb.ObjectID.isValid(_id))
-      		.map(_id => mongodb.ObjectID(_id))
+    if (args._ids && Array.isArray(args._ids) && args._ids.length > 0) {
+      query._id = { $in: args._ids }
+    }
 
-				query._id = { $in: blockIDs }
-			}
+    if (args.types && Array.isArray(args.types) && args.types.length > 0) {
+      const types = args.types.filter(type => typeof type === 'string')
+      query.type = { $in: types }
+    }
 
-			if (args.types && Array.isArray(args.types) && args.types.length > 0) {
-				const types = args.types.filter(type => typeof type === 'string')
-				query.type = { $in: types }
-			}
+    const cursor = mongodb.collections.blocks.find(query)
 
-      const cursor = mongodb.collections.blocks.find(query)
+    // const cursor = mongodb.collections.blocks.aggregate([
+    //   {$match: query}
+    // ])
 
-    	// const cursor = mongodb.collections.blocks.aggregate([
-    	//   {$match: query}
-    	// ])
-
-      resolve(cursor.toArray())
-	})
+    resolve(cursor.toArray())
+  })
 }
