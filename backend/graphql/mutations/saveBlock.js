@@ -1,4 +1,4 @@
-const { getPermissionsQuery } = require('../functions.js')
+const { getPermissionsAggregationQuery } = require('../functions.js')
 
 module.exports = (parent, args, context, info) => {
 	const mongodb = context.mongodb
@@ -49,32 +49,20 @@ module.exports = (parent, args, context, info) => {
 	    .then(resultDoc => {
 	    	if (!!resultDoc) {
 					// if it exists: check if the user has permission and update it
-					mongodb.collections.blocks.updateOne(
-						{
-							_id: block._id,
-							...getPermissionsQuery(context, ['editor', 'owner']),
-						},
-						{
-							$set: {
-								...block,
-								metadata: {
-									...resultDoc.metadata,
-									modified: new Date(),
-								}
-							}
-						},
-						{ upsert: false }
-					)
-					.then(result => {
-						if (result.upsertedCount > 0 && result.upsertedId) {
-							resolve(result.upsertedId)
-						} else if (result.acknowledged === true && (result.modifiedCount > 0 || result.matchedCount > 0)) {
-							resolve(block._id)
-						} else {
-							reject('Probably no permissions to save the block.')
-						}
-					})
-					.catch(reject)
+					mongodb.collections.blocks.aggregate([
+						{ $match: { _id: block._id }},
+						...getPermissionsAggregationQuery(context, ['editor', 'owner']),
+
+						{ $set: block},
+						{ $set: {
+							'metadata.created': { $toDate: '$metadata.created' },
+							'metadata.modified': new Date(),
+						}},
+
+						{ $merge: { into: 'blocks', on: '_id', whenMatched: 'replace', whenNotMatched: 'discard' } }
+					])
+
+					resolve(block._id)
 	    	}else{
 					// if it does not exist: create it
 					mongodb.collections.blocks.insertOne({
