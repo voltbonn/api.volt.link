@@ -19,6 +19,8 @@ const blockMatchesRoles = require('./resolvers/blockMatchesRoles.js')
 const saveBlock = require('./mutations/saveBlock.js')
 const deleteBlock = require('./mutations/deleteBlock.js')
 
+const mongoDB_ObjectID_scalar = require('./scalars/mongoDB_ObjectID_scalar.js')
+
 // const { getFilterByKeysFunction, getFilterByLanguageFunction } = require('./functions.js')
 
 module.exports = {
@@ -54,6 +56,8 @@ module.exports = {
 	// 		return 'Error'
 	// 	},
 	// },
+
+	ObjectID: mongoDB_ObjectID_scalar,
 
 	Query: {
 		// hello: (parent, args, context, info) => 'world',

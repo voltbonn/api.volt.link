@@ -10,6 +10,7 @@ const schema = gql`
 	scalar JSON
 	scalar JSONObject
 	scalar DateTime
+	scalar ObjectID
 
 	type Query {
 		id: ID
