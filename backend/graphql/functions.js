@@ -97,8 +97,52 @@ function getPermissionsQuery(context, roles = ['viewer', 'editor', 'owner']){
 	return { permissions: { $elemMatch: { $or: or } } }
 }
 
+function getPermissionsAggregationQuery(context, roles = ['viewer', 'editor', 'owner']){
+  const permissionsQuery = getPermissionsQuery(context, roles)
+
+  if (Object.keys(permissionsQuery).length === 0) { // Admins have empty permissionsQuery, to return everything. No aggregation needed.
+    return []
+  }
+
+  const query = [
+    // only leave blocks with sufficient parent permissions
+    { $match: permissionsQuery },
+
+    // Get the parents of matched blocks.
+    {$graphLookup: {
+        from: 'blocks',
+        startWith: '$parent',
+        connectFromField: 'parent',
+        connectToField: '_id',
+        as: 'parents',
+        maxDepth: 50,
+        depthField: 'computed.sort',
+        // restrictSearchWithMatch: <document>
+    }},
+
+    // Add the block itself to the found results. This prevents the block from being hidden if it has no parents.
+    { $set: { 'tmpRoot': '$$ROOT' } },
+    { $unset: 'tmpRoot.parents' },
+    { $set: { 'parents': { $concatArrays: [ ['$tmpRoot'], '$parents' ] } } },
+    { $unset: 'tmpRoot' },
+
+    // only leave blocks with sufficient parent permissions
+    { $unwind: '$parents' },
+    { $match: { 'parents.permissions': permissionsQuery.permissions } },
+
+    // group the parents back to the blocks and clean up the permissions checking stuff
+    { $unset: 'parents' },
+    { $project: { tmpRoot: '$$ROOT' }},
+    { $group: { _id: '$_id', tmpRoot: { $first: '$tmpRoot' } }},
+    { $replaceRoot: { newRoot: '$tmpRoot' } },
+  ]
+
+  return query
+}
+
 module.exports = {
   getFilterByKeysFunction,
   getFilterByLanguageFunction,
   getPermissionsQuery,
+  getPermissionsAggregationQuery,
 }
