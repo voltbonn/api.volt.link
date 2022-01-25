@@ -39,10 +39,15 @@ module.exports = (parent, args, context, info) => {
 			})
 
 			// permissions
-			block.permissions = (block.permissions || [{
-				email: context.user.email,
-				role: 'owner',
-			}])
+			if (
+				!(!!block.permissions)
+				|| (Array.isArray(block.permissions) && block.permissions.length === 0)
+			) {
+				block.permissions = [{
+					email: context.user.email,
+					role: 'owner',
+				}]
+			}
 
 	    // check if the block exists
 			mongodb.collections.blocks.findOne({
