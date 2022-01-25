@@ -31,6 +31,18 @@ module.exports = async (parent, args, context, info) => {
       query.type = { $in: types }
     }
 
+    if (args.archived && typeof args.archived === 'boolean') {
+      if (args.archived === true) {
+        query['properties.archived'] = { $eq: true }
+      } else {
+        console.log('args.archived === false')
+        query['properties.archived'] = { $or: [
+          { $exists: false },
+          { $ne: true },
+        ] }
+      }
+    }
+
     const cursor = mongodb.collections.blocks.find(query)
 
     // const cursor = mongodb.collections.blocks.aggregate([

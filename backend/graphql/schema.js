@@ -16,7 +16,7 @@ const schema = gql`
 		id: ObjectID
 
 		block(_id: ObjectID!): Block
-		blocks(ids: [ObjectID], types: [String]): [Block]
+		blocks(ids: [ObjectID], types: [String], archived: Boolean): [Block]
 		all_subblocks(_id: ObjectID!): [Block]
 		blockBySlug(slug: String!): Block
 		self: User
