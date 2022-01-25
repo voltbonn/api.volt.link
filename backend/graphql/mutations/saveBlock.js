@@ -64,6 +64,12 @@ module.exports = (parent, args, context, info) => {
 					.toArray()
 
 					if (matchedBlocks.length > 0) {
+						if (!block.metadata) {
+							block.metadata = {
+								created: new Date(),
+								modified: new Date(),
+							}
+						}
 						if (block.metadata && block.metadata.__typename) {
 							delete block.metadata.__typename
 						}
