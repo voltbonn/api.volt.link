@@ -93,6 +93,7 @@ module.exports = (parent, args, context, info) => {
 						})
 						.catch(reject)
 					} else {
+						console.error('User does not have permission to update the block.')
 						reject('You do not have permission to edit this block.')
 					}
 	    	}else{
@@ -108,6 +109,7 @@ module.exports = (parent, args, context, info) => {
 						if (result.insertedId) {
 							resolve(result.insertedId)
 						} else {
+							console.error('Could not save the block.')
 							reject('Could not save the block.')
 						}
 					})
