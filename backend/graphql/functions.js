@@ -94,7 +94,7 @@ function getPermissionsQuery(context, roles = ['viewer', 'editor', 'owner']){
 		}
 	}
 
-	return { permissions: { $elemMatch: { $or: or } } }
+	return { 'permissions./': { $elemMatch: { $or: or } } }
 }
 
 function getPermissionsAggregationQuery(context, roles = ['viewer', 'editor', 'owner']){
@@ -128,7 +128,7 @@ function getPermissionsAggregationQuery(context, roles = ['viewer', 'editor', 'o
 
     // only leave blocks with sufficient parent permissions
     { $unwind: '$parents' },
-    { $match: { 'parents.permissions': permissionsQuery.permissions } },
+    { $match: { 'parents.permissions./': permissionsQuery['permissions./'] } },
 
     // group the parents back to the blocks and clean up the permissions checking stuff
     { $unset: 'parents' },

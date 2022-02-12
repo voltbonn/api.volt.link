@@ -47,9 +47,11 @@ module.exports = async (parent, args, context, info) => {
             type: 'person',
             content: [],
             properties,
-            permissions: [
-              { email: context.user.email, role: 'owner' },
-            ],
+            permissions: {
+              '/': [
+                { email: context.user.email, role: 'owner' },
+              ],
+            },
             metadata: {
               created: new Date(),
               modified: new Date(),

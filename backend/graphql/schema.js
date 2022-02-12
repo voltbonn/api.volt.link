@@ -61,8 +61,12 @@ const schema = gql`
 		content: [ContentConfig]
 		parent: ObjectID
 		metadata: Metadata
-		permissions: [Permission]
+		permissions: JSON
 		computed: JSON
+	}
+
+	type Permissions {
+		'/': [Permission]
 	}
 
 	type Permission {

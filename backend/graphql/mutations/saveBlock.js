@@ -41,12 +41,14 @@ module.exports = (parent, args, context, info) => {
 			// permissions
 			if (
 				!(!!block.permissions)
-				|| (Array.isArray(block.permissions) && block.permissions.length === 0)
+				|| Object.keys(block.permissions).length === 0
 			) {
-				block.permissions = [{
-					email: context.user.email,
-					role: 'owner',
-				}]
+				block.permissions = {
+						'/': [{
+							email: context.user.email,
+							role: 'owner',
+						}]
+				}
 			}
 
 	    // check if the block exists
