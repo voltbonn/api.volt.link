@@ -23,6 +23,7 @@ function getMongoDbContext(){
 						},
 						collections: {
 							blocks: 'blocks',
+							history: 'history',
 						}
 					}
 
@@ -31,6 +32,7 @@ function getMongoDbContext(){
 					}
 					const collections = {
 						blocks: dbs.graph.collection(names.collections.blocks),
+						history: dbs.graph.collection(names.collections.history),
 					}
 
 					_ContextChache_.mongodb = {
