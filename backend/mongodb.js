@@ -30,12 +30,12 @@ async function closeClient() {
 //   parent: new ObjectId(),
 // }
 
-async function getBlock(block_id) {
-  const { blocks } = await connectClient()
-  const block = await blocks.findOne({ _id: ObjectId(block_id) })
-  await closeClient()
-  return block
-}
+// async function getBlock(block_id) {
+//   const { blocks } = await connectClient()
+//   const block = await blocks.findOne({ _id: ObjectId(block_id) })
+//   await closeClient()
+//   return block
+// }
 
 module.exports = {
   connectClient,
