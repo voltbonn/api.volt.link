@@ -7,11 +7,13 @@ async function connectClient() {
     await client.connect()
     const database = client.db('data')
     const blocks = database.collection('blocks')
+    const history = database.collection('history')
 
     return {
       client,
       database,
       blocks,
+      history,
     }
   } catch (error) {
     console.error(error)
