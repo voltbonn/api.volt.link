@@ -65,10 +65,6 @@ const schema = gql`
 		computed: JSON
 	}
 
-	type Permissions {
-		'/': [Permission]
-	}
-
 	type Permission {
 		email: String
 		role: String
