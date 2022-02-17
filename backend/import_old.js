@@ -815,6 +815,9 @@ async function import_old() {
   const mongoDbContext = await getMongoDbContext()
   // console.log(JSON.stringify(Object.keys(mongoDbContext), null, 2))
 
+  await delete_all_history(mongoDbContext)
+  await delete_all_blocks(mongoDbContext)
+
   const commits = await localListCommitsWithFiles({ max_commits: 10000 })
   const loadedCommitTS = performance.now()
 
