@@ -6,7 +6,7 @@ module.exports = async (parent, args, context, info) => {
 	const requestedFields = info.fieldNodes[0].selectionSet.selections.map(selection => selection.name.value)
 
 	if (
-		requestedFields.includes('content')
+		requestedFields.includes('block')
 		&& typeof newContent === 'object'
 		&& Array.isArray(newContent)
 		&& newContent.length > 0
