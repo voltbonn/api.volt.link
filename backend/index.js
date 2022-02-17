@@ -234,24 +234,6 @@ app.get('/login', (req, res) => {
   }))
 })
 
-app.get('/import_old', (req, res) => {
-  import_old()
-    .then(timings => {
-      res.send(`
-        <h1>✅ Imported old data</h1>
-        <code><pre>
-${timings}
-        </pre></code>
-      `)
-    })
-    .catch(error => {
-      res.send(`
-        <h1>⚠️ Error importing old data</h1>
-        <code><pre>${error}</pre></code>
-      `)
-    })
-})
-
 app.get('/', (req, res) => {
   // res.redirect('https://www.volteuropa.org/')
   res.send(`

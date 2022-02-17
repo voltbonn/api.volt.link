@@ -879,6 +879,10 @@ copied blocks  ${copiedBlocksTS - parsedFilesTS} ms
 `
 }
 
+import_old()
+  .then(console.log)
+  .catch(console.error)
+
 module.exports = {
   delete_all_blocks,
   import_old,
