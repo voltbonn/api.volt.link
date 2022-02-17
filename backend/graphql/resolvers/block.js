@@ -38,7 +38,10 @@ function buildQuery(parent, args, context, info) {
 		}, projectStage)
 	stages.unshift({ $project: projectStage })
 
-	if (fields.hasOwnProperty('content')) {
+	if (
+		fields.hasOwnProperty('content')
+		&& fields.content.fieldsByTypeName.hasOwnProperty('block')
+	) {
 		stages = [
 			...stages,
 			
