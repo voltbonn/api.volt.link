@@ -39,7 +39,7 @@ const schema = gql`
 
 	type Metadata {
 		modified: DateTime
-		created: DateTime
+		modified_by: String
 	}
 
 	enum BlockType {
