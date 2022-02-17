@@ -45,7 +45,7 @@ function buildQuery(parent, args, context, info) {
 		stages = [
 			...stages,
 			
-			{ $unwind: '$content' },
+			{ $unwind: { path: '$content', preserveNullAndEmptyArrays: true } },
       { $lookup: {
       	from: 'blocks',
       	localField: 'content.blockId',
@@ -56,7 +56,21 @@ function buildQuery(parent, args, context, info) {
       { $group: {
       	_id: '$_id',
       	block: { $first: '$$ROOT' },
-      	content: { $push: '$content' },
+      	content: {
+					$push: {
+						$ifNull: [
+							{_PRUNE_ME_: '_PRUNE_ME_'},
+							'$content'
+						]
+					}
+				},
+      }},
+      { $redact: {
+        $cond: {
+        	if: { $eq: [ "$_PRUNE_ME_", '_PRUNE_ME_' ] },
+        	then: "$$PRUNE",
+        	else: "$$DESCEND"
+        }
       }},
       { $addFields: { 'block.content': '$content' } },
       { $replaceRoot: { newRoot: '$block' } },
