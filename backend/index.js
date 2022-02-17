@@ -26,8 +26,6 @@ const FileStore = require('session-file-store')(session)
 const passport = require('passport')
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 
-const { import_old } = require('./import_old.js')
-
 // function getUserLocales(){
 //     const localesByCounty = {
 //       de: ['de'],
