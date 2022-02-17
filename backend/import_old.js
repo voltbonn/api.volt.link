@@ -804,7 +804,8 @@ async function addNewestHistoryToBlocks(mongoDbContext){
   return docs // docs should be an empty array
 }
 
-async function import_old() {  
+async function import_old() { 
+  console.log('Started the Import!') 
   const startTS = performance.now()
 
   // Read old data from git and write it to mongodb in the new format:
