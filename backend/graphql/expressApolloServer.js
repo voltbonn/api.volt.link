@@ -32,6 +32,8 @@ async function expressApolloServer(app) {
 }
 */
 
+const isDevEnvironment = process.env.environment === 'dev' || false
+
 const { ApolloServer } = require('apollo-server-express')
 const {
 	ApolloServerPluginDrainHttpServer,
@@ -43,12 +45,14 @@ const getMongoDbContext = require('../getMongoDbContext.js')
 
 const executableSchema = require('./executableSchema.js')
 
+const apolloTracing = require('apollo-tracing')
+
 async function startApolloServer(app, httpServer) {
   const apolloServer = new ApolloServer({
 		schema: executableSchema,
 		// Enable graphiql gui
 		introspection: true,
-		tracing: true,
+		tracing: isDevEnvironment,
 		context: async ({req}) => {
 			try {
 				const locales = req.acceptsLanguages()
@@ -66,7 +70,7 @@ async function startApolloServer(app, httpServer) {
 			return null
 		},
     plugins: [
-			require('apollo-tracing').plugin(),
+			...(isDevEnvironment ? [] : [apolloTracing.plugin()]),
 			ApolloServerPluginDrainHttpServer({ httpServer }),
 			(
     		true || process.env.environment === 'dev'
