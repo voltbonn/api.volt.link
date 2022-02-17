@@ -239,7 +239,7 @@ app.get('/import_old', (req, res) => {
 
   res.send(`
     <code><pre>
-done
+done importing old data
     </pre></code>
   `)
 })
