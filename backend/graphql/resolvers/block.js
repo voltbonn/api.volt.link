@@ -37,6 +37,28 @@ function buildQuery(parent, args, context, info) {
 			return acc
 		}, projectStage)
 	stages.unshift({ $project: projectStage })
+
+	if (fields.hasOwnProperty('content')) {
+		stages = [
+			...stages,
+			
+			{ $unwind: '$content' },
+      { $lookup: {
+      	from: 'blocks',
+      	localField: 'content.blockId',
+      	foreignField: '_id',
+      	as: 'content.block'
+     	}},
+      { $addFields: { 'content.block': { $first: '$content.block' } } },
+      { $group: {
+      	_id: '$_id',
+      	block: { $first: '$$ROOT' },
+      	content: { $push: '$content' },
+      }},
+      { $addFields: { 'block.content': '$content' } },
+      { $replaceRoot: { newRoot: '$block' } },
+		]
+	}
 	
 	return stages
 }
