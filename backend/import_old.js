@@ -866,7 +866,17 @@ async function import_old() {
   console.log('copied blocks ', copiedBlocksTS - parsedFilesTS, 'ms')
   console.log('--------------------------------')
 
-  process.exit(0)
+  // process.exit(0)
+
+  return `
+----------------------------------------------------------------
+commit amount  ${commits.length}
+----------------------------------------------------------------
+loaded commits ${loadedCommitTS - startTS} ms
+parsed files   ${parsedFilesTS - loadedCommitTS} ms (+ added history blocks)
+copied blocks  ${copiedBlocksTS - parsedFilesTS} ms
+----------------------------------------------------------------
+`
 }
 
 module.exports = {
