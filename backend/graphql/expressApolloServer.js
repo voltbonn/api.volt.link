@@ -66,6 +66,7 @@ async function startApolloServer(app, httpServer) {
 			return null
 		},
     plugins: [
+			require('apollo-tracing').plugin(),
 			ApolloServerPluginDrainHttpServer({ httpServer }),
 			(
     		true || process.env.environment === 'dev'
