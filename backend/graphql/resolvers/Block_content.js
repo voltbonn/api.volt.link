@@ -2,6 +2,7 @@ const { getPermissionsQuery } = require('../functions.js')
 
 module.exports = async (parent, args, context, info) => {
 	let newContent = parent.content
+	.filter(content => content !== null && Object.keys(content).length > 0) // TODO: This is a BUGFIX! Cause empty content results in an unnecessary empty object.
 
 	const requestedFields = info.fieldNodes[0].selectionSet.selections.map(selection => selection.name.value)
 

@@ -56,22 +56,27 @@ function buildQuery(parent, args, context, info) {
       { $group: {
       	_id: '$_id',
       	block: { $first: '$$ROOT' },
-      	content: {
-					$push: {
-						$ifNull: [
-							{_PRUNE_ME_: '_PRUNE_ME_'},
-							'$content'
-						]
-					}
-				},
+      	content: { $push: '$content' },
       }},
-      { $redact: {
-        $cond: {
-        	if: { $eq: [ "$_PRUNE_ME_", '_PRUNE_ME_' ] },
-        	then: "$$PRUNE",
-        	else: "$$DESCEND"
-        }
-      }},
+			// { $group: {
+      // 	_id: '$_id',
+      // 	block: { $first: '$$ROOT' },
+      // 	content: {
+			// 		$push: {
+			// 			$ifNull: [
+			// 				'$content',
+			// 				{_PRUNE_ME_: '_PRUNE_ME_'}
+			// 			]
+			// 		}
+			// 	},
+      // }},
+      // { $redact: {
+      //   $cond: {
+      //   	if: { $eq: [ "$_PRUNE_ME_", '_PRUNE_ME_' ] },
+      //   	then: "$$PRUNE",
+      //   	else: "$$DESCEND"
+      //   }
+      // }},
       { $addFields: { 'block.content': '$content' } },
       { $replaceRoot: { newRoot: '$block' } },
 		]
