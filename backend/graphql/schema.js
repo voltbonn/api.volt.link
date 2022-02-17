@@ -52,6 +52,7 @@ const schema = gql`
 
 	type ContentConfig {
 		blockId: ObjectID
+		block: Block
 	}
 
 	type Block {

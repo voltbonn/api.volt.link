@@ -15,6 +15,7 @@ const parentBlocks = require('./resolvers/parentBlocks.js')
 const siblingBlocks = require('./resolvers/siblingBlocks.js')
 const self = require('./resolvers/self.js')
 const blockMatchesRoles = require('./resolvers/blockMatchesRoles.js')
+const Block_content = require('./resolvers/Block_content.js')
 
 const saveBlock = require('./mutations/saveBlock.js')
 const deleteBlock = require('./mutations/deleteBlock.js')
@@ -84,6 +85,7 @@ module.exports = {
 	Block: {
 		// description: getFilterByLanguageFunction('description'),
 		// tags: getFilterByKeysFunction('tags'),
-	},
+		content: Block_content,
+	}
 }
 
