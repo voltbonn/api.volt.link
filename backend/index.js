@@ -324,7 +324,7 @@ app.get('/download_url', async (req, res) => {
 
         if (!mime) {
           if (filename.endsWith('.svg')) {
-             mime = 'image/svg'
+            mime = 'image/svg'
           } else {
             mime = ''
           }
