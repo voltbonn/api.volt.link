@@ -1,6 +1,6 @@
 const { getPermissionsQuery } = require('../functions.js')
 
-const { buildQuery } = require('../buildQuery.js')
+const { buildQuery } = require('../../buildQuery.js')
 
 module.exports = async (parent, args, context, info) => {
 	const mongodb = context.mongodb
