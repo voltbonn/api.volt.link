@@ -26,6 +26,8 @@ const FileStore = require('session-file-store')(session)
 const passport = require('passport')
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 
+const sharp = require('sharp')
+
 // function getUserLocales(){
 //     const localesByCounty = {
 //       de: ['de'],
@@ -316,7 +318,7 @@ app.get('/download_url', async (req, res) => {
   if (typeof url === 'string' && url.length > 0 && isAbsoluteUrlRegexp.test(url)) {
     fetch(url)
       .then(async response => {
-        const responseBuffer = await response.buffer()
+        let responseBuffer = await response.buffer()
 
         const filename = url.split('/').pop() || ''
 
@@ -328,6 +330,33 @@ app.get('/download_url', async (req, res) => {
           } else {
             mime = ''
           }
+        }
+
+        if ([
+          // sharp support: JPEG, PNG, WebP, AVIF, GIF, SVG, TIFF (date checked: 2022-02-18)
+          'image/jpeg',
+          'image/png',
+          'image/webp',
+          'image/gif', // TODO: sharp does not support animated gifs. Replace with this: https://stackoverflow.com/questions/47138754/nodejs-animated-gif-resizing
+          'image/tiff',
+        ].includes(mime)) {
+          // resize the image in responseBuffer to maxwidth
+          const maxWidth = parseInt(req.query.w) || 2000
+          const maxHeight = parseInt(req.query.h) || 2000
+          let format = req.query.f
+          if (![ 'jpeg', 'png', 'webp' ].includes(format)) {
+            format = 'jpeg'
+          }
+
+          responseBuffer = await sharp(responseBuffer)
+            .resize(maxWidth, maxHeight, {
+              kernel: sharp.kernel.nearest,
+              fit: 'outside',
+              withoutEnlargement: true,
+              fastShrinkOnLoad: true,
+            })
+            .toFormat(format)
+            .toBuffer()
         }
 
         res
