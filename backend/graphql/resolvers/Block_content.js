@@ -26,7 +26,7 @@ module.exports = async (parent, args, context, info) => {
 
     	const blocks = await cursor.toArray()
 
-    	newContent = parent.content.map(contentConfig => {
+    	newContent = newContent.map(contentConfig => {
     	  const block = blocks.find(block => block._id+'' === contentConfig.blockId+'')
     	  return {
     	    ...contentConfig,
