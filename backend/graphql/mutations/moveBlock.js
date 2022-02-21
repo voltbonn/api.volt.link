@@ -25,7 +25,7 @@ function changeParent(context, newParentId, movingBlockId, newPositionInContent 
 
     				{ $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
 					])
-          .explain() // TODO: find some other way to trigger a promise
+          .toArray()
           .then(()=>{
   					// 2. remove blockId from old parent
   					mongodb.collections.blocks.aggregate([
@@ -42,7 +42,7 @@ function changeParent(context, newParentId, movingBlockId, newPositionInContent 
 
       				{ $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
   					])
-            .explain() // TODO: find some other way to trigger a promise
+            .toArray()
             .then(()=>{
     					// 3. add blockId to content of parent
     					mongodb.collections.blocks.aggregate([
@@ -55,7 +55,7 @@ function changeParent(context, newParentId, movingBlockId, newPositionInContent 
 
         				{ $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
     					])
-              .explain() // TODO: find some other way to trigger a promise
+              .toArray()
               .then(()=>{
     					  resolve()
               })
