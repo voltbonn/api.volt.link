@@ -71,11 +71,15 @@ const schema = gql`
 		role: String
 	}
 
+	input InputContentConfig {
+		blockId: ObjectID
+	}
+
 	input InputBlock {
 		_id: ObjectID
 		type: String!
 		properties: JSON
-		content: [JSON]
+		content: [InputContentConfig]
 		parent: ObjectID
 		metadata: JSON
 		permissions: JSON

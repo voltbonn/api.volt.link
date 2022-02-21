@@ -36,6 +36,9 @@ module.exports = (parent, args, context, info) => {
 				if (content_config.block) {
 					delete content_config.block
 				}
+
+				content_config.blockId = new mongodb.ObjectId(content_config.blockId)
+				
 				return content_config
 			})
 
