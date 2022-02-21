@@ -1,92 +1,82 @@
 const { getPermissionsAggregationQuery } = require('../functions.js')
 
-function changeParent(context, newParentId, movingBlockId, newPositionInContent = 0) {
+async function changeParent(context, newParentId, movingBlockId, newPositionInContent = 0) {
 	const mongodb = context.mongodb
 
-	return new Promise((resolve, reject) => {
-		if (!!newParentId) {
-			mongodb.collections.blocks.aggregate([
+	if (!!newParentId) {
+		const results = await mongodb.collections.blocks
+			.aggregate([
 				{$match: {_id: newParentId}},
 				...getPermissionsAggregationQuery(context, ['editor', 'owner']),
 			])
 			.toArray()
-			.then(async results => {
-				if (results.length === 0) {
-					reject('no permissions to edit parent')
-				} else {
-					// 1. save parent info to the block
-					mongodb.collections.blocks.aggregate([
-						{$match: { _id: movingBlockId }},
-						...getPermissionsAggregationQuery(context, ['editor', 'owner']),
+			
+		if (results.length === 0) {
+			throw new Error('no permissions to edit parent')
+		} else {
 
-    				{$set: {
-							parent: newParentId,
-						}},
+			// 1. save parent info to the block
+			await mongodb.collections.blocks
+				.aggregate([
+					{$match: { _id: movingBlockId }},
+					...getPermissionsAggregationQuery(context, ['editor', 'owner']),
 
-    				{ $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
-					])
-          .toArray()
-          .then(()=>{
-  					// 2. remove blockId from old parent
-  					mongodb.collections.blocks.aggregate([
-  						{$match: {'content.blockId': movingBlockId}},
-  						...getPermissionsAggregationQuery(context, ['editor', 'owner']),
+	    		{$set: {
+						parent: newParentId,
+					}},
 
-      				{$redact: {
-      				    $cond: {
-      				      if: { $eq: [ "$blockId", movingBlockId ] },
-      				      then: "$$PRUNE",
-      				      else: "$$DESCEND"
-      				    }
-      				}},
+	    		{ $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
+				])
+	      .toArray()
+					
+  		// 2. remove blockId from old parent
+  		await mongodb.collections.blocks
+				.aggregate([
+	  			{$match: {'content.blockId': movingBlockId}},
+	  			...getPermissionsAggregationQuery(context, ['editor', 'owner']),
 
-      				{ $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
-  					])
-            .toArray()
-            .then(()=>{
-    					// 3. add blockId to content of parent
-    					mongodb.collections.blocks.aggregate([
-        				{$match: { _id: newParentId }},
-    						...getPermissionsAggregationQuery(context, ['editor', 'owner']),
+	      	{$redact: {
+	      	    $cond: {
+	      	      if: { $eq: [ "$blockId", movingBlockId ] },
+	      	      then: "$$PRUNE",
+	      	      else: "$$DESCEND"
+	      	    }
+	      	}},
 
-        				{ $set: { content: { $concatArrays: [ '$content', [{
-        				    blockId: movingBlockId
-        				}] ] } } },
+	      	{ $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
+	  		])
+	      .toArray()
+						
+    	// 3. add blockId to content of parent
+    	await mongodb.collections.blocks
+				.aggregate([
+	      	{$match: { _id: newParentId }},
+	    		...getPermissionsAggregationQuery(context, ['editor', 'owner']),
 
-        				{ $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
-    					])
-              .toArray()
-              .then(()=>{
-    					  resolve()
-              })
-              .catch(reject)
-            })
-            .catch(reject)
-          })
-          .catch(reject)
-				}
-			})
-			.catch(reject)
-		}else{
-			reject('newParentId is probably not a mongoId')
+	        { $set: { content: { $concatArrays: [ '$content', [{
+	            blockId: movingBlockId
+	        }] ] } } },
+
+	      	{ $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
+	    	])
+	      .toArray()
+
 		}
-	})
+	}else{
+		throw new Error('newParentId is probably not a mongoId')
+	}
 }
 
-module.exports = (parent, args, context, info) => {
-	return new Promise((resolve,reject)=>{
-		if (!context.logged_in) {
-			reject('Not logged in.')
-		} else {
-			const movingBlockId = args.movingBlockId
-			const newParentId = args.newParentId
-			const newPositionInContent = args.newIndex
+module.exports = async (parent, args, context, info) => {
+	if (!context.logged_in) {
+		throw new Error('Not logged in.')
+	} else {
+		const movingBlockId = args.movingBlockId
+		const newParentId = args.newParentId
+		const newPositionInContent = args.newIndex
 
-      changeParent(context, newParentId, movingBlockId, newPositionInContent)
-      .then(()=>{
-        resolve(true)
-      })
-      .catch(reject)
-		}
-	})
+    await changeParent(context, newParentId, movingBlockId, newPositionInContent)
+      
+		return true
+	}
 }
