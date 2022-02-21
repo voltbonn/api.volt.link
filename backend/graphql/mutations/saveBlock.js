@@ -68,7 +68,6 @@ module.exports = (parent, args, context, info) => {
 					if (matchedBlocks.length > 0) {
 						if (!block.metadata) {
 							block.metadata = {
-								created: new Date(),
 								modified: new Date(),
 							}
 						}
@@ -82,7 +81,6 @@ module.exports = (parent, args, context, info) => {
 							...block,
 							metadata: {
 								...block.metadata,
-								created: new Date(block.metadata.created), // TODO: move converting to date to graphql
 								modified: new Date(),
 							}
 						}})
@@ -103,7 +101,6 @@ module.exports = (parent, args, context, info) => {
 					mongodb.collections.blocks.insertOne({
 						...block,
 						metadata: {
-							created: new Date(),
 							modified: new Date(),
 						}
 					})
