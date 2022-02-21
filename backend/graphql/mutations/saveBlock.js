@@ -2,6 +2,7 @@ const { getPermissionsAggregationQuery } = require('../functions.js')
 
 module.exports = (parent, args, context, info) => {
 	const mongodb = context.mongodb
+	const user = context.user
 
 	return new Promise((resolve,reject)=>{
 		if (!context.logged_in) {
@@ -68,6 +69,7 @@ module.exports = (parent, args, context, info) => {
 					if (matchedBlocks.length > 0) {
 						if (!block.metadata) {
 							block.metadata = {
+								modified_by: user.email,
 								modified: new Date(),
 							}
 						}
@@ -81,6 +83,7 @@ module.exports = (parent, args, context, info) => {
 							...block,
 							metadata: {
 								...block.metadata,
+								modified_by: user.email,
 								modified: new Date(),
 							}
 						}})
@@ -101,6 +104,7 @@ module.exports = (parent, args, context, info) => {
 					mongodb.collections.blocks.insertOne({
 						...block,
 						metadata: {
+							modified_by: user.email,
 							modified: new Date(),
 						}
 					})
