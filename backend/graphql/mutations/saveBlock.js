@@ -1,4 +1,5 @@
 const { getPermissionsAggregationQuery } = require('../functions.js')
+const { copyToHistory } = require('../history.js')
 
 module.exports = (parent, args, context, info) => {
 	const mongodb = context.mongodb
@@ -92,7 +93,11 @@ module.exports = (parent, args, context, info) => {
 						}})
 						.then(result => {
 							if (result.matchedCount > 0) {
-								resolve(block._id)
+								copyToHistory(block._id, mongodb)
+									.catch(console.error)
+									.finally(() => {
+										resolve(block._id)
+									})
 							} else {
 								reject('Could not save the block.')
 							}
@@ -113,7 +118,11 @@ module.exports = (parent, args, context, info) => {
 					})
 					.then(result => {
 						if (result.insertedId) {
-							resolve(result.insertedId)
+							copyToHistory(result.insertedId, mongodb)
+								.catch(console.error)
+								.finally(() => {
+									resolve(result.insertedId)
+								})
 						} else {
 							console.error('Could not save the block.')
 							reject('Could not save the block.')
