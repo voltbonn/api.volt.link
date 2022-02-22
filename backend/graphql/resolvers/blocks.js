@@ -45,10 +45,6 @@ module.exports = async (parent, args, context, info) => {
 
     const cursor = mongodb.collections.blocks.find(query)
 
-    // const cursor = mongodb.collections.blocks.aggregate([
-    //   {$match: query}
-    // ])
-
     resolve(cursor.toArray())
   })
 }
