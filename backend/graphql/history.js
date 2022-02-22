@@ -19,6 +19,25 @@ async function copyToHistory (blockId, mongodb) {
 	.toArray()
 }
 
+async function copyManyToHistory (blockIds, mongodb) {
+  blockIds = blockIds.filter(blockId => mongodb.ObjectId.isValid(blockId))
+
+	return await mongodb.collections.blocks.aggregate([
+		{ $match: {
+      _id: { $in: blockIds },
+    }},
+
+    { $addFields: {
+      isHistoryFor: '$_id'
+    }},
+    { $unset: '_id' },
+
+ 		{ $merge: { into: 'history' } }
+	])
+	.toArray()
+}
+
 module.exports = {
   copyToHistory,
+  copyManyToHistory,
 }

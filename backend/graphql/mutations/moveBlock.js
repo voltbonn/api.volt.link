@@ -1,4 +1,5 @@
 const { getPermissionsAggregationQuery } = require('../functions.js')
+const { copyManyToHistory } = require('../history.js')
 
 async function changeParent(context, newParentId, movingBlockId, newPositionInContent = 0) {
 	const mongodb = context.mongodb
@@ -28,8 +29,22 @@ async function changeParent(context, newParentId, movingBlockId, newPositionInCo
 	    		{ $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
 				])
 	      .toArray()
-					
-  		// 2. remove blockId from old parent
+
+  		// 2.1. get ids of old parents
+  		let oldParentIds = await mongodb.collections.blocks
+				.aggregate([
+	  			{$match: {'content.blockId': movingBlockId}},
+	  			...getPermissionsAggregationQuery(context, ['editor', 'owner']),
+
+	      	{$project: {
+	      	  _id: true
+	      	}},
+	  		])
+	      .toArray()
+
+			oldParentIds = oldParentIds.map(id => id._id)
+
+			// 2.2: remove blockId from old parent
   		await mongodb.collections.blocks
 				.aggregate([
 	  			{$match: {'content.blockId': movingBlockId}},
@@ -61,6 +76,19 @@ async function changeParent(context, newParentId, movingBlockId, newPositionInCo
 	    	])
 	      .toArray()
 
+			// 4. copy all changed blocks to the history collection
+			const blockIdsToAddToHistory = [...new Set([
+				movingBlockId,
+				newParentId,
+				...oldParentIds,
+				newParentId,
+			])]
+
+			await copyManyToHistory(blockIdsToAddToHistory, mongodb)
+
+			// 5. finish
+			return true
+
 		}
 	}else{
 		throw new Error('newParentId is probably not a mongoId')
@@ -75,8 +103,6 @@ module.exports = async (parent, args, context, info) => {
 		const newParentId = args.newParentId
 		const newPositionInContent = args.newIndex
 
-    await changeParent(context, newParentId, movingBlockId, newPositionInContent)
-      
-		return true
+    return await changeParent(context, newParentId, movingBlockId, newPositionInContent)
 	}
 }
