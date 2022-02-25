@@ -17,8 +17,9 @@ module.exports = async (parent, args, context, info) => {
 
   return new Promise(resolve => {
 
+    const stages = []
+
     const query = {
-      // deleted: false,
       ...getPermissionsQuery(context),
     }
 
@@ -31,19 +32,30 @@ module.exports = async (parent, args, context, info) => {
       query.type = { $in: types }
     }
 
-    if (args.archived && typeof args.archived === 'boolean') {
+    stages.push({ $match: query })
+
+
+
+    if (args.hasOwnProperty('archived') && typeof args.archived === 'boolean') {
       if (args.archived === true) {
-        query['properties.archived'] = { $eq: true }
+        stages.push({ $match: {
+          'properties.archived': { $eq: true }
+        } })
       } else {
-        console.log('args.archived === false')
-        query['properties.archived'] = { $or: [
-          { $exists: false },
-          { $ne: true },
-        ] }
+        stages.push({ $match: {
+          $or: [
+            { 'properties.archived': { $exists: false } },
+            { $and: [
+              { 'properties.archived': { $exists: true } },
+              { 'properties.archived': false },
+            ]}
+          ]
+        } })
       }
     }
 
-    const cursor = mongodb.collections.blocks.find(query)
+    
+    const cursor = mongodb.collections.blocks.aggregate(stages)
 
     resolve(cursor.toArray())
   })
