@@ -1,4 +1,4 @@
-const { getPermissionsQuery } = require('../functions.js')
+const { getPermissionsQuery } = require('./functions.js')
 
 const { parseResolveInfo } = require('graphql-parse-resolve-info')
 
@@ -42,6 +42,28 @@ function buildQuery(parent, args, context, info) {
 		fields.hasOwnProperty('content')
 		&& fields.content.fieldsByTypeName.hasOwnProperty('block')
 	) {
+
+		let isArchivedQueryStage = []
+		if (
+			args.hasOwnProperty('archived')
+			&& typeof args.archived === 'boolean'
+  	  && args.archived === true
+		) {
+  	  isArchivedQueryStage = [{ $match: {
+  	    'content.block.properties.archived': { $eq: true }
+  	  } }]
+  	} else {
+  	  isArchivedQueryStage = [{ $match: {
+  	    $or: [
+  	      { 'content.block.properties.archived': { $exists: false } },
+  	      { $and: [
+  	        { 'content.block.properties.archived': { $exists: true } },
+  	        { 'content.block.properties.archived': false },
+  	      ]}
+  	    ]
+  	  } }]
+  	}
+
 		stages = [
 			...stages,
 			
@@ -54,7 +76,11 @@ function buildQuery(parent, args, context, info) {
      	}},
       { $addFields: { 'content.block': { $first: '$content.block' } } },
 
-			{ $match: getPermissionsQuery(context) },
+			...isArchivedQueryStage,
+
+			// { $match: {
+			// 	...getPermissionsQuery(context),
+			// }},
 
 			{ $group: {
       	_id: '$_id',

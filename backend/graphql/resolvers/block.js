@@ -1,13 +1,11 @@
 const { getPermissionsQuery } = require('../functions.js')
 
-const { buildQuery } = require('../../buildQuery.js')
+const { buildQuery } = require('../buildQuery.js')
 
 module.exports = async (parent, args, context, info) => {
 	const mongodb = context.mongodb
 
 	return new Promise(async (resolve,reject)=>{
-
-		const stages = buildQuery(parent, args, context, info)
 
 		const query = [
 			{ $match: {
@@ -15,7 +13,7 @@ module.exports = async (parent, args, context, info) => {
 				_id: args._id,
       } },
 
-			...stages,
+			...buildQuery(parent, args, context, info),
 		]
 
     const cursor = mongodb.collections.blocks.aggregate(query)
