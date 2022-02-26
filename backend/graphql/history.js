@@ -6,7 +6,7 @@ async function copyToHistory (blockId, mongodb) {
 
 	return await mongodb.collections.blocks.aggregate([
 		{ $match: {
-      _id: block._id,
+      _id: blockId,
     }},
 
     { $addFields: {
