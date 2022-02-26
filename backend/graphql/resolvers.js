@@ -18,7 +18,10 @@ const blockMatchesRoles = require('./resolvers/blockMatchesRoles.js')
 const Block_content = require('./resolvers/Block_content.js')
 
 const saveBlock = require('./mutations/saveBlock.js')
-const deleteBlock = require('./mutations/deleteBlock.js')
+const {
+	archiveBlock,
+	unarchiveBlock,
+} = require('./mutations/archiveBlock.js')
 const moveBlock = require('./mutations/moveBlock.js')
 
 const mongoDB_ObjectID_scalar = require('./scalars/mongoDB_ObjectID_scalar.js')
@@ -78,7 +81,8 @@ module.exports = {
 	},
 	Mutation: {
 		saveBlock,
-		deleteBlock,
+		archiveBlock,
+		unarchiveBlock,
 		moveBlock,
 	},
 

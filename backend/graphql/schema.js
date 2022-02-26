@@ -27,7 +27,8 @@ const schema = gql`
 
 	type Mutation {
 		saveBlock(block: InputBlock!): ObjectID
-		deleteBlock(_id: ObjectID!): Boolean
+		archiveBlock(_id: ObjectID!): Boolean
+		unarchiveBlock(_id: ObjectID!): Boolean
 		moveBlock(movingBlockId: ObjectID!, newParentId: ObjectID!, newIndex: Int!): Boolean
 	}
 
