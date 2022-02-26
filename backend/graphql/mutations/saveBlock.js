@@ -91,7 +91,7 @@ module.exports = async (parent, args, context, info) => {
 							modified: new Date(),
 						}
 					}})
-				
+
 				if (result.matchedCount > 0) {
 					await copyToHistory(block._id, mongodb)
 					return block._id
