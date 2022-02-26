@@ -1,4 +1,5 @@
 const { getPermissionsQuery } = require('../functions.js')
+const { copyManyToHistory } = require('../history.js')
 
 async function both (parent, args, context, info) {
 	const mongodb = context.mongodb
@@ -84,6 +85,11 @@ async function both (parent, args, context, info) {
 			{ $merge: { into: 'blocks', on: '_id', whenMatched: 'replace', whenNotMatched: 'discard' } }
 		])
 		.toArray()
+
+
+		// 3. save changes to history
+		await copyManyToHistory(blockIdsToAddToHistory, mongodb)
+
 
 		return true // TODO: return if it really worked
   }
