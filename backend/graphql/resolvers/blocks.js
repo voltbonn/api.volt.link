@@ -1,21 +1,11 @@
 const { getPermissionsQuery } = require('../functions.js')
 
+const { buildQuery } = require('../../buildQuery.js')
+
 module.exports = async (parent, args, context, info) => {
   const mongodb = context.mongodb
 
-  // const hasBlockSubQuery = info
-  // .operation
-  // .selectionSet
-  // .selections
-  // .find(s => s.name.value === 'blocksByIds')
-  // .selectionSet
-  // .selections
-  // .find(s => s.name.value === 'content')
-  // .selectionSet
-  // .selections
-  // .find(s => s.name.value === 'block')
-
-  const stages = []
+  let stages = []
 
   const query = {
     ...getPermissionsQuery(context),
@@ -52,8 +42,14 @@ module.exports = async (parent, args, context, info) => {
     }
   }
 
+  stages = [
+    ...stages,
+    ...buildQuery(parent, args, context, info),
+  ]
     
   const cursor = mongodb.collections.blocks.aggregate(stages)
 
-  return cursor.toArray()
+  const blocks = cursor.toArray()
+
+  return blocks
 }
