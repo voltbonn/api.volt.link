@@ -1,4 +1,4 @@
-// const { getPermissionsQuery } = require('../functions.js')
+const { getPermissionsQuery } = require('../functions.js')
 
 const { parseResolveInfo } = require('graphql-parse-resolve-info')
 
@@ -53,8 +53,10 @@ function buildQuery(parent, args, context, info) {
       	as: 'content.block'
      	}},
       { $addFields: { 'content.block': { $first: '$content.block' } } },
-      // TODO: check permissions
-      { $group: {
+
+			{ $match: getPermissionsQuery(context) },
+
+			{ $group: {
       	_id: '$_id',
       	block: { $first: '$$ROOT' },
       	content: { $push: '$content' },
