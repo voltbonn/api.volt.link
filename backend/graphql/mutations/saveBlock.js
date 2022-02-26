@@ -11,12 +11,10 @@ module.exports = async (parent, args, context, info) => {
 
 		const block = args.block || {}
 
-		// // _id
-		// if (block._id && mongodb.ObjectId.isValid(block._id)) {
-		// 	block._id = new mongodb.ObjectId(block._id)
-		// } else {
-		// 	block._id = new mongodb.ObjectId()
-		// }
+		// _id
+		if (!block._id && !mongodb.ObjectId.isValid(block._id)) {
+			block._id = new mongodb.ObjectId()
+		}
 
 		// properties
 		block.properties = block.properties || {}
