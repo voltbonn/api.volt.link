@@ -6,21 +6,16 @@ async function both (parent, args, context, info) {
 	if (!context.logged_in) {
 		throw new Error('Not logged in.')
 	} else {
-		const set_or_unset_stage = []
-		if (args.archive === false) {
-			set_or_unset_stage.push({ $unset: 'properties.archived' })
-		} else {
-			set_or_unset_stage.push({ $set: { 'properties.archived': true } })
-		}
 
-		// mark all children and its content blocks as archived
-		await mongodb.collections.blocks.aggregate([
+		// 1. find all children and it's content blocks
+		let blockIdsToAddToHistory = await mongodb.collections.blocks.aggregate([
 	    { $match: {
 	      _id: args._id,
 	      ...getPermissionsQuery(context, ['editor', 'owner']),
 	    } },
     
     	{ $facet: {
+    	  fromOriginal: [], // empty stages-array to copy the original document/block
     	  fromContent: [
     	    { $graphLookup: {
     	      from: 'blocks',
@@ -54,17 +49,39 @@ async function both (parent, args, context, info) {
     	}},
     
     	{ $project: {
-    	  blocks: { $setUnion: [ '$fromContent', '$fromParent' ] }
+    	  blocks: { $setUnion: [ '$fromOriginal', '$fromContent', '$fromParent' ] }
     	}},
     
     	{ $unwind: '$blocks' },
     	{ $replaceRoot: { newRoot: '$blocks' } },
     
     	// ...getPermissionsAggregationQuery(context, ['editor', 'owner']),
-        
+
+			{ $project: { _id: true } },
+
+    	// { $merge: { into: 'blocks', on: '_id', whenMatched: 'replace', whenNotMatched: 'discard' } }
+		])
+		.toArray()
+
+		blockIdsToAddToHistory = blockIdsToAddToHistory
+		.map(block => block._id)
+
+
+		// 2. mark all found blocks as archived (or unarchived)	const set_or_unset_stage = []
+		if (args.archive === false) {
+			set_or_unset_stage.push({ $unset: 'properties.archived' })
+		} else {
+			set_or_unset_stage.push({ $set: { 'properties.archived': true } })
+		}
+
+		await mongodb.collections.blocks.aggregate([
+	    { $match: {
+	      _id: { $in: blockIdsToAddToHistory },
+	    } },
+
     	...set_or_unset_stage,
 
-    	{ $merge: { into: 'blocks', on: '_id', whenMatched: 'replace', whenNotMatched: 'discard' } }
+			{ $merge: { into: 'blocks', on: '_id', whenMatched: 'replace', whenNotMatched: 'discard' } }
 		])
 		.toArray()
 
