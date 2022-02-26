@@ -1,4 +1,9 @@
 async function copyToHistory (blockId, mongodb) {
+  // only copy if blockId was given
+  if (blockId === undefined || blockId === null) {
+    return false
+  }
+
   // check if blockId is a valid ObjectId
   if (!mongodb.ObjectId.isValid(blockId)) {
     throw new Error('Invalid blockId.')
