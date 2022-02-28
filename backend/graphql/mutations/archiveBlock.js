@@ -67,8 +67,8 @@ async function both (parent, args, context, info) {
 		blockIdsToAddToHistory = blockIdsToAddToHistory
 		.map(block => block._id)
 
-
-		// 2. mark all found blocks as archived (or unarchived)	const set_or_unset_stage = []
+		// 2. mark all found blocks as archived (or unarchived)
+		const set_or_unset_stage = []
 		if (args.archive === false) {
 			set_or_unset_stage.push({ $unset: 'properties.archived' })
 		} else {
