@@ -206,7 +206,7 @@ async function getSimilarCodes({
   return pages
 }
 
-const forbidden = {
+const forbiddenInPath = {
   codes: `
 undefined
 null
@@ -233,7 +233,7 @@ list
 }
 
 function quickcheckCode(code, { userEmail = '' }) {
-  const forbidden_letters_splitted = forbidden.letters.split('')
+  const forbidden_letters_splitted = forbiddenInPath.letters.split('')
 
   // Info: quickcheckCode is there to check a code without opening the file or checking it's permissions.
 
@@ -248,7 +248,7 @@ function quickcheckCode(code, { userEmail = '' }) {
     code === ''
     || code.includes('/')
     || code.startsWith('volt')
-    || forbidden.codes.includes(code)
+    || forbiddenInPath.codes.includes(code)
     || forbidden_letters_splitted.filter(value => !code_split.includes(value)).length < forbidden_letters_splitted.length
   ) {
     allowed_to_edit = false
@@ -327,7 +327,7 @@ module.exports = {
   removeDiacritics,
   filterPagesByPermission,
   getSimilarCodes,
-  forbidden,
+  forbiddenInPath,
   quickcheckCode,
   hasEditPermission,
   generateRandomCode,
