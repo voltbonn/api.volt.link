@@ -8,7 +8,7 @@ module.exports = async (parent, args, context, info) => {
 	const query = [
 		{ $match: {
 			_id: args._id,
-      ...getPermissionsQuery(context),
+      ...getPermissionsQuery(context, null),
     } },
 
 		...buildQuery(parent, args, context, info),

@@ -60,13 +60,14 @@ module.exports = async (parent, args, context, info) => {
 	  	})
 	  
 	  if (!!resultDoc) {
+			const stages = [
+					{ $match: { _id: block._id }},
+					...getPermissionsAggregationQuery(context, ['editor', 'owner']),
+				]
 
 			// if it exists: check if the user has permission and update it
 			const matchedBlocks = await mongodb.collections.blocks
-				.aggregate([
-					{ $match: { _id: block._id }},
-					...getPermissionsAggregationQuery(context, ['editor', 'owner']),
-				])
+				.aggregate(stages)
 				.toArray()
 
 			if (matchedBlocks.length > 0) {

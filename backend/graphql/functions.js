@@ -63,7 +63,7 @@ function getFilterByLanguageFunction(graphqlKey){
   }
 }
 
-function getPermissionsQuery(context, roles = ['viewer', 'editor', 'owner']){
+function getPermissionsQuery(context, roles = null, options = {}){
   const admin_addresses = (process.env.admin_addresses || '').split(',').filter(Boolean)
   const user_email = ((context || {}).user || {}).email || null
   if (
@@ -72,6 +72,20 @@ function getPermissionsQuery(context, roles = ['viewer', 'editor', 'owner']){
   ) {
     return {}
   }
+
+  if (
+    roles === null
+    || (
+      typeof roles !== 'object'
+      && Array.isArray(roles)
+    )
+  ) {
+    roles = ['viewer', 'editor', 'owner']
+  }
+
+  const {
+    fieldName = 'permissions',
+  } = options
 
 	const or = [
     {
@@ -94,11 +108,11 @@ function getPermissionsQuery(context, roles = ['viewer', 'editor', 'owner']){
 		}
 	}
 
-	return { 'permissions./': { $elemMatch: { $or: or } } }
+	return { [fieldName+'./']: { $elemMatch: { $or: or } } }
 }
 
-function getPermissionsAggregationQuery(context, roles = ['viewer', 'editor', 'owner']){
-  const permissionsQuery = getPermissionsQuery(context, roles)
+function getPermissionsAggregationQuery(context, roles){
+  const permissionsQuery = getPermissionsQuery(context, roles, {})
 
   if (Object.keys(permissionsQuery).length === 0) { // Admins have empty permissionsQuery, to return everything. No aggregation needed.
     return []
