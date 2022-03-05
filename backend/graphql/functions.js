@@ -64,14 +64,14 @@ function getFilterByLanguageFunction(graphqlKey){
 }
 
 function getPermissionsQuery(context, roles = null, options = {}){
-  const admin_addresses = (process.env.admin_addresses || '').split(',').filter(Boolean)
-  const user_email = ((context || {}).user || {}).email || null
-  if (
-    admin_addresses.length > 0
-    && admin_addresses.includes(user_email)
-  ) {
-    return {}
-  }
+  // const admin_addresses = (process.env.admin_addresses || '').split(',').filter(Boolean)
+  // const user_email = ((context || {}).user || {}).email || null
+  // if (
+  //   admin_addresses.length > 0
+  //   && admin_addresses.includes(user_email)
+  // ) {
+  //   return {}
+  // }
 
   if (
     roles === null
@@ -114,9 +114,9 @@ function getPermissionsQuery(context, roles = null, options = {}){
 function getPermissionsAggregationQuery(context, roles){
   const permissionsQuery = getPermissionsQuery(context, roles, {})
 
-  if (Object.keys(permissionsQuery).length === 0) { // Admins have empty permissionsQuery, to return everything. No aggregation needed.
-    return []
-  }
+  // if (Object.keys(permissionsQuery).length === 0) { // Admins have empty permissionsQuery, to return everything. No aggregation needed.
+  //   return []
+  // }
 
   const query = [
     // only leave blocks with sufficient parent permissions
