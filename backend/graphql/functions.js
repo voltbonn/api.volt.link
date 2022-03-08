@@ -64,8 +64,9 @@ function getFilterByLanguageFunction(graphqlKey){
 }
 
 function getPermissionsQuery(context, roles = null, options = {}){
+  const user_email = ((context || {}).user || {}).email || null
+  
   // const admin_addresses = (process.env.admin_addresses || '').split(',').filter(Boolean)
-  // const user_email = ((context || {}).user || {}).email || null
   // if (
   //   admin_addresses.length > 0
   //   && admin_addresses.includes(user_email)
