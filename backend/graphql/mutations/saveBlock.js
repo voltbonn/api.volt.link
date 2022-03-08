@@ -22,23 +22,27 @@ module.exports = async (parent, args, context, info) => {
 		// content
 		block.content = (block.content || [])
 		.filter(content_config => typeof content_config === 'object' && content_config !== null)
-		.filter(content_config => content_config.hasOwnProperty('blockId') && mongodb.ObjectId.isValid(content_config.blockId))
 		.map(content_config => {
-			// remove client-side properties
-			if (content_config.__typename) {
-				delete content_config.__typename
+			if (
+				content_config.hasOwnProperty('blockId')
+				&& mongodb.ObjectId.isValid(content_config.blockId)
+			) {
+				return {
+					blockId: mongodb.ObjectId(content_config.blockId)
+				}
+			} else if (
+				content_config.hasOwnProperty('block')
+				&& content_config.block.hasOwnProperty('_id')
+				&& mongodb.ObjectId.isValid(content_config.block._id)
+			) {
+				return {
+					blockId: mongodb.ObjectId(content_config.block._id)
+				}
+			} else {
+				return null
 			}
-			if (content_config.tmp_id) {
-				delete content_config.tmp_id
-			}
-			if (content_config.block) {
-				delete content_config.block
-			}
-
-			content_config.blockId = new mongodb.ObjectId(content_config.blockId)
-				
-			return content_config
 		})
+		.filter(content_config => content_config !== null)
 
 		// permissions
 		if (
