@@ -104,10 +104,12 @@ async function parseItem(item, mongoDbContext, parentBlockLess) {
         newBlock.type = 'button'
         break
       case 'headline':
-        newBlock.type = 'headline'
+        newBlock.type = 'text'
+        newBlock.properties.text_style = 'h2'
         break
       case 'headline3':
-        newBlock.type = 'headline'
+        newBlock.type = 'text'
+        newBlock.properties.text_style = 'h3'
         break
       case 'text':
         newBlock.type = 'text'
@@ -119,7 +121,7 @@ async function parseItem(item, mongoDbContext, parentBlockLess) {
     // END type
 
 
-
+    const oldType = item.type || ''
 
     // START text
     switch (newBlock.type) {
@@ -129,16 +131,14 @@ async function parseItem(item, mongoDbContext, parentBlockLess) {
           ...reformatTranslatedText(item.title),
         }
         break
-      case 'headline':
-        newBlock.properties = {
-          ...newBlock.properties,
-          ...reformatTranslatedText(item.title),
-        }
-        break
       case 'text':
         newBlock.properties = {
           ...newBlock.properties,
-          ...reformatTranslatedText(item.text),
+          ...reformatTranslatedText(
+            oldType.startsWith('headline')
+              ? item.title
+              : item.text
+          ),
         }
         break
       default:
