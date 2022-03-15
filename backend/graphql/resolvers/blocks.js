@@ -7,6 +7,28 @@ module.exports = async (parent, args, context, info) => {
 
   let stages = []
 
+  if (args.roots && Array.isArray(args.roots) && args.roots.length > 0) {
+    stages = [
+      ...stages,
+      { $match: {
+        _id: { $in: args.roots },
+        ...getPermissionsQuery(context, null),
+      }},
+      { $graphLookup: {
+          from: 'blocks',
+          startWith: '$content.blockId',
+          connectFromField: 'content.blockId',
+          connectToField: '_id',
+          as: 'children',
+          maxDepth: 100,
+          // depthField: 'depth',
+          restrictSearchWithMatch: getPermissionsQuery(context, null),
+      }},
+      { $unwind: '$children' },
+      { $replaceRoot: { newRoot: '$children' }}
+    ]
+  }
+
   const query = {
     ...getPermissionsQuery(context),
   }
