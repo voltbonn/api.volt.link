@@ -33,8 +33,8 @@ module.exports = async (parent, args, context, info) => {
     ...getPermissionsQuery(context),
   }
 
-  if (args._ids && Array.isArray(args._ids) && args._ids.length > 0) {
-    query._id = { $in: args._ids }
+  if (args.ids && Array.isArray(args.ids) && args.ids.length > 0) {
+    query._id = { $in: args.ids }
   }
 
   if (args.types && Array.isArray(args.types) && args.types.length > 0) {
