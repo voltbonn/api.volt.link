@@ -229,7 +229,7 @@ async function parseOldLinklistFile(content, mongoDbContext, fileinfo = {}) {
   } else if (content.use_as === 'linklist' && content.layout === 'default') {
     type = 'page'
   } else if (content.use_as === 'redirect') {
-    type = 'automation'
+    type = 'redirect'
   }
 
   newBlock.type = type
@@ -242,7 +242,7 @@ async function parseOldLinklistFile(content, mongoDbContext, fileinfo = {}) {
   // use_as: linklist
   // layout: default
   //
-  // # automation
+  // # redirect
   // use_as: redirect
   // redirect: https://linktr.ee/voltbonn/
   // END type
@@ -310,7 +310,7 @@ async function parseOldLinklistFile(content, mongoDbContext, fileinfo = {}) {
 
 
   // START action
-  if (newBlock.type === 'automation') {
+  if (newBlock.type === 'redirect') {
     if (!!content.redirect && content.redirect !== '') {
       newBlock.properties.action = {
         type: 'open_url',
