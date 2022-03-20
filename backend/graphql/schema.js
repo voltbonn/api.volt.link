@@ -124,11 +124,11 @@ const schema = gql`
 module.exports = schema
 
 const sampleBlock1 = {
-	type: 'actions', // add 'empty' type when only used for actions
+	type: 'automation', // add 'empty' type when only used for automation
 	properties: {},
 	content: [
 		{
-			type: 'action',
+			type: 'automation',
 			properties: {
 				trigger: {
 					type: 'path',
@@ -242,4 +242,21 @@ const sampleBlock2 = {
 			},
 		}
 	],
+}
+
+const sampleBlock3 = {
+	type: 'page',
+	properties: {
+		actionsBlockId: 'actions_block_id', // this or
+		isActionsForBlockId: 'actions_block_id', // that
+		trigger: {
+			type: 'path',
+			path: 'test_slug',
+		},
+		action: {
+			type: 'render_block',
+			blockId: 'test_block_id', // renders this block if not provided
+		},
+	},
+	content: [],
 }
