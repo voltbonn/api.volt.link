@@ -880,13 +880,13 @@ copied blocks  ${copiedBlocksTS - parsedFilesTS} ms
 `
 }
 
-// import_old()
-//   .then(console.log)
-//   .catch(console.error)
-//   .finally(() => {
-//     console.info('Finished the Import!') 
-//     process.exit(0)
-//   })
+import_old()
+  .then(console.log)
+  .catch(console.error)
+  .finally(() => {
+    console.info('Finished the Import!') 
+    process.exit(0)
+  })
 
 /*
   {
