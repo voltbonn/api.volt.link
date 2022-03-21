@@ -208,6 +208,8 @@ function reformatTranslatedText(oldTranslations) {
     locale: text.locale === 'en' ? null : text.locale,
     text: strip_some_html_tag(text.value),
   }))
+  .filter(translation => translation.text !== '')
+
   if (translations.length > 0) {
     properties.translations = translations
   }
