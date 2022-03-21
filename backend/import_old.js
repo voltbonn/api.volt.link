@@ -73,12 +73,12 @@ function reformatTranslatedText(oldTranslations) {
   }
 
   const firstItem = oldTranslations.shift()
-  properties.locale = firstItem.locale
+  properties.locale = firstItem.locale === 'en' ? null : firstItem.locale
   properties.text = firstItem.value
 
   const translations = oldTranslations
   .map(text => ({
-    locale: text.locale,
+    locale: text.locale === 'en' ? null : text.locale,
     text: text.value,
   }))
   if (translations.length > 0) {
