@@ -20,6 +20,13 @@ module.exports = async (parent, args, context, info) => {
 	if (blocks.length === 0) {
 		throw new Error('Could not find the requested block or no sufficent permission.')
 	} else {
-		return blocks[0]
+		const block2return = blocks[0]
+		
+		// Remove permission infos from the block if not logged-in, to not leak user data.
+		if (context.logged_in !== true) {
+			delete block2return.permissions
+		}
+
+		return block2return
 	}
 }

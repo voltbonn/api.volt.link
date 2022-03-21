@@ -12,6 +12,10 @@ module.exports = async (parent, args, context, info) => {
 	    })
 	    .then(resultDoc => {
 	    	if (!!resultDoc) {
+	    		// Remove permission infos from the block if not logged-in, to not leak user data.
+	    		if (context.logged_in !== true) {
+	    			delete resultDoc.permissions
+	    		}
 	    		resolve(resultDoc)
 	    	}else{
 	    		reject(new Error('could not find block by slug.'))

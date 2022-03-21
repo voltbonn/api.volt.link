@@ -3,7 +3,7 @@ const { getPermissionsQuery } = require('../functions.js')
 module.exports = async (parent, args, context, info) => {
   const mongodb = context.mongodb
 
-  return new Promise(resolve => {
+  return new Promise(async resolve => {
     const cursor = mongodb.collections.blocks.aggregate([
       { $match: {
         _id: args._id,
@@ -26,6 +26,16 @@ module.exports = async (parent, args, context, info) => {
       { $match: getPermissionsQuery(context) },
     ])
 
-    resolve(cursor.toArray())
+    let blocks = await cursor.toArray()
+
+    // Remove permission infos from the blocks if not logged-in, to not leak user data.
+    if (context.logged_in !== true) {
+      blocks = blocks.map(block => {
+        delete block.permissions
+        return block
+      })
+    }
+
+    resolve(blocks)
   })
 }

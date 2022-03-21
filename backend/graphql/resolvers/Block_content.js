@@ -24,7 +24,15 @@ module.exports = async (parent, args, context, info) => {
     	  } },
     	])
 
-    	const blocks = await cursor.toArray()
+    	let blocks = await cursor.toArray()
+
+    	// Remove permission infos from the blocks if not logged-in, to not leak user data.
+    	if (context.logged_in !== true) {
+    	  blocks = blocks.map(block => {
+    	    delete block.permissions
+    	    return block
+    	  })
+    	}
 
     	newContent = newContent.map(contentConfig => {
     	  const block = blocks.find(block => block._id+'' === contentConfig.blockId+'')

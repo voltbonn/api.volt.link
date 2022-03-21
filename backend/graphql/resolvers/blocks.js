@@ -71,7 +71,15 @@ module.exports = async (parent, args, context, info) => {
     
   const cursor = mongodb.collections.blocks.aggregate(stages)
 
-  const blocks = cursor.toArray()
+  let blocks = await cursor.toArray()
+
+  // Remove permission infos from the blocks if not logged-in, to not leak user data.
+  if (context.logged_in !== true) {
+    blocks = blocks.map(block => {
+      delete block.permissions
+      return block
+    })
+  }
 
   return blocks
 }
