@@ -490,7 +490,13 @@ async function parseOldLinklistFile(content, mongoDbContext, fileinfo = {}) {
     })
   }
 
-  if (blockPermissions.filter(p => p.email === '@volteuropa.org').length === 0) {
+  if (
+    (
+      content.use_as === 'linklist'
+      || content.use_as === 'redirect'
+    )
+    && blockPermissions.filter(p => p.email === '@volteuropa.org').length === 0
+  ) {
     blockPermissions.push({
       email: '@public',
       role: 'viewer',
