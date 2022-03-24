@@ -17,6 +17,34 @@ const THOMAS_EMAIL = 'thomas.rosen@volteuropa.org'
 
 const _blockIds_ = []
 
+console.debug = function (...args) {
+  // console.log(...args)
+}
+
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
+console.debug('')
 
 function _phpCastString (value) {
   // original by: Rafał Kukawski
@@ -458,11 +486,11 @@ async function parseOldLinklistFile(content, mongoDbContext, fileinfo = {}) {
   // START metadata
   newBlock.metadata = {}
 
-  if (content.last_modified) {
-    newBlock.metadata.modified = new Date(content.last_modified)
-  } else {
+  // if (content.last_modified) {
+  //   newBlock.metadata.modified = new Date(content.last_modified)
+  // } else {
     newBlock.metadata.modified = new Date(iso_ts)
-  }
+  // }
 
   if (content.last_modified_by) {
     newBlock.metadata.modified_by = content.last_modified_by      
@@ -476,8 +504,13 @@ async function parseOldLinklistFile(content, mongoDbContext, fileinfo = {}) {
   let blockPermissions = (content.permissions || [])
   .map(permission => ({
     email: permission.value,
-    role: permission.role,
+    role: permission.role || 'editor',
   }))
+
+  if (content.use_as === '') {
+    blockPermissions = blockPermissions
+      .filter(permission => permission.email !== '@volteuropa.org')
+  }
 
   if (blockPermissions.length === 0) {
     blockPermissions.push({
@@ -524,8 +557,16 @@ async function parseOldLinklistFile(content, mongoDbContext, fileinfo = {}) {
       permissions: newBlock.permissions,
     })
 
+    const itemCompareId = { // this is just to compare the items
+      type: item.type || '',
+      title: (Array.isArray(item.title) ? item.title : []).map(t => ({ v: t.value || '', l: t.locale || ''})),
+      text: (Array.isArray(item.text) ? item.text : []).map(t => ({ v: t.value || '', l: t.locale || ''})),
+      link: item.link || '',
+      active: typeof item.active !== 'boolean' ? true : item.active,
+    }
+
     blockContent.push({
-      item: JSON.stringify(item), // We only need it to compare old and new items.
+      compareId: JSON.stringify(itemCompareId), // We only need it to compare old and new items.
       block,
       commonId: new mongoDbContext.ObjectId(),
     })
@@ -683,7 +724,7 @@ async function addBlockToHistory(block, mongoDbContext) {
   try {
     await history.insertOne(block)
   } catch (error) {
-    console.log('error-in-block:', JSON.stringify(block, null, 2))
+    console.debug('error-in-block:', JSON.stringify(block, null, 2))
     console.error('error-msg:', error)
   }
 }
@@ -710,6 +751,8 @@ function setItemsForBlockInfo(commomId, newItems) {
 
 async function addFileToHistory(fileinfo, mongoDbContext) {
   return new Promise(async resolve => {
+
+    console.debug('addFileToHistory:', fileinfo)
 
     if (fileinfo.status_letter === 'D') {
       // TODO: Load prev block from db and add archived property to it. And update metadata.modified timestamp.
@@ -786,19 +829,24 @@ async function addFileToHistory(fileinfo, mongoDbContext) {
       const textContent = await localReadFileAtCommit(filepath, fileinfo.commitHash)
       const content = yaml.load(textContent)
 
+      console.debug('content:', content)
+
       if (
         typeof content === 'object'
         && content !== null
         && !Array.isArray(content)
       ) {
-      const newBlock = await parseOldLinklistFile(content, mongoDbContext, fileinfo)
+        const newBlock = await parseOldLinklistFile(content, mongoDbContext, fileinfo)
 
-      const {
-        commonId,
-        prevBlockInfos,
-      } = addToBlockIdsList(filepath, fileinfo.new_filepath, newBlock, mongoDbContext)
+        console.debug('newBlock:', newBlock)
 
-      newBlock.isHistoryFor = commonId
+        const {
+          commonId: newGeneratedCommonId,
+          prevBlockInfos
+        } = addToBlockIdsList(filepath, fileinfo.new_filepath, newBlock, mongoDbContext)
+
+        console.debug('newGeneratedCommonId:', newGeneratedCommonId)
+        newBlock.isHistoryFor = newGeneratedCommonId
 
       // START match items to older versions and add, update or archive neccerary items
 
@@ -823,77 +871,112 @@ async function addFileToHistory(fileinfo, mongoDbContext) {
         oldItems = newestBlockInfos.items
       }
 
+      const usedItems = []
+
+
+        // R: ISODate("2021-05-23T11:36:12.331Z"),
+        // P: ISODate("2021-05-26T19:46:18.182Z"),
 
       if (oldItems.length === 0) {
         // Block is new. So all items are new. Everything can be added.
         for (const { block, commonId } of newItems) {
           block.isHistoryFor = commonId
+          // block.matchType = 'brand_new'
+          // block.isNewBlock = true
           await addBlockToHistory(block, mongoDbContext)
         }
+        usedItems.push(...newItems)
       } else {
         // Check items:
 
+        const usedOldItemIndexes = []
+          
+        // add new items to history
         for (let i = 0; i < newItems.length; i += 1) {
-          const { item } = newItems[i]
+          const newItem = newItems[i]
+          const {
+            compareId: newCompareId,
+            block: newBlock,
+            commonId: newCommonId
+          } = newItem
 
-          const oldItemIndex = oldItems.findIndex(oldItem => oldItem.item === item)
+          let commonId = null
 
+          const unusedOldItems = oldItems
+            .map((item, index) => {
+              item.original_index = index
+              return item
+            })
+            .filter((oldItem, index) => !usedOldItemIndexes.includes(index))
+
+          const oldItemIndex = unusedOldItems
+            .findIndex(oldItem => oldItem.compareId === newCompareId)
+
+          // match items to the existing ones
           if (oldItemIndex > -1) {
-            // Item is already in history.
-          
-            // return and remove item at index
-            let oldItem = oldItems.splice(oldItemIndex, 1)
-            oldItem = oldItem[0]
-          
-            newItems[i].block = oldItem.block
+            // newBlock.matchType = 'exact'
+            // found exact match
+            const exactMatchOldItem = unusedOldItems[oldItemIndex]
+            commonId = exactMatchOldItem.commonId
 
-            // No need to add-to or update DB.
+            const original_index = exactMatchOldItem.original_index
+            usedOldItemIndexes.push(original_index)
+            usedItems.push(exactMatchOldItem)
           } else {
-            // find nearest item index
-            
-            let maxLevelsteinSimilarity = 0
-            let maxLevelsteinItemIndex = -1
+            // newBlock.matchType = 'fuzzy'
+            // no exact match found
+            // try to find a match with levenstein distance
 
-            for (let i = 0; i < oldItems.length; i += 1) {
-              const { item: oldItem } = oldItems[i]
-              const thisLevelstein = levenshtein(oldItem, item)
-              const similarity = thisLevelstein.similarity
+            let fuzzyMatchedItem = unusedOldItems
+              .map(oldItem => { // 
+                const thisLevelstein = levenshtein(oldItem.compareId, newCompareId)
+                return {
+                  ...oldItem,
+                  distance: thisLevelstein.steps,
+                }
+              })
+              .sort((a, b) => a.distance - b.distance) // sort by smallest distance first
+              .shift() // get first item
 
-              if (similarity > maxLevelsteinSimilarity) {
-                maxLevelsteinSimilarity = similarity
-                maxLevelsteinItemIndex = i
+              if (fuzzyMatchedItem !== undefined) {
+                // found a best match
+                // use it's commonId
+                usedOldItemIndexes.push(fuzzyMatchedItem.original_index)
+                usedItems.push(fuzzyMatchedItem)
+                commonId = fuzzyMatchedItem.commonId
               }
-            }
-
-            if (maxLevelsteinItemIndex > -1) {
-              // Found a nearest item.
-
-              // return and remove item at index
-              let oldItem = oldItems.splice(maxLevelsteinItemIndex, 1)
-              oldItem = oldItem[0]
-
-              newItems[i].block.isHistoryFor = oldItem.commonId
-            } else {
-              // Item is new. Add it as it is.
-              newItems[i].block.isHistoryFor = newItems[i].commonId
-            }
-
-            await addBlockToHistory(newItems[i].block, mongoDbContext)
           }
+
+          if (commonId === null) {
+            // did not find a exact or fuzzy match
+            // so create a new block with a new id
+            commonId = newCommonId
+            // newBlock.matchType = 'new'
+            // newBlock.isNewBlock = true
+            usedItems.push(newItem)
+          } else {
+            newBlock.isNewBlock = false
+          }
+
+          newBlock.isHistoryFor = commonId
+          await addBlockToHistory(newBlock, mongoDbContext)
         }
 
+        const unusedOldItems = oldItems
+          .filter((oldItem, index) => !usedOldItemIndexes.includes(index))
+              
         // mark unmatched old-items as archived
-        for (const oldItem of oldItems) {
+        for (const archivedItem of unusedOldItems) {
           const newOldBlock = {
-            ...oldItem.block,
+            ...archivedItem.block,
             _id: new mongoDbContext.ObjectId(),
-            isHistoryFor: oldItem.commonId,
+            isHistoryFor: archivedItem.commonId,
             properties: {
-              ...oldItem.block.properties,
+              ...archivedItem.block.properties,
               archived: true,
             },
             metadata: {
-              ...oldItem.block.metadata,
+              ...archivedItem.block.metadata,
               modified: fileinfo.commitInfo.iso_ts,
             },
           }
@@ -904,7 +987,7 @@ async function addFileToHistory(fileinfo, mongoDbContext) {
       // only save blockId in the database
       newBlock.content = newItems.map(({ block }) => ({ blockId: block.isHistoryFor }))
 
-      setItemsForBlockInfo(commonId, newItems)
+      setItemsForBlockInfo(newGeneratedCommonId, usedItems)
       // END match items to older versions and add, update or archive neccerary items
 
       await addBlockToHistory(newBlock, mongoDbContext)
@@ -946,7 +1029,7 @@ async function import_old() {
   // Read old data from git and write it to mongodb in the new format:
 
   const mongoDbContext = await getMongoDbContext()
-  // console.log(JSON.stringify(Object.keys(mongoDbContext), null, 2))
+  // console.debug(JSON.stringify(Object.keys(mongoDbContext), null, 2))
 
   await delete_all_history(mongoDbContext)
   await delete_all_blocks(mongoDbContext)
@@ -961,6 +1044,7 @@ async function import_old() {
   for (const commitInfo of commits) {
     const files = commitInfo.files
       .filter(fileinfo => fileinfo.filepath.startsWith('paths/') && fileinfo.filepath.endsWith('.yml')) // filter for only fies in paths folder and only use yaml-files (not .gitkeep)
+      // .filter(fileinfo => fileinfo.filepath.includes('voltgroningen')) // || fileinfo.filepath.includes('groningen')
       // .filter(fileinfo => fileinfo.status_letter === 'A')
 
     if (files.length > 0) {
@@ -982,6 +1066,8 @@ async function import_old() {
           console.error(error)
         }
       }
+    // } else {
+    //   console.log(`${commitInfo.commitHash} | ${todoCommitCounter} | no files`)
     }
 
     todoCommitCounter -= 1
@@ -994,7 +1080,7 @@ async function import_old() {
 
   const copiedBlocksTS = performance.now()
 
-  // console.log(JSON.stringify(_blockIds_, null, 2))
+  // console.debug(JSON.stringify(_blockIds_, null, 2))
 
   console.log('--------------------------------')
   console.log('loaded commits', loadedCommitTS - startTS, 'ms')
