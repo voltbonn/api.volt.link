@@ -52,10 +52,10 @@ module.exports = async (parent, args, context, info) => {
 			|| Object.keys(block.permissions).length === 0
 		) {
 			block.permissions = {
-					'/': [{
-						email: context.user.email,
-						role: 'owner',
-					}]
+				'/': [{
+					email: context.user.email,
+					role: 'owner',
+				}]
 			}
 		}
 
