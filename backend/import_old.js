@@ -308,6 +308,18 @@ async function parseItem(item, mongoDbContext, parentBlockLess) {
     // END text
 
 
+
+    // START check if it is a divider
+    if (newBlock.type === 'text' && newBlock.properties.text === '---') {
+      newBlock.type = 'divider'
+      delete newBlock.properties.text
+      delete newBlock.properties.translations
+      delete newBlock.properties.text_style
+    }
+    // END check if it is a divider
+
+
+
     // START link
     if (
       newBlock.type === 'button'
