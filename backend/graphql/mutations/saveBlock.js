@@ -26,7 +26,6 @@ module.exports = async (parent, args, context, info) => {
 			...(block.metadata || {}),
 			modified_by: user.email,
 			modified: new Date(),
-			// created is renewed on save (only created when inserting the block) 
 		}
 
 		// content
@@ -109,13 +108,7 @@ module.exports = async (parent, args, context, info) => {
 		}else{
 			// if it does not exist: create it
 			const result = await mongodb.collections.blocks
-				.insertOne({
-					...block,
-					metadata: {
-						...block.metadata,
-						created: new Date(),
-					}
-				})
+				.insertOne(block)
 
 			if (result.insertedId) {
 				await copyToHistory(result.insertedId, mongodb)
