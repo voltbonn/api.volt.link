@@ -1,4 +1,4 @@
-const { getPermissionsQuery } = require('../functions.js')
+const { getPermissionsQuery, getRolesOfUser } = require('../functions.js')
 
 const { buildQuery } = require('../buildQuery.js')
 
@@ -23,7 +23,10 @@ module.exports = async (parent, args, context, info) => {
 		const block2return = blocks[0]
 		
 		// Remove permission infos from the block if not logged-in, to not leak user data.
-		if (context.logged_in !== true) {
+		if (context.logged_in === true) {
+			block2return.roles = getRolesOfUser(context, block2return.permissions)
+		} else {
+			block2return.roles = ['viewer'] // getRolesOfUser doesn't make sense here, as we don't have a user.
 			delete block2return.permissions
 		}
 

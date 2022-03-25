@@ -1,4 +1,4 @@
-const { getPermissionsQuery } = require('../functions.js')
+const { getPermissionsQuery, getRolesOfUser } = require('../functions.js')
 
 module.exports = async (parent, args, context, info) => {
 	const mongodb = context.mongodb
@@ -43,13 +43,19 @@ module.exports = async (parent, args, context, info) => {
 
 		let blocks = await cursor.toArray()
 
-    // Remove permission infos from the blocks if not logged-in, to not leak user data.
-    if (context.logged_in !== true) {
-      blocks = blocks.map(block => {
-        delete block.permissions
-        return block
-      })
-    }
+		if (context.logged_in === true) {
+			blocks = blocks.map(block => {
+				block.roles = getRolesOfUser(context, block.permissions)
+				return block
+			})
+		} else {
+			// Remove permission infos from the blocks if not logged-in, to not leak user data.
+			blocks = blocks.map(block => {
+				block.roles = ['viewer'] // getRolesOfUser doesn't make sense here, as we don't have a user.
+				delete block.permissions
+				return block
+			})
+		}
 
     resolve(blocks)
 	})

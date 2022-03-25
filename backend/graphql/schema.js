@@ -65,6 +65,7 @@ const schema = gql`
 		metadata: Metadata
 		permissions: JSON
 		computed: JSON
+		roles: [String]
 	}
 
 	type Permission {

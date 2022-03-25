@@ -1,18 +1,28 @@
-const { getPermissionsQuery } = require('../functions.js')
+const { getPermissionsQuery, getRolesOfUser } = require('../functions.js')
 
 module.exports = async (parent, args, context, info) => {
 	let newContent = (parent.content || [])
 	.filter(content => content !== null && Object.keys(content).length > 0) // TODO: This is a BUGFIX! Cause empty content results in an unnecessary empty object.
 
-	// Remove permission-infos from blocks if not logged-in, to not leak user data.
-  if (context.logged_in !== true) {
-    newContent = newContent.map(contentConfig => {
-    	if (contentConfig.block && contentConfig.block.permissions) {
-    		delete contentConfig.block.permissions
-    	}
-    	return contentConfig
-    })
-  }
+	if (context.logged_in === true) {
+		newContent = newContent.map(contentConfig => {
+			if (contentConfig.block && contentConfig.block.permissions) {
+				contentConfig.block.roles = getRolesOfUser(context, contentConfig.block.permissions)
+			}
+			return contentConfig
+		})
+	} else {
+		// Remove permission infos from the blocks if not logged-in, to not leak user data.
+		newContent = newContent.map(contentConfig => {
+			if (contentConfig.block) {
+				contentConfig.block.roles = ['viewer'] // getRolesOfUser doesn't make sense here, as we don't have a user.
+				if (contentConfig.block.permissions) {
+					delete contentConfig.block.permissions
+				}
+			}
+			return contentConfig
+		})
+	}
 
 	const requestedFields = info.fieldNodes[0].selectionSet.selections.map(selection => selection.name.value)
 
@@ -36,13 +46,19 @@ module.exports = async (parent, args, context, info) => {
 
     	let blocks = await cursor.toArray()
 
-    	// Remove permission infos from the blocks if not logged-in, to not leak user data.
-    	if (context.logged_in !== true) {
-    	  blocks = blocks.map(block => {
-    	    delete block.permissions
-    	    return block
-    	  })
-    	}
+			if (context.logged_in === true) {
+				blocks = blocks.map(block => {
+					block.roles = getRolesOfUser(context, block.permissions)
+					return block
+				})
+			} else {
+				// Remove permission infos from the blocks if not logged-in, to not leak user data.
+				blocks = blocks.map(block => {
+					block.roles = ['viewer'] // getRolesOfUser doesn't make sense here, as we don't have a user.
+					delete block.permissions
+					return block
+				})
+			}
 
     	newContent = newContent.map(contentConfig => {
     	  const block = blocks.find(block => block._id+'' === contentConfig.blockId+'')

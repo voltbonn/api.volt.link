@@ -155,9 +155,45 @@ function getPermissionsAggregationQuery(context, roles){
   return query
 }
 
+function getRolesOfUser(context, permissions){
+  const roles = new Set()
+
+  const blockPermissions = permissions['/'] || []
+
+  const indexOfPublic = blockPermissions.findIndex(p => p.email === '@public')
+  if (indexOfPublic > -1) {
+    roles.add(blockPermissions[indexOfPublic].role)
+  }
+
+  if (context.logged_in) {
+    const user_email = ((context || {}).user || {}).email || null
+
+    // const admin_addresses = (process.env.admin_addresses || '').split(',').filter(Boolean)
+    // if (
+    //   admin_addresses.length > 0
+    //   && admin_addresses.includes(user_email)
+    // ) {
+    //   roles.add('admin')
+    // }
+
+    const indexOfUser = blockPermissions.findIndex(p => p.email === user_email)
+    if (indexOfUser > -1) {
+      roles.add(blockPermissions[indexOfUser].role)
+    }
+
+    const indexOfInternal = blockPermissions.findIndex(p => p.email === '@volteuropa.org')
+    if (indexOfInternal > -1) {
+      roles.add(blockPermissions[indexOfInternal].role)
+    }
+  }
+
+  return [...roles]
+}
+
 module.exports = {
   getFilterByKeysFunction,
   getFilterByLanguageFunction,
   getPermissionsQuery,
   getPermissionsAggregationQuery,
+  getRolesOfUser,
 }
