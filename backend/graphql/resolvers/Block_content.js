@@ -7,7 +7,10 @@ module.exports = async (parent, args, context, info) => {
 	if (context.logged_in === true) {
 		newContent = newContent.map(contentConfig => {
 			if (contentConfig.block && contentConfig.block.permissions) {
-				contentConfig.block.roles = getRolesOfUser(context, contentConfig.block.permissions)
+				if (!contentConfig.block.computed) {
+					contentConfig.block.computed = {}
+				}
+				contentConfig.block.computed.roles = getRolesOfUser(context, contentConfig.block.permissions)
 			}
 			return contentConfig
 		})
@@ -15,7 +18,10 @@ module.exports = async (parent, args, context, info) => {
 		// Remove permission infos from the blocks if not logged-in, to not leak user data.
 		newContent = newContent.map(contentConfig => {
 			if (contentConfig.block) {
-				contentConfig.block.roles = ['viewer'] // getRolesOfUser doesn't make sense here, as we don't have a user.
+				if (!contentConfig.block.computed) {
+					contentConfig.block.computed = {}
+				}
+				contentConfig.block.computed.roles = ['viewer'] // getRolesOfUser doesn't make sense here, as we don't have a user.
 				if (contentConfig.block.permissions) {
 					delete contentConfig.block.permissions
 				}
@@ -48,13 +54,19 @@ module.exports = async (parent, args, context, info) => {
 
 			if (context.logged_in === true) {
 				blocks = blocks.map(block => {
-					block.roles = getRolesOfUser(context, block.permissions)
+					if (!block.computed) {
+						block.computed = {}
+					}
+					block.computed.roles = getRolesOfUser(context, block.permissions)
 					return block
 				})
 			} else {
 				// Remove permission infos from the blocks if not logged-in, to not leak user data.
 				blocks = blocks.map(block => {
-					block.roles = ['viewer'] // getRolesOfUser doesn't make sense here, as we don't have a user.
+					if (!block.computed) {
+						block.computed = {}
+					}
+					block.computed.roles = ['viewer'] // getRolesOfUser doesn't make sense here, as we don't have a user.
 					delete block.permissions
 					return block
 				})

@@ -56,6 +56,11 @@ const schema = gql`
 		block: Block
 	}
 
+	type Computed {
+		roles: [String]
+		sort: Int
+	}
+
 	type Block {
 		_id: ObjectID
 		type: String
@@ -64,8 +69,7 @@ const schema = gql`
 		parent: ObjectID
 		metadata: Metadata
 		permissions: JSON
-		computed: JSON
-		roles: [String]
+		computed: Computed
 	}
 
 	type Permission {
@@ -85,6 +89,7 @@ const schema = gql`
 		parent: ObjectID
 		metadata: JSON
 		permissions: JSON
+		computed: JSON
 	}
 
 

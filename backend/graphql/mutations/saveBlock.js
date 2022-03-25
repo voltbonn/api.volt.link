@@ -11,6 +11,8 @@ module.exports = async (parent, args, context, info) => {
 
 		const block = args.block || {}
 
+		delete block.computed // This should be able to be send to the server, but it should not be saved to the DB.
+
 		// _id
 		if (!block._id && !mongodb.ObjectId.isValid(block._id)) {
 			block._id = new mongodb.ObjectId()
