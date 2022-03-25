@@ -39,6 +39,7 @@ const schema = gql`
 	}
 
 	type Metadata {
+		created: DateTime
 		modified: DateTime
 		modified_by: String
 	}

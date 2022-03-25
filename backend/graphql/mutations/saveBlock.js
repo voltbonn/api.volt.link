@@ -21,6 +21,14 @@ module.exports = async (parent, args, context, info) => {
 		// properties
 		block.properties = block.properties || {}
 
+		// metadata
+		block.metadata = {
+			...(block.metadata || {}),
+			modified_by: user.email,
+			modified: new Date(),
+			// created is renewed on save (only created when inserting the block) 
+		}
+
 		// content
 		block.content = (block.content || [])
 		.filter(content_config => typeof content_config === 'object' && content_config !== null)
@@ -77,12 +85,6 @@ module.exports = async (parent, args, context, info) => {
 				.toArray()
 
 			if (matchedBlocks.length > 0) {
-				if (!block.metadata) {
-					block.metadata = {
-						modified_by: user.email,
-						modified: new Date(),
-					}
-				}
 				if (block.metadata && block.metadata.__typename) {
 					delete block.metadata.__typename
 				}
@@ -90,14 +92,7 @@ module.exports = async (parent, args, context, info) => {
 				const result = await mongodb.collections.blocks
 					.updateOne({
 						_id: block._id,
-					}, { $set: {
-						...block,
-						metadata: {
-							...block.metadata,
-							modified_by: user.email,
-							modified: new Date(),
-						}
-					}})
+					}, { $set: block })
 
 				if (result.matchedCount > 0) {
 					await copyToHistory(block._id, mongodb)
@@ -117,8 +112,8 @@ module.exports = async (parent, args, context, info) => {
 				.insertOne({
 					...block,
 					metadata: {
-						modified_by: user.email,
-						modified: new Date(),
+						...block.metadata,
+						created: new Date(),
 					}
 				})
 
