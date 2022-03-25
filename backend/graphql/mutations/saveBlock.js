@@ -121,7 +121,7 @@ module.exports = async (parent, args, context, info) => {
 						modified: new Date(),
 					}
 				})
-				
+
 			if (result.insertedId) {
 				await copyToHistory(result.insertedId, mongodb)
 				return result.insertedId
