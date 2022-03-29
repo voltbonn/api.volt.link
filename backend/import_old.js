@@ -874,6 +874,8 @@ async function addFileToHistory(fileinfo, mongoDbContext) {
 
       const newestBlockInfos = prevBlockInfos
 
+      const parentId = newBlock.isHistoryFor
+
       let oldItems = []
       let newItems = newBlock.content
 
@@ -892,6 +894,7 @@ async function addFileToHistory(fileinfo, mongoDbContext) {
       if (oldItems.length === 0) {
         // Block is new. So all items are new. Everything can be added.
         for (const { block, commonId } of newItems) {
+          block.parent = parentId
           block.isHistoryFor = commonId
           // block.matchType = 'brand_new'
           // block.isNewBlock = true
@@ -970,6 +973,7 @@ async function addFileToHistory(fileinfo, mongoDbContext) {
             newBlock.isNewBlock = false
           }
 
+          newBlock.parent = parentId
           newBlock.isHistoryFor = commonId
           await addBlockToHistory(newBlock, mongoDbContext)
         }
