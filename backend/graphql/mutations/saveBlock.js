@@ -72,7 +72,7 @@ module.exports = async (parent, args, context, info) => {
 	  		_id: block._id,
 	  	})
 	  
-	  if (!!resultDoc) {
+		if (!!resultDoc) {
 			const stages = [
 					{ $match: { _id: block._id }},
 					...getPermissionsAggregationQuery(context, ['editor', 'owner']),
