@@ -1,4 +1,4 @@
-const { getPermissionsQuery, getRolesOfUser } = require('../functions.js')
+const { getPermissionsQuery, getRolesOfUser } = require('../../functions.js')
 
 const { buildQuery } = require('../buildQuery.js')
 

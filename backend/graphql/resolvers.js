@@ -27,7 +27,7 @@ const moveBlock = require('./mutations/moveBlock.js')
 
 const mongoDB_ObjectID_scalar = require('./scalars/mongoDB_ObjectID_scalar.js')
 
-// const { getFilterByKeysFunction, getFilterByLanguageFunction } = require('./functions.js')
+// const { getFilterByKeysFunction, getFilterByLanguageFunction } = require('../functions.js')
 
 module.exports = {
 	// JSON: GraphQLJSON,

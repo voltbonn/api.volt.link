@@ -1,4 +1,4 @@
-const { getPermissionsQuery } = require('../functions.js')
+const { getPermissionsQuery } = require('../../functions.js')
 
 module.exports = async (parent, args, context, info) => {
 	const mongodb = context.mongodb

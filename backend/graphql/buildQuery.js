@@ -1,4 +1,4 @@
-const { getPermissionsQuery } = require('./functions.js')
+const { getPermissionsQuery } = require('../functions.js')
 
 const { parseResolveInfo } = require('graphql-parse-resolve-info')
 

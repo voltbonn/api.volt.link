@@ -1,4 +1,4 @@
-const { changeParent } = require('../functions.js')
+const { changeParent } = require('../../functions.js')
 
 module.exports = async (parent, args, context, info) => {
 	if (!context.logged_in) {

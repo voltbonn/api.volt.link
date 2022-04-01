@@ -1,4 +1,4 @@
-const { getPermissionsQuery } = require('../functions.js')
+const { getPermissionsQuery } = require('../../functions.js')
 const { copyManyToHistory } = require('../history.js')
 
 async function both (parent, args, context, info) {

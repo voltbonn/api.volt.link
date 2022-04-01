@@ -1,4 +1,4 @@
-const { getPermissionsAggregationQuery, changeParent } = require('../functions.js')
+const { getPermissionsAggregationQuery, changeParent } = require('../../functions.js')
 const { copyToHistory } = require('../history.js')
 
 module.exports = async (parent, args, context, info) => {
