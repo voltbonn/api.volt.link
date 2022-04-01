@@ -23,6 +23,7 @@ const schema = gql`
 		parentBlocks(_id: ObjectID!): [Block]
 		siblingBlocks(_id: ObjectID!, types: [String]): [Block]
 		blockMatchesRoles(_id: ObjectID!, roles: [String]): Boolean
+		checkPath(path: String!): PathInfos
 	}
 
 	type Mutation {
@@ -30,6 +31,11 @@ const schema = gql`
 		archiveBlock(_id: ObjectID!): Boolean
 		unarchiveBlock(_id: ObjectID!): Boolean
 		moveBlock(movingBlockId: ObjectID!, newParentId: ObjectID!, newIndex: Int!): Boolean
+	}
+
+	type PathInfos {
+		isOkay: Boolean
+		errors: [String]
 	}
 
 	type User {

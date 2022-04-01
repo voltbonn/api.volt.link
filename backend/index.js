@@ -15,7 +15,6 @@ const startApolloServer = require('./graphql/expressApolloServer.js')
 
 const {
   checkOrigin,
-  forbiddenInPath,
 } = require('./functions.js')
 
 const { header } = require('./html.js')
@@ -373,10 +372,6 @@ app.get('/download_url', async (req, res) => {
   } else {
     res.status(404).send('')
   }
-})
-
-app.get('/forbidden_codes', (req, res) => {
-  res.status(200).send(JSON.stringify(forbiddenInPath))
 })
 
 const httpServer = http.createServer(app)

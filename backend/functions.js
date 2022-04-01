@@ -206,59 +206,6 @@ async function getSimilarCodes({
   return pages
 }
 
-const forbiddenInPath = {
-  codes: `
-undefined
-null
-error
-public
-auth
-auth/google
-auth/google/callback
-auth/failure
-logout
-user.json
-login
-forbidden_codes
-pull
-exists
-get
-set
-list
-`
-  .split('\n')
-  .filter(Boolean),
-  letters: ' /\\\'"´`(){}[]<>,;:?!¿¡=#+|~^°',
-  special_letters: '.'
-}
-
-function quickcheckCode(code, { userEmail = '' }) {
-  const forbidden_letters_splitted = forbiddenInPath.letters.split('')
-
-  // Info: quickcheckCode is there to check a code without opening the file or checking it's permissions.
-
-  // const username = (userEmail || '').split('@')[0]
-  // (userEmail !== '' && admin_addresses.includes(userEmail))
-
-  const code_split = code.split('')
-
-  let allowed_to_edit = false
-
-  if (
-    code === ''
-    || code.includes('/')
-    || code.startsWith('volt')
-    || forbiddenInPath.codes.includes(code)
-    || forbidden_letters_splitted.filter(value => !code_split.includes(value)).length < forbidden_letters_splitted.length
-  ) {
-    allowed_to_edit = false
-  } else {
-    allowed_to_edit = true
-  }
-
-  return { allowed_to_edit }
-}
-
 function hasEditPermission(permissions, userEmail, strict = false) {
   const admin_addresses = (process.env.admin_addresses || '').split(',')
 
@@ -327,8 +274,6 @@ module.exports = {
   removeDiacritics,
   filterPagesByPermission,
   getSimilarCodes,
-  forbiddenInPath,
-  quickcheckCode,
   hasEditPermission,
   generateRandomCode,
   checkOrigin,
