@@ -1,4 +1,5 @@
 const { negotiateLanguages } = require('@fluent/langneg')
+const { copyManyToHistory } = require('./history.js')
 
 function getFilterByKeysFunction(graphqlKey) {
   return (parent, args, context, info) => {
@@ -190,10 +191,121 @@ function getRolesOfUser(context, permissions){
   return [...roles]
 }
 
+async function changeParent(context, newParentId, movingBlockId, newPositionInContent = -1) {
+  const mongodb = context.mongodb
+
+  if (!!newParentId) {
+    const results = await mongodb.collections.blocks
+      .aggregate([
+        { $match: { _id: newParentId } },
+        ...getPermissionsAggregationQuery(context, ['editor', 'owner']),
+      ])
+      .toArray()
+
+    if (results.length === 0) {
+      throw new Error('no permissions to edit parent')
+    } else {
+
+      // 1. save parent info to the block
+      await mongodb.collections.blocks
+        .aggregate([
+          { $match: { _id: movingBlockId } },
+          ...getPermissionsAggregationQuery(context, ['editor', 'owner']),
+
+          {
+            $set: {
+              parent: newParentId,
+            }
+          },
+
+          { $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
+        ])
+        .toArray()
+
+      // 2.1. get ids of old parents
+      let oldParentIds = await mongodb.collections.blocks
+        .aggregate([
+          { $match: { 'content.blockId': movingBlockId } },
+          ...getPermissionsAggregationQuery(context, ['editor', 'owner']),
+
+          {
+            $project: {
+              _id: true
+            }
+          },
+        ])
+        .toArray()
+
+      oldParentIds = oldParentIds.map(id => id._id)
+
+      // 2.2: remove blockId from old parent
+      await mongodb.collections.blocks
+        .aggregate([
+          { $match: { 'content.blockId': movingBlockId } },
+          ...getPermissionsAggregationQuery(context, ['editor', 'owner']),
+
+          {
+            $redact: {
+              $cond: {
+                if: { $eq: ["$blockId", movingBlockId] },
+                then: "$$PRUNE",
+                else: "$$DESCEND"
+              }
+            }
+          },
+
+          { $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
+        ])
+        .toArray()
+
+      // 3. add blockId to content of parent
+      await mongodb.collections.blocks
+        .aggregate([
+          { $match: { _id: newParentId } },
+          ...getPermissionsAggregationQuery(context, ['editor', 'owner']),
+
+          {
+            $set: {
+              content: {
+                $concatArrays: ['$content', [
+                  // Add a new content-config at the end.
+                  // TODO: Use newPositionInContent to add the content-config at a specific index. -1 should add it to the end.
+                  {
+                    blockId: movingBlockId
+                  }
+                ]]
+              }
+            }
+          },
+
+          { $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
+        ])
+        .toArray()
+
+      // 4. copy all changed blocks to the history collection
+      const blockIdsToAddToHistory = [...new Set([
+        movingBlockId,
+        newParentId,
+        ...oldParentIds,
+        newParentId,
+      ])]
+
+      await copyManyToHistory(blockIdsToAddToHistory, mongodb)
+
+      // 5. finish
+      return true
+
+    }
+  } else {
+    throw new Error('newParentId is probably not a mongoId')
+  }
+}
+
 module.exports = {
   getFilterByKeysFunction,
   getFilterByLanguageFunction,
   getPermissionsQuery,
   getPermissionsAggregationQuery,
   getRolesOfUser,
+  changeParent,
 }
