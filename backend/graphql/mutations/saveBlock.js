@@ -1,4 +1,4 @@
-const { getPermissionsAggregationQuery } = require('../functions.js')
+const { getPermissionsAggregationQuery, changeParent } = require('../functions.js')
 const { copyToHistory } = require('../history.js')
 
 module.exports = async (parent, args, context, info) => {
@@ -17,6 +17,7 @@ module.exports = async (parent, args, context, info) => {
 		if (!block._id && !mongodb.ObjectId.isValid(block._id)) {
 			block._id = new mongodb.ObjectId()
 		}
+		const blockId = block._id
 
 		// properties
 		block.properties = block.properties || {}
@@ -69,12 +70,17 @@ module.exports = async (parent, args, context, info) => {
 	  // check if the block exists
 		const resultDoc = await mongodb.collections.blocks
 			.findOne({
-	  		_id: block._id,
+				_id: blockId,
 	  	})
 	  
 		if (!!resultDoc) {
+
+			const oldParent = resultDoc.parent
+			const newParent = block.parent
+			block.parent = oldParent
+
 			const stages = [
-					{ $match: { _id: block._id }},
+					{ $match: { _id: blockId }},
 					...getPermissionsAggregationQuery(context, ['editor', 'owner']),
 				]
 
@@ -90,12 +96,21 @@ module.exports = async (parent, args, context, info) => {
 
 				const result = await mongodb.collections.blocks
 					.updateOne({
-						_id: block._id,
+						_id: blockId,
 					}, { $set: block })
 
 				if (result.matchedCount > 0) {
-					await copyToHistory(block._id, mongodb)
-					return block._id
+					await copyToHistory(blockId, mongodb)
+
+					if (
+						newParent
+						&& mongodb.ObjectId.isValid(newParent)
+						&& newParent !== oldParent
+					) {
+						await changeParent(context, newParent, blockId, -1)
+					}
+
+					return blockId
 				} else {
 					throw new Error('Could not save the block.')
 				}
@@ -104,15 +119,26 @@ module.exports = async (parent, args, context, info) => {
 				console.error('User does not have permission to update the block.')
 				throw new Error('You do not have permission to edit this block.')
 			}
-	  
+
 		}else{
 			// if it does not exist: create it
 			const result = await mongodb.collections.blocks
 				.insertOne(block)
 
-			if (result.insertedId) {
-				await copyToHistory(result.insertedId, mongodb)
-				return result.insertedId
+			const newBlockId = result.insertedId
+
+			if (newBlockId) {
+				await copyToHistory(newBlockId, mongodb)
+
+				const newParent = block.parent
+				if (
+					newParent
+					&& mongodb.ObjectId.isValid(newParent)
+				) {
+					await changeParent(context, newParent, newBlockId, -1)
+				}
+				
+				return newBlockId
 			} else {
 				console.error('Could not save the block.')
 				throw new Error('Could not save the block.')
