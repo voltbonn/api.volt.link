@@ -252,8 +252,8 @@ app.get('/', (req, res) => {
   <ul>
     ${
       req.logged_in
-      ? `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:3000' : 'https://beta.volt.link'}">beta.volt.link</a></li>`
-      : `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://api.volt.link'}/login?redirect_to=${isDevEnvironment ? 'http%3A%2F%2Flocalhost:3000' : 'https%3A%2F%2Fbeta.volt.link'}">Login and edit volt.link</a></li>`
+      ? `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:4003' : 'https://beta.volt.link'}">beta.volt.link</a></li>`
+    : `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://api.volt.link'}/login?redirect_to=${isDevEnvironment ? 'http%3A%2F%2Flocalhost:4003' : 'https%3A%2F%2Fbeta.volt.link'}">Login and edit volt.link</a></li>`
     }
     <li>All volt.link micropages and redirects: <a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://api.volt.link'}/list">volt.link/list</a></li>
     <li>Contact <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">Thomas Rosen</a><!--/sse--> for help with volt.link.</li>

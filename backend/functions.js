@@ -265,8 +265,10 @@ function checkOrigin(origin){
 
       // allow for localhost
       || origin.endsWith('localhost:3000')
+      || origin.endsWith('localhost:4003')
       || origin.endsWith('localhost:4000')
       || origin.endsWith('0.0.0.0:3000')
+      || origin.endsWith('0.0.0.0:4003')
       || origin.endsWith('0.0.0.0:4000')
       || origin.endsWith('localhost:19006')
     )
