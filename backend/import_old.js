@@ -216,8 +216,28 @@ async function delete_all_blocks(mongoDbContext) {
   })
 }
 
-function strip_some_html_tag(text){
-  return strip_tags(text, '<b><strong><em><i><br><a><img>')
+function strip_some_html_tag(text) {
+  text = strip_tags(text, '<ol><ul><li><div><br><b><strong><em><i><br><a><img><iframe>')
+
+  text = text.replace(/(<span.*?>|<\/span>)/g, '')
+
+  text = text.replace(/(<br.*?>|<\/br>)/g, '\n')
+
+  text = text.replace(/(<div.*?>|<p.*?>)/g, '')
+  text = text.replace(/(<\/div>|<\/p>)/g, '\n\n')
+
+  text = text.replace(/(<strong.*?>|<\/strong>|<b.*?>|<\/b>)/g, '**')
+  text = text.replace(/(<em.*?>|<\/em>|<i.*?>|<\/i>)/g, '*')
+
+  text = text.replace(/<li.*?>/g, '- ')
+  text = text.replace(/<\/li>/g, '')
+  text = text.replace(/(<ul.*?>|<\/ul>|<ol.*?>|<\/ol>)/g, '\n')
+
+  text = text.replace(/\r/g, '\n')
+
+  // console.log('strip_some_html_tag', text.replace('\n', ' '))
+
+  return text
 }
 
 function reformatTranslatedText(oldTranslations) {
