@@ -38,6 +38,9 @@ function buildQuery(parent, args, context, info) {
 		}, projectStage)
 	stages.unshift({ $project: projectStage })
 
+	// make sure for the query necessary fields are always loaded
+	projectStage.permissions = true
+
 	if (
 		fields.hasOwnProperty('content')
 		&& fields.content.fieldsByTypeName.hasOwnProperty('block')
