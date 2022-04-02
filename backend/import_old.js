@@ -544,6 +544,11 @@ async function parseOldLinklistFile(content, mongoDbContext, fileinfo = {}) {
     )
     && blockPermissions.filter(p => p.email === '@volteuropa.org').length === 0
   ) {
+    // make it public
+    blockPermissions.push({
+      email: '@volteuropa.org',
+      role: 'viewer',
+    })
     blockPermissions.push({
       email: '@public',
       role: 'viewer',
