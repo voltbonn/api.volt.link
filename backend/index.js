@@ -134,7 +134,7 @@ app.use(function (req, res, next) {
   // const origin = req.get('origin')
   const origin = req.header('Origin')
   console.log('origin:', origin)
-  if (true || checkOrigin(origin)) {
+  if (checkOrigin(origin)) {
     req.is_subdomain = true
     req.origin = origin
     res.setHeader('Access-Control-Allow-Origin', origin)
