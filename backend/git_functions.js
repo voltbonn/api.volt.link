@@ -32,8 +32,8 @@ const octokit = new OctokitWithRest({
   timeZone: 'Europe/Berlin',
   baseUrl: 'https://api.github.com',
   // log: {
-  //   debug: console.log,
-  //   info: console.log,
+  //   debug: console.info,
+  //   info: console.info,
   //   warn: console.warn,
   //   error: console.error
   // },
@@ -269,6 +269,247 @@ async function readCache() {
   return JSON.parse(await fs.promises.readFile(cacheFilePath, 'utf-8'))
 }
 
+function listCommits() {
+  return octokit.request('GET /repos/{owner}/{repo}/commits?branch={branch}', {
+    ...repoMetadata,
+    // sha: repoMetadata.branch,
+    path: 'paths',
+    per_page: 1, // default is 30, max is 100
+  })
+}
+
+function getCommit(ref) {
+  return octokit.request('GET /repos/{owner}/{repo}/commits/{ref}?branch={branch}', {
+    ...repoMetadata,
+    ref,
+  })
+}
+
+function localListCommits() { // { reversed = false }
+  // list all commits in a local repo
+
+  // git log --pretty="%H | %s" --max-count=100
+  // git log --pretty="%H | %f" --max-count=10 --graph
+  // git log --pretty="%H | %s" --max-count=10 --graph
+
+  return new Promise(resolve => {
+    // execShPromise(`git log ${reversed === true ? '--reverse' : ''} --pretty="%H" paths/`, {
+    execShPromise(`git log --date-order --pretty="%H" paths/`, {
+      cwd: tree_data_path,
+      stdio: null // "stdio: null" for no output
+    })
+    .then(result => {
+      const commits = result.stdout.split('\n')
+      resolve(commits)
+    })
+    .catch(error => {
+      console.error(error)
+      process.exit(1)
+      resolve([])
+    })
+  })
+}
+
+function parseRawGitFileLine(line) {
+  const regex = /^:.+\s([A-Z]+)([0-9]*)\s+([\S]*)(?:\s+([\S]*))?$/
+  const matches = regex.exec(line)
+  // matches[0] = full match
+  // matches[1] = status letter
+  // matches[2] = status percent
+  // matches[3] = file path
+  // matches[4] = new file path
+
+  if (matches !== null) {
+    return {
+      status_letter: matches[1],
+      status_score: (!matches[2] || matches[2] === '') ? null : parseInt(matches[2]), //  The rename or copy score
+      filepath: matches[3],
+      new_filepath: matches[4] || null, // if renaming or copying
+    }
+  }
+
+  return null
+}
+
+function parseCommitLine(line) {
+  const regex = /(.*)\s(.*)\s\[(.*)\]/
+  const matches = regex.exec(line)
+  // matches[0] = full match
+  // matches[1] = commit hash
+  // matches[2] = iso-8601 timestamp
+  // matches[3] = parent commits separated by spaces
+
+  if (matches !== null) {
+    return {
+      commitHash: matches[1],
+      iso_ts: new Date(matches[2]),
+      parents: matches[3].split(' '),
+    }
+  }
+
+  return null
+}
+
+function localListCommitsWithFiles({ max_commits = 1 } = {}) {
+  // list all commits in a local repo
+
+  // git log --pretty="%H | %s" --max-count=100
+  // git log --pretty="%H | %f" --max-count=10 --graph
+  // git log --pretty="%H | %s" --max-count=10 --graph
+  // git log --date-order --reverse --max-count=2 --raw --pretty='--separator--%n%H %at %aI [%P]' paths/
+  // git log --date-order --reverse --max-count=2 --raw --pretty='--separator--%n%H %aI [%P]' paths/
+
+  return new Promise(resolve => {
+    execShPromise(`git log --date-order --reverse --max-count=${max_commits} --raw --pretty='--separator--%n%H %aI [%P]' paths/`, {
+      cwd: tree_data_path,
+      stdio: null // "stdio: null" for no output
+    })
+    .then(result => {
+      const raw_commits = result.stdout
+      .split('--separator--')
+      .filter(Boolean)
+
+      let commits = []
+
+      for (let i = 0; i < raw_commits.length; i++) {
+        const parsedLines = raw_commits[i]
+        .split('\n')
+        .filter(Boolean)
+        .map(line => {
+          if (line.startsWith(':')) {
+            return parseRawGitFileLine(line)
+          } else {
+            return parseCommitLine(line)
+          }
+        })
+
+        const commit = parsedLines.shift()
+        commit.files = parsedLines.filter(Boolean)
+
+        commits.push(commit)
+      }
+
+      resolve(commits)
+    })
+    .catch(error => {
+      console.error(error)
+      process.exit(1)
+      resolve([])
+    })
+  })
+}
+
+function localCheckoutHead() {
+  return new Promise((resolve) => {
+    execShPromise(`git checkout HEAD`, {
+      cwd: tree_data_path,
+      stdio: null // "stdio: null" for no output
+    })
+    .then(result => {
+      resolve(true)
+    })
+    .catch(error => {
+      console.error(error)
+      resolve(false)
+    })
+  })
+}
+
+function changeLocalRepoToCommit(commitSha) {
+  return new Promise(resolve => {
+    execShPromise(`git checkout ${commitSha}`, {
+      cwd: tree_data_path,
+      stdio: null // "stdio: null" for no output
+    }).then(() => {
+      resolve(true)
+    }).catch(error => {
+      console.error(error)
+      resolve(false)
+    })
+  })
+}
+
+const statusRegex = /([A-Z])([0-9]*)/ // used in localCommitDiffFiles()
+
+function localCommitDiffFiles(commitSha_prev, commitSha_this, { reversed = false }) {
+  // return the changed files between two commits
+  return new Promise(resolve => {
+    let commit_a = commitSha_prev
+    let commit_b = commitSha_this
+    if (reversed === true) {
+      commit_a = commitSha_this
+      commit_b = commitSha_prev
+    }
+
+    let cmd = `git diff --name-status ${commit_a} ${commit_b} | sed 's/%/%%/g' | while read -r line ; do printf "\${line}\n" ; done | sed 's/\\\ / /g'`
+
+    // Possible status letters are:
+    // A: addition of a file
+    // C: copy of a file into a new one
+    // D: deletion of a file
+    // M: modification of the contents or mode of a file
+    // R: renaming of a file
+    // T: change in the type of the file (regular file, symbolic link or submodule)
+    // U: file is unmerged (you must complete the merge before it can be committed)
+    // X: "unknown" change type (most probably a bug, please report it)
+
+    execShPromise(cmd, {
+      cwd: tree_data_path,
+      stdio: null // "stdio: null" for no output
+    }).then(result => {
+      const stdout = result.stdout.toString()
+      const filenames = stdout
+      .split('\n')
+      .filter(Boolean)
+      .map(line => {
+        const parts = line.split(/\t/)
+
+        const statusMatch = statusRegex.exec(parts[0])
+
+        const toReturn = {
+          status_letter: statusMatch[1],
+          status_score: statusMatch[2] === '' ? null : parseInt(statusMatch[2]), //  The rename or copy score
+        }
+
+        if (reversed === true) {
+          toReturn.filepath = parts[1]
+          toReturn.new_filepath = parts[2] || null // if renaming or copying
+        } else {
+          toReturn.new_filepath = parts[1]
+          toReturn.filepath = parts[2] || null // if renaming or copying
+        }
+
+        return toReturn
+      })
+
+      resolve(filenames)
+    }).catch(error => {
+      console.error(error)
+      process.exit(1)
+      resolve([])
+    })
+  })
+}
+
+function localReadFileAtCommit(filepath, commitSha) {
+  // return the content of a file at a specific commit
+  return new Promise(resolve => {
+    execShPromise(`git show "${commitSha}:${filepath}"`, {
+      cwd: tree_data_path,
+      stdio: null // "stdio: null" for no output
+    }).then(result => {
+      const stdout = result.stdout.toString()
+      resolve(stdout)
+    }).catch(error => {
+      console.error('Error in localReadFileAtCommit:', error)
+      process.exit(1)
+      resolve('')
+    })
+  })
+}
+
+
+
 module.exports = {
   // getFileContent,
   getFileContentLocal,
@@ -279,4 +520,13 @@ module.exports = {
   rebuildCache,
   writeCache,
   readCache,
+
+  listCommits,
+  getCommit,
+  changeLocalRepoToCommit,
+  localCommitDiffFiles,
+  localReadFileAtCommit,
+  localListCommits,
+  localCheckoutHead,
+  localListCommitsWithFiles,
 }
