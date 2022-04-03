@@ -257,14 +257,13 @@ function generateRandomCode(){
 }
 
 function checkOrigin(origin) {
-  console.log('checkOrigin', origin)
-  
   let isAllowed = false
 
   if (typeof origin === 'string') {
     if (
       // allow from main domain
       origin === 'volt.link'
+      || origin.endsWith('://volt.link')
 
       // allow from subdomains
       || origin.endsWith('.volt.link')
