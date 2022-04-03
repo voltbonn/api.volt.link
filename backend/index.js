@@ -236,6 +236,7 @@ app.get('/login', (req, res) => {
 })
 
 app.get('/', (req, res) => {
+  console.log('main')
   // res.redirect('https://www.volteuropa.org/')
   res.send(`
 <!DOCTYPE html>
