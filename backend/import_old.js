@@ -325,6 +325,11 @@ async function parseItem(item, mongoDbContext, parentBlockLess) {
         }
         break
     }
+
+    // remove new lines at the start and end of a text block
+    if (typeof newBlock.properties.text === 'string') {
+      newBlock.properties.text = newBlock.properties.text.replace(/(^\n+|\n+$)/g, '')
+    }
     // END text
 
 
