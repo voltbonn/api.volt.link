@@ -256,13 +256,15 @@ function generateRandomCode(){
   })
 }
 
-function checkOrigin(origin){
-  console.log('origin', origin)
-  return (
-    typeof origin === 'string'
-    && (
+function checkOrigin(origin) {
+  console.log('checkOrigin', origin)
+  
+  let isAllowed = false
+
+  if (typeof origin === 'string') {
+    if (
       // allow from main domain
-      origin.endsWith('volt.link')
+      origin === 'volt.link'
 
       // allow from subdomains
       || origin.endsWith('.volt.link')
@@ -275,8 +277,12 @@ function checkOrigin(origin){
       || origin.endsWith('0.0.0.0:4003')
       || origin.endsWith('0.0.0.0:4000')
       || origin.endsWith('localhost:19006')
-    )
-  )
+    ) {
+      isAllowed = true
+    }
+  }
+
+  return isAllowed
 }
 
 function getFilterByKeysFunction(graphqlKey) {
