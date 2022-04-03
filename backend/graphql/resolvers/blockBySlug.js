@@ -10,7 +10,7 @@ module.exports = async (parent, args, context, info) => {
 			$match: {
 				'properties.trigger.type': 'path',
 				'properties.trigger.path': args.slug,
-				'properties.action.type': 'render_block',
+				// 'properties.action.type': 'render_block',
 				...getPermissionsQuery(context, null),
 			}
 		},
