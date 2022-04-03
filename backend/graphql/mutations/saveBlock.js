@@ -22,6 +22,19 @@ module.exports = async (parent, args, context, info) => {
 		// properties
 		block.properties = block.properties || {}
 
+		if (block.properties.hasOwnProperty('trigger')) {
+			if (
+				block.properties.trigger.hasOwnProperty('type')
+				&& block.properties.trigger.type === 'path'
+			) {
+				if (!block.properties.hasOwnProperty('action')) {
+					block.properties.action = {
+						type: 'render_block',
+					}
+				}
+			}
+		}
+
 		// metadata
 		block.metadata = {
 			...(block.metadata || {}),
