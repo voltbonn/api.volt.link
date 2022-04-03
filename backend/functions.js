@@ -257,6 +257,7 @@ function generateRandomCode(){
 }
 
 function checkOrigin(origin){
+  console.log('origin', origin)
   return (
     typeof origin === 'string'
     && (
