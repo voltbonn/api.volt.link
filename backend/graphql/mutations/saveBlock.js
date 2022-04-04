@@ -1,4 +1,4 @@
-const { getPermissionsAggregationQuery, changeParent } = require('../../functions.js')
+const { getPermissionsAggregationQuery } = require('../../functions.js') // changeParent
 const { copyToHistory } = require('../history.js')
 
 module.exports = async (parent, args, context, info) => {
@@ -115,13 +115,13 @@ module.exports = async (parent, args, context, info) => {
 				if (result.matchedCount > 0) {
 					await copyToHistory(blockId, mongodb)
 
-					if (
-						newParent
-						&& mongodb.ObjectId.isValid(newParent)
-						&& newParent !== oldParent
-					) {
-						await changeParent(context, newParent, blockId, -1)
-					}
+					// if (
+					// 	newParent
+					// 	&& mongodb.ObjectId.isValid(newParent)
+					// 	&& newParent !== oldParent
+					// ) {
+					// 	await changeParent(context, newParent, blockId, -1)
+					// }
 
 					return blockId
 				} else {
@@ -143,13 +143,13 @@ module.exports = async (parent, args, context, info) => {
 			if (newBlockId) {
 				await copyToHistory(newBlockId, mongodb)
 
-				const newParent = block.parent
-				if (
-					newParent
-					&& mongodb.ObjectId.isValid(newParent)
-				) {
-					await changeParent(context, newParent, newBlockId, -1)
-				}
+				// const newParent = block.parent
+				// if (
+				// 	newParent
+				// 	&& mongodb.ObjectId.isValid(newParent)
+				// ) {
+				// 	await changeParent(context, newParent, newBlockId, -1)
+				// }
 				
 				return newBlockId
 			} else {
