@@ -1352,7 +1352,7 @@ markdown-it-kbd@^2.2.2:
   resolved "https://registry.yarnpkg.com/markdown-it-kbd/-/markdown-it-kbd-2.2.2.tgz#d6fee278f6675018983f77f7bfd5ecd7359aa993"
   integrity sha512-J5qVHtLuxh1HTJcl5xhopiFpf6fnHIBY0OO1akGHf2KW0VwQLYhsip/bkiTJFoEZqhssxQuUBY1LO5/SbCrB6g==
 
-markdown-it@^12.2.0:
+markdown-it@^12.3.2:
   version "12.3.2"
   resolved "https://registry.yarnpkg.com/markdown-it/-/markdown-it-12.3.2.tgz#bf92ac92283fe983fe4de8ff8abfb5ad72cd0c90"
   integrity sha512-TchMembfxfNVpHkbtriWltGWc+m3xszaRD0CZup7GFFhzIgQqxIfn3eGj1yZpfuflzPvfkt611B2Q/Bsk1YnGg==
@@ -1416,9 +1416,9 @@ minimalistic-assert@^1.0.0:
   integrity sha512-UtJcAD4yEaGtjPezWuO9wC4nwUnVH/8/Im3yEHQP4b67cXlD/Qr9hdITCU1xDbSEXg2XKNaP8jsReV7vQd00/A==
 
 minimist@^1.2.0, minimist@^1.2.3:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
-  integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.6.tgz#8637a5b759ea0d6e98702cfb3a9283323c93af44"
+  integrity sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==
 
 mkdirp-classic@^0.5.2, mkdirp-classic@^0.5.3:
   version "0.5.3"
