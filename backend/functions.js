@@ -117,7 +117,7 @@ function removeDiacritics(stringWithDiacritics){
 
 function filterPagesByPermission(pages, {
   logged_in = false
-}) {
+}) {
   return (pages || []).filter(page => {
     let { permissions } = page
 
