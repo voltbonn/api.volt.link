@@ -1,6 +1,8 @@
 /sessions
 /cache
 
+yarn.lock
+
 # Logs
 logs
 *.log
