@@ -8,7 +8,7 @@ module.exports = async (parent, args, context, info) => {
       // get the user block
       mongodb.collections.blocks.findOne({
 	    	type: 'person',
-        ...getPermissionsQuery(context, ['owner']),
+        ...getPermissionsQuery(context, ['owner'], { noAdminCheck: true }),
 	    })
 	    .then(resultDoc => {
 	    	if (!!resultDoc) {

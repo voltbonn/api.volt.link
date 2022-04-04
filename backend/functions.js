@@ -350,9 +350,15 @@ function getFilterByLanguageFunction(graphqlKey) {
 function getPermissionsQuery(context, roles = null, options = {}) {
   const user_email = ((context || {}).user || {}).email || null
 
+  const {
+    fieldName = 'permissions',
+    noAdminCheck = false,
+  } = options
+
   const admin_addresses = (process.env.admin_addresses || '').split(',').filter(Boolean)
   if (
-    admin_addresses.length > 0
+    noAdminCheck === false
+    && admin_addresses.length > 0
     && admin_addresses.includes(user_email)
   ) {
     return {}
@@ -367,10 +373,6 @@ function getPermissionsQuery(context, roles = null, options = {}) {
   ) {
     roles = ['viewer', 'editor', 'owner']
   }
-
-  const {
-    fieldName = 'permissions',
-  } = options
 
   const or = [
     {
