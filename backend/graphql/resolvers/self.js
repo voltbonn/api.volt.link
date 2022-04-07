@@ -5,6 +5,19 @@ module.exports = async (parent, args, context, info) => {
 
 	return new Promise((resolve,reject)=>{
     if (context.logged_in) {
+
+      let userroles = new Set()
+      const user_email = ((context || {}).user || {}).email || null
+      const admin_addresses = (process.env.admin_addresses || '').split(',').filter(Boolean)
+      if (
+        typeof user_email === 'string'
+        && admin_addresses.length > 0
+        && admin_addresses.includes(user_email)
+      ) {
+        userroles.add('admin')
+      }
+      userroles = [...userroles]
+
       // get the user block
       mongodb.collections.blocks.findOne({
 	    	type: 'person',
@@ -16,6 +29,7 @@ module.exports = async (parent, args, context, info) => {
             user: context.user,
             logged_in: true,
             blockId: resultDoc._id,
+            userroles: [...userroles],
           })
 
 	    		resolve(resultDoc)
@@ -63,6 +77,7 @@ module.exports = async (parent, args, context, info) => {
                 user: context.user,
                 logged_in: true,
                 blockId: result.insertedId,
+                userroles: [],
               })
 						} else {
 							reject('Could not create the user-block.')
@@ -77,6 +92,7 @@ module.exports = async (parent, args, context, info) => {
         user: null,
         logged_in: false,
         blockId: null,
+        userroles: [],
       })
     }
 	})

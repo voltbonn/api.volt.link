@@ -42,6 +42,7 @@ const schema = gql`
 		user: JSONObject
 		logged_in: Boolean
 		blockId: ObjectID
+		userroles: [String]
 	}
 
 	type Metadata {
