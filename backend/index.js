@@ -235,66 +235,7 @@ app.get('/login', (req, res) => {
 })
 
 app.get('/', (req, res) => {
-  // res.redirect('https://www.volteuropa.org/')
-  res.send(`
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  ${header}
-  <title>volt.link • Micropage and Redirect Server for Volt Europa</title>
-</head>
-<body class="basis_0_4">
-<div class="app spine_aligned" dir="auto">
-<main class="contentWrapper">
-  <h1>Microservices for Volt Europa</h1>
-
-  <h3>volt.link</h3>
-  <ul>
-    ${
-      req.logged_in
-      ? `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:4003' : 'https://beta.volt.link'}">beta.volt.link</a></li>`
-    : `<li>Create a micropage/linktree or redirect: <a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://api.volt.link'}/login?redirect_to=${isDevEnvironment ? 'http%3A%2F%2Flocalhost:4003' : 'https%3A%2F%2Fbeta.volt.link'}">Login and edit volt.link</a></li>`
-    }
-    <li>All volt.link micropages and redirects: <a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://api.volt.link'}/list">volt.link/list</a></li>
-    <li>Contact <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">Thomas Rosen</a><!--/sse--> for help with volt.link.</li>
-  </ul>
-
-  <h3>Tools</h3>
-  <ul>
-    <li>QR-Code Generator: <a href="https://qrcode.volt.link">qrcode.volt.link</a></li>
-    <li>Social Media Profile Picture Generator: <a href="https://www.profile-volt.org/">profile-volt.org</a></li>
-    <li>All tools Volt uses: <a href="https://volt.link/tools">volt.link/tools</a></li>
-  </ul>
-
-  <h3>Other Shortcuts</h3>
-  <ul>
-    <li>Volt Merch Shops: <a href="https://volt.link/merch">volt.link/merch</a></li>
-    <li>Volt related meme pages: <a href="https://volt.link/memes">volt.link/memes</a></li>
-  </ul>
-
-  <!--
-  <h3>Examples</h3>
-  <ul>
-    <li>Micropage: <a href="https://volt.link/bonn">volt.link/bonn</a></li>
-    <li>Redirect: <a href="https://volt.link/🇪🇺">volt.link/🇪🇺</a></li>
-  </ul>
-  -->
-
-  <footer>
-    <!--sse--><a href="mailto:thomas.rosen@volteuropa.org">Contact</a><!--/sse-->
-    ${
-      req.logged_in
-      ? `&nbsp; • &nbsp;<a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://api.volt.link'}/logout">Logout</a>`
-      : `&nbsp; • &nbsp;<a href="${isDevEnvironment ? 'http://localhost:4004' : 'https://api.volt.link'}/login">Login</a>`
-    }
-    &nbsp; • &nbsp;<a href="https://www.volteuropa.org/legal">Imprint</a>
-    &nbsp; • &nbsp;<a href="https://www.volteuropa.org/privacy">Privacy Policy</a>
-  </footer>
-</main>
-</div>
-</body>
-</html>
-`)
+  res.redirect('https://volt.link/api_volt_link')
 })
 
 // app.get('/teams.json', async (req, res) => {
