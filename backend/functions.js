@@ -398,8 +398,13 @@ function getPermissionsQuery(context, roles = null, options = {}) {
   return { [fieldName + './']: { $elemMatch: { $or: or } } }
 }
 
-function getPermissionsAggregationQuery(context, roles) {
-  const permissionsQuery = getPermissionsQuery(context, roles, {})
+function getPermissionsAggregationQuery(context, roles, options = {}) {
+  const {
+    fieldName = 'permissions',
+    // noAdminCheck = false,
+  } = options
+  
+  const permissionsQuery = getPermissionsQuery(context, roles, options)
 
   if (Object.keys(permissionsQuery).length === 0) { // Admins have empty permissionsQuery, to return everything. No aggregation needed.
     return []
@@ -431,7 +436,7 @@ function getPermissionsAggregationQuery(context, roles) {
 
     // only leave blocks with sufficient parent permissions
     { $unwind: '$parents' },
-    { $match: { 'parents.permissions./': permissionsQuery['permissions./'] } },
+    { $match: { ['parents.' + fieldName + './']: permissionsQuery[fieldName + './'] } },
 
     // group the parents back to the blocks and clean up the permissions checking stuff
     { $unset: 'parents' },
