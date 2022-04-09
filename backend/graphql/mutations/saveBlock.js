@@ -120,7 +120,7 @@ module.exports = async (parent, args, context, info) => {
 					// 	&& mongodb.ObjectId.isValid(newParent)
 					// 	&& newParent !== oldParent
 					// ) {
-					// 	await changeParent(context, newParent, blockId, -1)
+					// 	await changeParent(context, newParent, blockId, { positionInContent: -1 })
 					// }
 
 					return blockId
@@ -148,7 +148,7 @@ module.exports = async (parent, args, context, info) => {
 				// 	newParent
 				// 	&& mongodb.ObjectId.isValid(newParent)
 				// ) {
-				// 	await changeParent(context, newParent, newBlockId, -1)
+				// 	await changeParent(context, newParent, newBlockId, { positionInContent: -1 })
 				// }
 				
 				return newBlockId

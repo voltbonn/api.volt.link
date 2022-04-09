@@ -8,6 +8,8 @@ module.exports = async (parent, args, context, info) => {
 		const newParentId = args.newParentId
 		const newPositionInContent = args.newIndex
 
-    return await changeParent(context, newParentId, movingBlockId, newPositionInContent)
+    return await changeParent(context, newParentId, movingBlockId, {
+			positionInContent: newPositionInContent,
+		})
 	}
 }

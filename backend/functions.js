@@ -478,8 +478,12 @@ function getRolesOfUser(context, permissions) {
   return [...roles]
 }
 
-async function changeParent(context, newParentId, movingBlockId, newPositionInContent = -1) {
+async function changeParent(context, newParentId, movingBlockId, options) {
   const mongodb = context.mongodb
+
+  const {
+    positionInContent = -1
+  } = options || {}
 
   if (!!newParentId) {
     const results = await mongodb.collections.blocks
@@ -499,11 +503,9 @@ async function changeParent(context, newParentId, movingBlockId, newPositionInCo
           { $match: { _id: movingBlockId } },
           ...getPermissionsAggregationQuery(context, ['editor', 'owner']),
 
-          {
-            $set: {
-              parent: newParentId,
-            }
-          },
+          { $set: {
+            parent: newParentId
+          } },
 
           { $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
         ])
@@ -556,7 +558,7 @@ async function changeParent(context, newParentId, movingBlockId, newPositionInCo
               content: {
                 $concatArrays: ['$content', [
                   // Add a new content-config at the end.
-                  // TODO: Use newPositionInContent to add the content-config at a specific index. -1 should add it to the end.
+                  // TODO: Use positionInContent to add the content-config at a specific index. -1 should add it to the end.
                   {
                     blockId: movingBlockId
                   }
