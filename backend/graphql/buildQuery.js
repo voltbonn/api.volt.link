@@ -1,5 +1,3 @@
-const { getPermissionsQuery } = require('../functions.js')
-
 const { parseResolveInfo } = require('graphql-parse-resolve-info')
 
 function simpleFields(fieldsByTypeName) {
@@ -85,7 +83,6 @@ function buildQuery(parent, args, context, info) {
   				{ $replaceRoot: { newRoot:  '$content' } },
   				{ $match: {
 						'block._id': { $ne: null },
-						...getPermissionsQuery(context, null, { fieldName: 'block.permissions' }),
 					}},
 
 					...isArchivedQueryStage,

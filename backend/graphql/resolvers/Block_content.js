@@ -1,4 +1,4 @@
-const { getPermissionsQuery, getRolesOfUser } = require('../../functions.js')
+const { getPermissionsAggregationQuery, getRolesOfUser } = require('../../functions.js')
 
 module.exports = async (parent, args, context, info) => {
 	let newContent = (parent.content || [])
@@ -46,8 +46,9 @@ module.exports = async (parent, args, context, info) => {
     	const cursor = context.mongodb.collections.blocks.aggregate([
     	  { $match: {
     	    _id: { $in: blockIds },
-    	    ...getPermissionsQuery(context),
     	  } },
+
+				...getPermissionsAggregationQuery(context),
     	])
 
     	let blocks = await cursor.toArray()

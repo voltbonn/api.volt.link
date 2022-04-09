@@ -1,4 +1,4 @@
-const { getPermissionsQuery } = require('../../functions.js')
+const { getPermissionsAggregationQuery } = require('../../functions.js')
 const { copyManyToHistory } = require('../history.js')
 
 async function both (parent, args, context, info) {
@@ -12,8 +12,8 @@ async function both (parent, args, context, info) {
 		let blockIdsToAddToHistory = await mongodb.collections.blocks.aggregate([
 	    { $match: {
 	      _id: args._id,
-	      ...getPermissionsQuery(context, ['editor', 'owner']),
 	    } },
+			...getPermissionsAggregationQuery(context, ['editor', 'owner']),
     
     	{ $facet: {
     	  fromOriginal: [], // empty stages-array to copy the original document/block
@@ -25,9 +25,6 @@ async function both (parent, args, context, info) {
     	      connectToField: '_id',
     	      as: 'kids',
     	      maxDepth: 50,
-    	      restrictSearchWithMatch: {
-    	        ...getPermissionsQuery(context, ['editor', 'owner']),
-    	      }
     	    }},
         	{ $unwind: '$kids' },
         	{ $replaceRoot: { newRoot: '$kids' } },
@@ -40,9 +37,6 @@ async function both (parent, args, context, info) {
     	      connectToField: 'parent',
     	      as: 'kids',
     	      maxDepth: 50,
-    	      restrictSearchWithMatch: {
-    	        ...getPermissionsQuery(context, ['editor', 'owner']),
-    	      }
     	    }},
     	    { $unwind: '$kids' },
     	    { $replaceRoot: { newRoot: '$kids' } },
@@ -56,7 +50,7 @@ async function both (parent, args, context, info) {
     	{ $unwind: '$blocks' },
     	{ $replaceRoot: { newRoot: '$blocks' } },
     
-    	// ...getPermissionsAggregationQuery(context, ['editor', 'owner']),
+    	...getPermissionsAggregationQuery(context, ['editor', 'owner']),
 
 			{ $project: { _id: true } },
 

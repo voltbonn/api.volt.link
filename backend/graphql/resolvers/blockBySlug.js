@@ -1,4 +1,4 @@
-const { getPermissionsQuery, getRolesOfUser } = require('../../functions.js')
+const { getPermissionsAggregationQuery, getRolesOfUser } = require('../../functions.js')
 
 const { buildQuery } = require('../buildQuery.js')
 
@@ -11,11 +11,11 @@ module.exports = async (parent, args, context, info) => {
 				'properties.trigger.type': 'path',
 				'properties.trigger.path': args.slug,
 				// 'properties.action.type': 'render_block',
-				...getPermissionsQuery(context, null),
 			}
 		},
 
 		...buildQuery(parent, args, context, info),
+		...getPermissionsAggregationQuery(context),
 	]
 
 	const cursor = mongodb.collections.blocks.aggregate(query)

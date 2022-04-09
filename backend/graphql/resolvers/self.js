@@ -1,9 +1,9 @@
-const { getPermissionsQuery } = require('../../functions.js')
+const { getPermissionsAggregationQuery } = require('../../functions.js')
 
 module.exports = async (parent, args, context, info) => {
 	const mongodb = context.mongodb
 
-	return new Promise((resolve,reject)=>{
+	return new Promise(async (resolve,reject)=>{
     if (context.logged_in) {
 
       let userroles = new Set()
@@ -19,74 +19,77 @@ module.exports = async (parent, args, context, info) => {
       userroles = [...userroles]
 
       // get the user block
-      mongodb.collections.blocks.findOne({
-	    	type: 'person',
-        ...getPermissionsQuery(context, ['owner'], { noAdminCheck: true }),
-	    })
-	    .then(resultDoc => {
-	    	if (!!resultDoc) {
-          resolve({
-            user: context.user,
-            logged_in: true,
-            blockId: resultDoc._id,
-            userroles: [...userroles],
-          })
+      const cursor = mongodb.collections.blocks.aggregate([
+        {$match: {
+	    	  type: 'person',
+        }},
+        
+        ...getPermissionsAggregationQuery(context, ['owner'], { noAdminCheck: true }),
+      ])
 
-	    		resolve(resultDoc)
-	    	} else {
+      let blocks = await cursor.toArray()
 
-          const properties = {}
+      if (blocks.length > 0) {
+        const resultDoc = blocks[0]
 
-          const username = context.user.email.split('@')[0]
-          const displayName = context.user.displayName || username
+        resolve({
+          user: context.user,
+          logged_in: true,
+          blockId: resultDoc._id,
+          userroles: [...userroles],
+        })
+	    } else {
 
-          properties.trigger = {
-            type: 'path',
-            path: username,
-          }
-          properties.action = {
-            type: 'render_block',
-          }
-          properties.text = displayName
-          // properties.text = [
-          //   { value: displayName, locale: context.locale },
-          // ]
+        const properties = {}
 
-          if (context.user.picture.length > 0 && !context.user.picture.includes('default-user')) {
-            properties.icon = context.user.picture
-          }
+        const username = context.user.email.split('@')[0]
+        const displayName = context.user.displayName || username
 
-          // create user block if it doesn't exist
-					mongodb.collections.blocks.insertOne({
-            type: 'person',
-            content: [],
-            properties,
-            permissions: {
-              '/': [
-                { email: context.user.email, role: 'owner' },
-              ],
-            },
-            metadata: {
-              created: new Date(),
-              modified: new Date(),
-            },
-          })
-					.then(result => {
-						if (result.insertedId) {
-              resolve({
-                user: context.user,
-                logged_in: true,
-                blockId: result.insertedId,
-                userroles: [],
-              })
-						} else {
-							reject('Could not create the user-block.')
-						}
-					})
-					.catch(reject)
-	    	}
-	    })
-	    .catch(reject)
+        properties.trigger = {
+          type: 'path',
+          path: username,
+        }
+        properties.action = {
+          type: 'render_block',
+        }
+        properties.text = displayName
+        // properties.text = [
+        //   { value: displayName, locale: context.locale },
+        // ]
+
+        if (context.user.picture.length > 0 && !context.user.picture.includes('default-user')) {
+          properties.icon = context.user.picture
+        }
+
+        // create user block if it doesn't exist
+				mongodb.collections.blocks.insertOne({
+          type: 'person',
+          content: [],
+          properties,
+          permissions: {
+            '/': [
+              { email: context.user.email, role: 'owner' },
+            ],
+          },
+          metadata: {
+            created: new Date(),
+            modified: new Date(),
+          },
+        })
+				.then(result => {
+					if (result.insertedId) {
+            resolve({
+              user: context.user,
+              logged_in: true,
+              blockId: result.insertedId,
+              userroles: [],
+            })
+					} else {
+						reject('Could not create the user-block.')
+					}
+				})
+				.catch(reject)
+	    }
     } else {
       resolve({
         user: null,

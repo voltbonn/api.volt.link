@@ -1,12 +1,10 @@
-const { getPermissionsQuery, getRolesOfUser } = require('../../functions.js')
+const { getPermissionsAggregationQuery, getRolesOfUser } = require('../../functions.js')
 
 module.exports = async (parent, args, context, info) => {
 	const mongodb = context.mongodb
 
 	return new Promise(async resolve => {
-		const finalQuery = {
-			...getPermissionsQuery(context),
-		}
+		const finalQuery = {}
 
 		if (Array.isArray(args.types) && args.types.length > 0) {
 			finalQuery.type = { $in: args.types }
@@ -15,7 +13,6 @@ module.exports = async (parent, args, context, info) => {
     const cursor = mongodb.collections.blocks.aggregate([
 			{ $match: {
 				_id: args._id,
-				...getPermissionsQuery(context),
 			} },
 
 			{ $lookup: {
@@ -39,6 +36,8 @@ module.exports = async (parent, args, context, info) => {
 			{ $unwind : '$siblings' },
 			{ $replaceRoot: { newRoot: '$siblings' } },
 			{ $match: finalQuery },
+
+			...getPermissionsAggregationQuery(context),
     ])
 
 		let blocks = await cursor.toArray()

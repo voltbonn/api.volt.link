@@ -1,4 +1,4 @@
-const { getPermissionsQuery, getRolesOfUser } = require('../../functions.js')
+const { getPermissionsAggregationQuery, getRolesOfUser } = require('../../functions.js')
 
 module.exports = async (parent, args, context, info) => {
   const mongodb = context.mongodb
@@ -7,7 +7,6 @@ module.exports = async (parent, args, context, info) => {
     const cursor = mongodb.collections.blocks.aggregate([
       { $match: {
         _id: args._id,
-        ...getPermissionsQuery(context),
       } },
 
       { $graphLookup: {
@@ -23,7 +22,8 @@ module.exports = async (parent, args, context, info) => {
 
       { $unwind : '$parents' },
       { $replaceRoot: { newRoot: '$parents' } },
-      { $match: getPermissionsQuery(context) },
+
+      ...getPermissionsAggregationQuery(context),
     ])
 
     let blocks = await cursor.toArray()

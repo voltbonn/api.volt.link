@@ -1,4 +1,4 @@
-const { getPermissionsQuery, getRolesOfUser } = require('../../functions.js')
+const { getPermissionsAggregationQuery, getRolesOfUser } = require('../../functions.js')
 
 const { buildQuery } = require('../buildQuery.js')
 
@@ -12,8 +12,8 @@ module.exports = async (parent, args, context, info) => {
       ...stages,
       { $match: {
         _id: { $in: args.roots },
-        ...getPermissionsQuery(context, null),
       }},
+      ...getPermissionsAggregationQuery(context),
       { $graphLookup: {
           from: 'blocks',
           startWith: '$content.blockId',
@@ -22,16 +22,13 @@ module.exports = async (parent, args, context, info) => {
           as: 'children',
           maxDepth: 100,
           // depthField: 'depth',
-          restrictSearchWithMatch: getPermissionsQuery(context, null),
       }},
       { $unwind: '$children' },
       { $replaceRoot: { newRoot: '$children' }}
     ]
   }
 
-  const query = {
-    ...getPermissionsQuery(context),
-  }
+  const query = {}
 
   if (args.ids && Array.isArray(args.ids) && args.ids.length > 0) {
     query._id = { $in: args.ids }
@@ -67,6 +64,7 @@ module.exports = async (parent, args, context, info) => {
   stages = [
     ...stages,
     ...buildQuery(parent, args, context, info),
+    ...getPermissionsAggregationQuery(context),
   ]
     
   const cursor = mongodb.collections.blocks.aggregate(stages)
