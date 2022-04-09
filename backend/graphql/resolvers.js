@@ -19,6 +19,7 @@ const Block_content = require('./resolvers/Block_content.js')
 const checkPath = require('./resolvers/checkPath.js')
 
 const saveBlock = require('./mutations/saveBlock.js')
+const saveProperty = require('./mutations/saveProperty.js')
 const {
 	archiveBlock,
 	unarchiveBlock,
@@ -83,6 +84,7 @@ module.exports = {
 	},
 	Mutation: {
 		saveBlock,
+		saveProperty,
 		archiveBlock,
 		unarchiveBlock,
 		moveBlock,
