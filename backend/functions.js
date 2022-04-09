@@ -604,7 +604,6 @@ module.exports = {
   checkOrigin,
   getFilterByKeysFunction,
   getFilterByLanguageFunction,
-  getPermissionsQuery,
   getPermissionsAggregationQuery,
   getRolesOfUser,
   changeParent,
