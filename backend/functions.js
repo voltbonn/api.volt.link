@@ -398,10 +398,15 @@ function getPermissionsQuery(context, roles = null, options = {}) {
 }
 
 function getPermissionsAggregationQuery(context, roles, options = {}) {
-  const {
+  let {
     fieldName = 'permissions',
     // noAdminCheck = false,
+    startField = '$_id',
   } = options
+
+  if (typeof startField !== 'string' || startField.length === 0) {
+    startField = '$_id'
+  }
   
   const permissionsQuery = getPermissionsQuery(context, roles, options)
 
@@ -412,6 +417,7 @@ function getPermissionsAggregationQuery(context, roles, options = {}) {
   const query = [
       {
         $project: {
+          startId: startField,
           root: '$$ROOT'
         }
       },
@@ -419,7 +425,7 @@ function getPermissionsAggregationQuery(context, roles, options = {}) {
       {
         "$graphLookup": {
           "from": "blocks",
-          "startWith": "$_id",
+          "startWith": "$startId",
           "connectFromField": "parent",
           "connectToField": "_id",
           "as": "parentBlocks",
@@ -450,15 +456,16 @@ function getPermissionsAggregationQuery(context, roles, options = {}) {
 
       {
         $group: {
-          _id: { $concat: [{ $toString: '$root._id' }, '-', '$parentBlocks.' + fieldName + './.email'] },
+          _id: { $concat: [{ $toString: '$startId' }, '-', '$parentBlocks.' + fieldName + './.email'] },
           block_permission: { $first: '$parentBlocks.' + fieldName + './' },
           root: { $first: '$root' },
+          startId: { $first: '$startId' },
         }
       },
 
       {
         $group: {
-          _id: '$root._id',
+          _id: '$startId',
           inherited_block_permissions: { $push: '$block_permission' },
           root: { $first: '$root' },
         }

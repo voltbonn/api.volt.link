@@ -1,3 +1,4 @@
+const { getPermissionsAggregationQuery } = require('../functions.js')
 const { parseResolveInfo } = require('graphql-parse-resolve-info')
 
 function simpleFields(fieldsByTypeName) {
@@ -88,6 +89,38 @@ function buildQuery(parent, args, context, info) {
 					...isArchivedQueryStage,
       	]
   		}},
+
+			// START permissions
+			{
+				$unwind: {
+					path: '$newContent',
+					includeArrayIndex: 'newContent.array_position',
+					preserveNullAndEmptyArrays: false
+				}
+			},
+
+			...getPermissionsAggregationQuery(context, ['editor', 'owner'], {
+				startField: '$newContent.block._id',
+			}),
+			{
+				$addFields: {
+					'newContent.block.computed.inherited_block_permissions': '$computed.inherited_block_permissions'
+				}
+			},
+			{
+				$sort: {
+					"newContent.array_position": 1
+				}
+			},
+			{ $unset: ['newContent.array_position'] },
+			{
+				$group: {
+					_id: '$newBlock._id',
+					newBlock: { $first: '$newBlock' },
+					newContent: { $push: '$newContent' },
+				}
+			},
+			// END permissions
   
 	  	{ $addFields: { 'newBlock': { $first: '$newBlock' } } },
 	  	{ $addFields: { 'newBlock.content': '$newContent' } },
