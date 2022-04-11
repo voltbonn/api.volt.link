@@ -67,6 +67,7 @@ const schema = gql`
 	type Computed {
 		roles: [String]
 		sort: Int
+		inherited_block_permissions: JSON
 	}
 
 	type Block {

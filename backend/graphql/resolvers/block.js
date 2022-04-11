@@ -26,10 +26,11 @@ module.exports = async (parent, args, context, info) => {
 			block2return.computed = {}
 		}
 		if (context.logged_in === true) {
-			block2return.computed.roles = getRolesOfUser(context, block2return.permissions)
+			block2return.computed.roles = getRolesOfUser(context, block2return)
 		} else {
 			block2return.computed.roles = ['viewer'] // getRolesOfUser doesn't make sense here, as we don't have a user.
 			delete block2return.permissions // Remove permission infos from the block if not logged-in, to not leak user data.
+			delete block2return.computed.inherited_block_permissions
 		}
 
 		return block2return

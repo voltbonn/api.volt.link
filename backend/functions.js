@@ -351,7 +351,6 @@ function getPermissionsQuery(context, roles = null, options = {}) {
   const user_email = ((context || {}).user || {}).email || null
 
   const {
-    fieldName = 'permissions',
     noAdminCheck = false,
   } = options
 
@@ -395,7 +394,7 @@ function getPermissionsQuery(context, roles = null, options = {}) {
     }
   }
 
-  return { [fieldName + './']: { $elemMatch: { $or: or } } }
+  return { $elemMatch: { $or: or } }
 }
 
 function getPermissionsAggregationQuery(context, roles, options = {}) {
@@ -411,47 +410,91 @@ function getPermissionsAggregationQuery(context, roles, options = {}) {
   }
 
   const query = [
-    // only leave blocks with sufficient parent permissions
-    { $match: permissionsQuery },
+      {
+        $project: {
+          root: '$$ROOT'
+        }
+      },
 
-    // Get the parents of matched blocks.
-    {
-      $graphLookup: {
-        from: 'blocks',
-        startWith: '$parent',
-        connectFromField: 'parent',
-        connectToField: '_id',
-        as: 'parents',
-        maxDepth: 50,
-        depthField: 'computed.sort',
-        // restrictSearchWithMatch: <document>
-      }
-    },
+      {
+        "$graphLookup": {
+          "from": "blocks",
+          "startWith": "$_id",
+          "connectFromField": "parent",
+          "connectToField": "_id",
+          "as": "parentBlocks",
+          "maxDepth": 50,
+          "depthField": "depth",
+          restrictSearchWithMatch: {
+            _id: { $not: { $eq: null } },
+          }
+        }
+      },
 
-    // Add the block itself to the found results. This prevents the block from being hidden if it has no parents.
-    { $set: { 'tmpRoot': '$$ROOT' } },
-    { $unset: 'tmpRoot.parents' },
-    { $set: { 'parents': { $concatArrays: [['$tmpRoot'], '$parents'] } } },
-    { $unset: 'tmpRoot' },
+      { $unwind: '$parentBlocks' },
+      { $unwind: '$parentBlocks.' + fieldName + './' },
 
-    // only leave blocks with sufficient parent permissions
-    { $unwind: '$parents' },
-    { $match: { ['parents.' + fieldName + './']: permissionsQuery[fieldName + './'] } },
+      // { $unset: ['parentBlocks.' + fieldName + './.tmp_id'] },
+      {
+        $set: {
+          ['parentBlocks.' + fieldName + './.depth']: '$parentBlocks.depth',
+        }
+      },
 
-    // group the parents back to the blocks and clean up the permissions checking stuff
-    { $unset: 'parents' },
-    { $project: { tmpRoot: '$$ROOT' } },
-    { $group: { _id: '$_id', tmpRoot: { $first: '$tmpRoot' } } },
-    { $replaceRoot: { newRoot: '$tmpRoot' } },
+      {
+        $sort: {
+          'parentBlocks.depth': 1
+        }
+      },
+
+
+      {
+        $group: {
+          _id: { $concat: [{ $toString: '$root._id' }, '-', '$parentBlocks.' + fieldName + './.email'] },
+          block_permission: { $first: '$parentBlocks.' + fieldName + './' },
+          root: { $first: '$root' },
+        }
+      },
+
+      {
+        $group: {
+          _id: '$root._id',
+          inherited_block_permissions: { $push: '$block_permission' },
+          root: { $first: '$root' },
+        }
+      },
+
+      {
+        $match: {
+          inherited_block_permissions: permissionsQuery
+        }
+      },
+
+      {
+        $set: {
+          'root.computed.inherited_block_permissions': '$inherited_block_permissions'
+        }
+      },
+
+      { $replaceRoot: { newRoot: '$root' } },
   ]
 
   return query
 }
 
-function getRolesOfUser(context, permissions) {
+function getRolesOfUser(context, block) {
   const roles = new Set()
 
-  const blockPermissions = permissions['/'] || []
+  const {
+    computed = {},
+    permissions = {},
+  } = block || {}
+
+  const {
+    inherited_block_permissions = [],
+  } = computed || {}
+
+  const blockPermissions = inherited_block_permissions || permissions['/'] || []
 
   const indexOfPublic = blockPermissions.findIndex(p => p.email === '@public')
   if (indexOfPublic > -1) {
@@ -512,6 +555,7 @@ async function changeParent(context, newParentId, movingBlockId, options) {
             parent: newParentId
           } },
 
+          { $unset: ['computed'] },
           { $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
         ])
         .toArray()
@@ -548,6 +592,7 @@ async function changeParent(context, newParentId, movingBlockId, options) {
             }
           },
 
+          { $unset: ['computed'] },
           { $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
         ])
         .toArray()
@@ -572,6 +617,7 @@ async function changeParent(context, newParentId, movingBlockId, options) {
             }
           },
 
+          { $unset: ['computed'] },
           { $merge: { into: "blocks", on: "_id", whenMatched: "replace", whenNotMatched: "discard" } }
         ])
         .toArray()

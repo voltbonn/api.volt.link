@@ -10,7 +10,7 @@ module.exports = async (parent, args, context, info) => {
 				if (!contentConfig.block.computed) {
 					contentConfig.block.computed = {}
 				}
-				contentConfig.block.computed.roles = getRolesOfUser(context, contentConfig.block.permissions)
+				contentConfig.block.computed.roles = getRolesOfUser(context, contentConfig.block)
 			}
 			return contentConfig
 		})
@@ -22,9 +22,8 @@ module.exports = async (parent, args, context, info) => {
 					contentConfig.block.computed = {}
 				}
 				contentConfig.block.computed.roles = ['viewer'] // getRolesOfUser doesn't make sense here, as we don't have a user.
-				if (contentConfig.block.permissions) {
-					delete contentConfig.block.permissions
-				}
+				delete contentConfig.block.permissions
+				delete contentConfig.block.computed.inherited_block_permissions
 			}
 			return contentConfig
 		})
@@ -58,7 +57,7 @@ module.exports = async (parent, args, context, info) => {
 					if (!block.computed) {
 						block.computed = {}
 					}
-					block.computed.roles = getRolesOfUser(context, block.permissions)
+					block.computed.roles = getRolesOfUser(context, block)
 					return block
 				})
 			} else {
@@ -69,6 +68,7 @@ module.exports = async (parent, args, context, info) => {
 					}
 					block.computed.roles = ['viewer'] // getRolesOfUser doesn't make sense here, as we don't have a user.
 					delete block.permissions
+					delete block.computed.inherited_block_permissions
 					return block
 				})
 			}
