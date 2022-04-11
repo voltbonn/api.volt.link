@@ -354,14 +354,14 @@ function getPermissionsQuery(context, roles = null, options = {}) {
     noAdminCheck = false,
   } = options
 
-  const admin_addresses = (process.env.admin_addresses || '').split(',').filter(Boolean)
-  if (
-    noAdminCheck === false
-    && admin_addresses.length > 0
-    && admin_addresses.includes(user_email)
-  ) {
-    return {}
-  }
+  // const admin_addresses = (process.env.admin_addresses || '').split(',').filter(Boolean)
+  // if (
+  //   noAdminCheck === false
+  //   && admin_addresses.length > 0
+  //   && admin_addresses.includes(user_email)
+  // ) {
+  //   return {}
+  // }
 
   if (
     roles === null
