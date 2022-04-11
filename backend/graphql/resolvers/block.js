@@ -25,6 +25,7 @@ module.exports = async (parent, args, context, info) => {
 		if (!block2return.computed) {
 			block2return.computed = {}
 		}
+
 		if (context.logged_in === true) {
 			block2return.computed.roles = getRolesOfUser(context, block2return)
 		} else {
