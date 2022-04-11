@@ -22,7 +22,11 @@ function simpleFields(fieldsByTypeName) {
 	return {}
 }
 
-function buildQuery(parent, args, context, info) {
+function buildQuery(parent, args, context, info, options) {
+
+	const {
+		roles = null,
+	} = options || {}
 
 	let stages = []
 	let projectStage = { _id: true }
@@ -99,7 +103,7 @@ function buildQuery(parent, args, context, info) {
 				}
 			},
 
-			...getPermissionsAggregationQuery(context, ['editor', 'owner'], {
+			...getPermissionsAggregationQuery(context, roles, {
 				startField: '$newContent.block._id',
 			}),
 			{
