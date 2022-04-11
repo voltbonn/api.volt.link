@@ -13,9 +13,9 @@ module.exports = async (parent, args, context, info) => {
 				// 'properties.action.type': 'render_block',
 			}
 		},
+		...getPermissionsAggregationQuery(context),
 
 		...buildQuery(parent, args, context, info),
-		...getPermissionsAggregationQuery(context),
 	]
 
 	const cursor = mongodb.collections.blocks.aggregate(query)

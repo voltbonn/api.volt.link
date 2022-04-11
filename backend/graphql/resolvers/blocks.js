@@ -63,8 +63,8 @@ module.exports = async (parent, args, context, info) => {
 
   stages = [
     ...stages,
-    ...buildQuery(parent, args, context, info),
     ...getPermissionsAggregationQuery(context),
+    ...buildQuery(parent, args, context, info),
   ]
     
   const cursor = mongodb.collections.blocks.aggregate(stages)

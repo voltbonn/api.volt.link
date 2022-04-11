@@ -6,12 +6,14 @@ module.exports = async (parent, args, context, info) => {
 	const mongodb = context.mongodb
 
 	const query = [
-		{ $match: {
-			_id: args._id,
-    } },
+		{
+			$match: {
+				_id: args._id,
+			}
+		},
+		...getPermissionsAggregationQuery(context),
 
 		...buildQuery(parent, args, context, info),
-		...getPermissionsAggregationQuery(context),
 	]
 
   const cursor = mongodb.collections.blocks.aggregate(query)
