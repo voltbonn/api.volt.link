@@ -23,7 +23,7 @@ module.exports = async (parent, args, context, info) => {
 		]
 
 		const cursor = mongodb.collections.blocks.aggregate(query)
-		const blocks = await cursor.toArray()
+		blocks = await cursor.toArray()
 	}
 
 	if (blocks.length === 0) {
