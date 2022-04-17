@@ -648,6 +648,19 @@ async function changeParent(context, newParentId, movingBlockId, options) {
   }
 }
 
+function normalizeSlug(slug) {
+  if (typeof slug === 'string') {
+    slug = slug
+      .trim()
+      .toLowerCase()
+      // .replace(/_/g, '-')
+
+    return slug
+  }
+
+  return null
+}
+
 module.exports = {
   removeDiacritics,
   filterPagesByPermission,
@@ -660,4 +673,5 @@ module.exports = {
   getPermissionsAggregationQuery,
   getRolesOfUser,
   changeParent,
+  normalizeSlug,
 }

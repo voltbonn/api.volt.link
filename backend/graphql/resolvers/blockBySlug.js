@@ -1,25 +1,30 @@
-const { getPermissionsAggregationQuery, getRolesOfUser } = require('../../functions.js')
+const { getPermissionsAggregationQuery, getRolesOfUser, normalizeSlug } = require('../../functions.js')
 
 const { buildQuery } = require('../buildQuery.js')
 
 module.exports = async (parent, args, context, info) => {
 	const mongodb = context.mongodb
 
-	const query = [
-		{
-			$match: {
-				'properties.trigger.type': 'path',
-				'properties.trigger.path': args.slug,
-				// 'properties.action.type': 'render_block',
-			}
-		},
-		...getPermissionsAggregationQuery(context),
+	let blocks = []
 
-		...buildQuery(parent, args, context, info),
-	]
+	const slug = normalizeSlug(args.slug)
+	if (typeof slug === 'string') {
+		const query = [
+			{
+				$match: {
+					'properties.trigger.type': 'path',
+					'properties.trigger.path': slug,
+					// 'properties.action.type': 'render_block',
+				}
+			},
+			...getPermissionsAggregationQuery(context),
 
-	const cursor = mongodb.collections.blocks.aggregate(query)
-	const blocks = await cursor.toArray()
+			...buildQuery(parent, args, context, info),
+		]
+
+		const cursor = mongodb.collections.blocks.aggregate(query)
+		const blocks = await cursor.toArray()
+	}
 
 	if (blocks.length === 0) {
 		throw new Error('Could not find the requested block or no sufficent permission.')
