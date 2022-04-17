@@ -501,7 +501,16 @@ function getRolesOfUser(context, block) {
     inherited_block_permissions = [],
   } = computed || {}
 
-  const blockPermissions = inherited_block_permissions || permissions['/'] || []
+  let blockPermissions = []
+  if (Array.isArray(inherited_block_permissions) && inherited_block_permissions.length > 0) {
+    blockPermissions = inherited_block_permissions
+  } else if (
+    permissions.hasOwnProperty('/')
+    && Array.isArray(permissions['/'])
+    && permissions['/'].length > 0
+  ) {
+    blockPermissions = permissions['/']
+  }
 
   const indexOfPublic = blockPermissions.findIndex(p => p.email === '@public')
   if (indexOfPublic > -1) {
