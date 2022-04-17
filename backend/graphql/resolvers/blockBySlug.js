@@ -26,6 +26,22 @@ module.exports = async (parent, args, context, info) => {
 		blocks = await cursor.toArray()
 	}
 
+	if (blocks.length === 0 && mongodb.ObjectId.isValid(args.slug)) {
+		const query = [
+			{
+				$match: {
+					_id: new mongodb.ObjectId(args.slug),
+				}
+			},
+			...getPermissionsAggregationQuery(context),
+
+			...buildQuery(parent, args, context, info),
+		]
+
+		const cursor = mongodb.collections.blocks.aggregate(query)
+		blocks = await cursor.toArray()
+	}
+
 	if (blocks.length === 0) {
 		throw new Error('Could not find the requested block or no sufficent permission.')
 	} else {
