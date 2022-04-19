@@ -77,54 +77,43 @@ function buildQuery(parent, args, context, info, options) {
   		{ $facet: {
       	newBlock: [], // An empty array copies the currently matched docs.
       	newContent: [
-					{ $unwind: { path: '$content' } },
+					{ $unwind: {
+						path: '$content',
+						includeArrayIndex: 'index',
+						preserveNullAndEmptyArrays: true,
+					} },
       		{ $lookup: {
       			from: 'blocks',
       			localField: 'content.blockId',
       			foreignField: '_id',
       			as: 'content.block'
-     			}},
-      		{ $addFields: { 'content.block': { $first: '$content.block' } } },
+					}
+					},
+					{ $addFields: { 'content.block': { $first: '$content.block' } } },
+					{ $addFields: { 'content.index': '$index' } },
   				{ $replaceRoot: { newRoot:  '$content' } },
   				{ $match: {
 						'block._id': { $ne: null },
 					}},
 
 					...isArchivedQueryStage,
+
+					// START permissions
+					...getPermissionsAggregationQuery(context, roles, {
+						startField: '$block._id',
+					}),
+					{
+						$addFields: {
+							'block.computed.inherited_block_permissions': '$computed.inherited_block_permissions'
+						}
+					},
+					{ $unset: ['computed.inherited_block_permissions'] },
+					// END permissions
+
+					{ $sort: { 'index': 1 } },
+					{ $unset: ['index'] },
       	]
   		}},
-
-			// START permissions
-			// {
-			// 	$unwind: {
-			// 		path: '$newContent',
-			// 		includeArrayIndex: 'newContent.array_position',
-			// 		preserveNullAndEmptyArrays: false
-			// 	}
-			// },
-
-			// ...getPermissionsAggregationQuery(context, roles, {
-			// 	startField: '$newContent.block._id',
-			// }),
-			// {
-			// 	$addFields: {
-			// 		'newContent.block.computed.inherited_block_permissions': '$computed.inherited_block_permissions'
-			// 	}
-			// },
-			// {
-			// 	$sort: {
-			// 		"newContent.array_position": 1
-			// 	}
-			// },
-			// { $unset: ['newContent.array_position'] },
-			// {
-			// 	$group: {
-			// 		_id: '$newBlock._id',
-			// 		newBlock: { $first: '$newBlock' },
-			// 		newContent: { $push: '$newContent' },
-			// 	}
-			// },
-			// END permissions
   
 	  	{ $addFields: { 'newBlock': { $first: '$newBlock' } } },
 	  	{ $addFields: { 'newBlock.content': '$newContent' } },
