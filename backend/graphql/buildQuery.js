@@ -98,17 +98,17 @@ function buildQuery(parent, args, context, info, options) {
 
 					...isArchivedQueryStage,
 
-					// START permissions
-					...getPermissionsAggregationQuery(context, roles, {
-						startField: '$block._id',
-					}),
-					{
-						$addFields: {
-							'block.computed.inherited_block_permissions': '$computed.inherited_block_permissions'
-						}
-					},
-					{ $unset: ['computed.inherited_block_permissions'] },
-					// END permissions
+					// // START permissions
+					// ...getPermissionsAggregationQuery(context, roles, {
+					// 	startField: '$block._id',
+					// }),
+					// {
+					// 	$addFields: {
+					// 		'block.computed.inherited_block_permissions': '$computed.inherited_block_permissions'
+					// 	}
+					// },
+					// { $unset: ['computed.inherited_block_permissions'] },
+					// // END permissions
 
 					{ $sort: { 'index': 1 } },
 					{ $unset: ['index'] },
