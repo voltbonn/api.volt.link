@@ -12,9 +12,14 @@ module.exports = async (parent, args, context, info) => {
 		const query = [
 			{
 				$match: {
-					'properties.trigger.type': 'path',
-					'properties.trigger.path': slug,
-					// 'properties.action.type': 'render_block',
+					$or: [
+						{
+							'properties.slug': slug,
+						},
+						{
+							'properties.trigger.path': slug, // fallback for old blocks
+						},
+					],
 				}
 			},
 			...getPermissionsAggregationQuery(context),
