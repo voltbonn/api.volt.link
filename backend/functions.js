@@ -670,6 +670,22 @@ function normalizeSlug(slug) {
   return null
 }
 
+function cleanUpBlock(context, block) {
+  if (!block.computed) {
+    block.computed = {}
+  }
+
+  if (context.logged_in === true) {
+    block.computed.roles = getRolesOfUser(context, block)
+  } else {
+    block.computed.roles = ['viewer'] // getRolesOfUser doesn't make sense here, as we don't have a user.
+    delete block.permissions // Remove permission infos from the block if not logged-in, to not leak user data.
+    delete block.computed.inherited_block_permissions
+  }
+
+  return block
+}
+
 module.exports = {
   removeDiacritics,
   filterPagesByPermission,
@@ -683,4 +699,5 @@ module.exports = {
   getRolesOfUser,
   changeParent,
   normalizeSlug,
+  cleanUpBlock,
 }
