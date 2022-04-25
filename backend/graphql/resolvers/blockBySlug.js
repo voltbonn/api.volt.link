@@ -12,30 +12,7 @@ module.exports = async (parent, args, context, info) => {
 		const query = [
 			{
 				$match: {
-					$or: [
-						{
-							'properties.slug': slug,
-						},
-						{
-							'properties.trigger.path': slug, // fallback for old blocks
-						},
-					],
-				}
-			},
-			...getPermissionsAggregationQuery(context),
-
-			...buildQuery(parent, args, context, info),
-		]
-
-		const cursor = mongodb.collections.blocks.aggregate(query)
-		blocks = await cursor.toArray()
-	}
-
-	if (blocks.length === 0 && mongodb.ObjectId.isValid(args.slug)) {
-		const query = [
-			{
-				$match: {
-					_id: new mongodb.ObjectId(args.slug),
+					'properties.slug': slug,
 				}
 			},
 			...getPermissionsAggregationQuery(context),

@@ -23,7 +23,7 @@ const schema = gql`
 		parentBlocks(_id: ObjectID!): [Block]
 		siblingBlocks(_id: ObjectID!, types: [String]): [Block]
 		blockMatchesRoles(_id: ObjectID!, roles: [String]): Boolean
-		checkPath(path: String!): PathInfos
+		checkSlug(slug: String!): SlugInfos
 	}
 
 	type Mutation {
@@ -33,7 +33,7 @@ const schema = gql`
 		moveBlock(movingBlockId: ObjectID!, newParentId: ObjectID!, newIndex: Int!): Boolean
 	}
 
-	type PathInfos {
+	type SlugInfos {
 		isOkay: Boolean
 		errors: [String]
 	}
@@ -136,141 +136,3 @@ const schema = gql`
 `
 
 module.exports = schema
-
-const sampleBlock1 = {
-	type: 'automation', // add 'empty' type when only used for automation
-	properties: {},
-	content: [
-		{
-			type: 'automation',
-			properties: {
-				trigger: {
-					type: 'path',
-					path: 'example',
-				},
-				action: {
-					type: 'open_url',
-					url: 'https://www.example.org',
-				}
-			}
-		},
-		{
-			trigger: {
-				type: 'path',
-				path: 'test_slug',
-			},
-			action: {
-				type: 'render_block',
-				blockId: 'test_block_id', // renders this block if not provided
-			}
-		},
-		{
-			trigger: {
-				type: 'cron',
-				cron: '45 23 * * 6',
-			},
-			action: {
-				action: 'run_block',
-				blockId: 'test_block_id', // runs this block if not provided
-			}
-		},
-		{
-			trigger: {
-				type: 'click',
-			},
-			action: {
-				type: 'open_url',
-				url: 'https://www.example.org',
-			}
-		},
-		{
-			type: 'action',
-			properties: {
-				trigger: {
-					type: 'block_change', // this is like a hook
-					blockId: 'test_block_id', // triggered by the parent block if not provided
-				},
-				action: {
-					type: 'send_payload',
-					url: 'https://www.example.org',
-				}
-			}
-		}
-	]
-}
-
-const sampleBlock2 = {
-	type: 'page',
-	properties: {
-		actionsBlockId: 'actions_block_id', // this or
-		isActionsForBlockId: 'actions_block_id', // that
-		trigger: {
-			type: 'path',
-			path: 'test_slug',
-		},
-		action: {
-			type: 'render_block',
-			blockId: 'test_block_id', // renders this block if not provided
-		},
-	},
-	content: [
-		{
-			type: 'button',
-			properties: {
-				text: 'button-label',
-				trigger: {
-					type: 'click',
-				},
-				action: {
-					type: 'open_url',
-					url: 'https://www.example.org',
-				},
-			},
-		},
-		{
-			type: 'code',
-			properties: {
-				language: 'javascript',
-				text: `
-					function (input) {
-						console.log('input', input)
-
-						return {
-							text: 'Hello World',
-						}
-					}
-				`,
-			},
-		},
-		{
-			type: 'code',
-			properties: {
-				language: 'javascript',
-				text: `
-					function (input) {
-						console.log('input', input) // { text: 'Hello World' }
-
-						return input.text
-					}
-				`,
-			},
-		}
-	],
-}
-
-const sampleBlock3 = {
-	type: 'page',
-	properties: {
-		actionsBlockId: 'actions_block_id', // this or
-		isActionsForBlockId: 'actions_block_id', // that
-		trigger: {
-			type: 'path',
-			path: 'test_slug',
-		},
-		action: {
-			type: 'render_block',
-			blockId: 'test_block_id', // renders this block if not provided
-		},
-	},
-	content: [],
-}

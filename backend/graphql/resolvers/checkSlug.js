@@ -1,4 +1,4 @@
-const forbiddenInPath = {
+const forbiddenInSlug = {
   codes: `
 undefined
 null
@@ -26,30 +26,30 @@ list
 module.exports = async (parent, args, context, info) => {
   const mongodb = context.mongodb
 
-  const path = args.path
-  const path_split = path.split('')
+  const slug = args.slug
+  const slug_split = slug.split('')
 
   const errors = []
 
-  const forbidden_letters_splitted = forbiddenInPath.letters.split('')
+  const forbidden_letters_splitted = forbiddenInSlug.letters.split('')
 
-  if (path.includes('/')) {
+  if (slug.includes('/')) {
     errors.push(`Cant't contain a slash (/).`)
   }
 
-  if (path.startsWith('volt')) {
+  if (slug.startsWith('volt')) {
     errors.push(`Cant't start with "volt".`)
   }
 
-  if (forbiddenInPath.codes.includes(path)) {
-    errors.push(`Can't be a forbidden path.`)
+  if (forbiddenInSlug.codes.includes(slug)) {
+    errors.push(`Can't be a forbidden slug.`)
   }
 
-  if (forbidden_letters_splitted.filter(value => !path_split.includes(value)).length < forbidden_letters_splitted.length) {
+  if (forbidden_letters_splitted.filter(value => !slug_split.includes(value)).length < forbidden_letters_splitted.length) {
     errors.push(`Can't contain one or more of these forbidden letter: ${forbidden_letters_splitted.join(' ')}`)
   }
 
-  if (mongodb.ObjectId.isValid(path)) {
+  if (mongodb.ObjectId.isValid(slug)) {
     errors.push(`Cant't be a mongoID. Just make it one letter longer.`)
   }
 

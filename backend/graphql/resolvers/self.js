@@ -45,13 +45,7 @@ module.exports = async (parent, args, context, info) => {
         const username = context.user.email.split('@')[0]
         const displayName = context.user.displayName || username
 
-        properties.trigger = {
-          type: 'path',
-          path: username,
-        }
-        properties.action = {
-          type: 'render_block',
-        }
+        properties.slug = username
         properties.text = displayName
         // properties.text = [
         //   { value: displayName, locale: context.locale },
