@@ -92,7 +92,7 @@ const schema = gql`
 
 	input InputBlock {
 		_id: ObjectID
-		type: String!
+		type: String
 		properties: JSON
 		content: [InputContentConfig]
 		parent: ObjectID
