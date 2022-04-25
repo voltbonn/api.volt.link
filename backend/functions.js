@@ -686,6 +686,31 @@ function cleanUpBlock(context, block) {
   return block
 }
 
+function flattenObject(obj, parentKey = null, res = {}) {
+  // source: https://jeffdevslife.com/p/flatten-object-with-javascript/
+  for (let key in obj) {
+    const propName = parentKey ? parentKey + '.' + key : key
+    if (typeof (obj[key]) === 'object' && !Array.isArray(obj[key])) {
+      flattenObject(obj[key], propName, res)
+    } else {
+      res[propName] = obj[key]
+    }
+  }
+  return res
+}
+
+function unflattenObject(obj) {
+  // source: https://jeffdevslife.com/p/unflatten-object-with-javascript/
+  let res = {}
+  for (let key in obj) {
+    const keys = key.split('.')
+    keys.reduce((acc, value, index) => {
+      return acc[value] || (acc[value] = keys.length - 1 === index ? obj[key] : {})
+    }, res)
+  }
+  return res
+}
+
 module.exports = {
   removeDiacritics,
   filterPagesByPermission,
@@ -700,4 +725,6 @@ module.exports = {
   changeParent,
   normalizeSlug,
   cleanUpBlock,
+  flattenObject,
+  unflattenObject,
 }

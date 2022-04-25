@@ -1,4 +1,4 @@
-const { getPermissionsAggregationQuery } = require('../../functions.js') // changeParent
+const { getPermissionsAggregationQuery, flattenObject } = require('../../functions.js') // changeParent
 const { copyToHistory } = require('../history.js')
 
 module.exports = async (parent, args, context, info) => {
@@ -11,151 +11,149 @@ module.exports = async (parent, args, context, info) => {
 
 		const block = args.block || {}
 
-		delete block.computed // This should be able to be send to the server, but it should not be saved to the DB.
+		let blockId = block._id
 
-		// _id
-		if (!block._id && !mongodb.ObjectId.isValid(block._id)) {
-			block._id = new mongodb.ObjectId()
+		if (block.hasOwnProperty('computed')) {
+			delete block.computed // This should be able to be send to the server, but it should not be saved to the DB.
 		}
-		const blockId = block._id
 
-		// properties
-		block.properties = block.properties || {}
-
-		if (block.properties.hasOwnProperty('trigger')) {
-			if (
-				block.properties.trigger.hasOwnProperty('type')
-				&& block.properties.trigger.type === 'path'
-			) {
-				if (!block.properties.hasOwnProperty('action')) {
-					block.properties.action = {
-						type: 'render_block',
+		if (block.hasOwnProperty('content') && Array.isArray(block.content)) {
+			block.content = block.content
+				.filter(content_config => typeof content_config === 'object' && content_config !== null)
+				.map(content_config => {
+					if (
+						content_config.hasOwnProperty('blockId')
+						&& mongodb.ObjectId.isValid(content_config.blockId)
+					) {
+						return {
+							blockId: mongodb.ObjectId(content_config.blockId)
+						}
+					} else if (
+						content_config.hasOwnProperty('block')
+						&& content_config.block.hasOwnProperty('_id')
+						&& mongodb.ObjectId.isValid(content_config.block._id)
+					) {
+						return {
+							blockId: mongodb.ObjectId(content_config.block._id)
+						}
+					} else {
+						return null
 					}
-				}
-			}
+				})
+				.filter(content_config => content_config !== null)
 		}
 
-		// metadata
-		block.metadata = {
-			...(block.metadata || {}),
-			modified_by: user.email,
-			modified: new Date(),
-		}
-
-		// content
-		block.content = (block.content || [])
-		.filter(content_config => typeof content_config === 'object' && content_config !== null)
-		.map(content_config => {
-			if (
-				content_config.hasOwnProperty('blockId')
-				&& mongodb.ObjectId.isValid(content_config.blockId)
-			) {
-				return {
-					blockId: mongodb.ObjectId(content_config.blockId)
-				}
-			} else if (
-				content_config.hasOwnProperty('block')
-				&& content_config.block.hasOwnProperty('_id')
-				&& mongodb.ObjectId.isValid(content_config.block._id)
-			) {
-				return {
-					blockId: mongodb.ObjectId(content_config.block._id)
-				}
-			} else {
-				return null
-			}
-		})
-		.filter(content_config => content_config !== null)
-
-		// permissions
-		if (
-			!(!!block.permissions)
-			|| Object.keys(block.permissions).length === 0
-		) {
-			block.permissions = {
-				'/': [{
-					email: context.user.email,
-					role: 'owner',
-				}]
-			}
-		}
-
-	  // check if the block exists
-		const resultDoc = await mongodb.collections.blocks
+		// check if the block exists
+		const blockExistsDoc = await mongodb.collections.blocks
 			.findOne({
 				_id: blockId,
-	  	})
-	  
-		if (!!resultDoc) {
+			})
 
-			const oldParent = resultDoc.parent
-			const newParent = block.parent
-			block.parent = oldParent
+		let shouldCopyToHistory = false
 
-			const stages = [
-					{ $match: { _id: blockId }},
+		if (!!blockExistsDoc) {
+			// block already exists
+
+			// check if the user has edit permissions
+			const editPermissionsDocs = await mongodb.collections.blocks
+				.aggregate([
+					{ $match: { _id: blockId } },
 					...getPermissionsAggregationQuery(context, ['editor', 'owner']),
-				]
-
-			// if it exists: check if the user has permission and update it
-			const matchedBlocks = await mongodb.collections.blocks
-				.aggregate(stages)
+				])
 				.toArray()
+			
+			if (editPermissionsDocs.length > 0) {
+				// update changed properties
 
-			if (matchedBlocks.length > 0) {
-				if (block.metadata && block.metadata.__typename) {
-					delete block.metadata.__typename
+				const updatePipline = []
+
+				const unset = []
+				const set = {
+					'metadata.modified_by': user.email,
+					'metadata.modified': new Date(),
 				}
 
-				const result = await mongodb.collections.blocks
-					.updateOne({
-						_id: blockId,
-					}, { $set: block })
+				const flattenedBlock = flattenObject(block)
 
-				if (result.matchedCount > 0) {
-					await copyToHistory(blockId, mongodb)
-
-					// if (
-					// 	newParent
-					// 	&& mongodb.ObjectId.isValid(newParent)
-					// 	&& newParent !== oldParent
-					// ) {
-					// 	await changeParent(context, newParent, blockId, { positionInContent: -1 })
-					// }
-
-					return blockId
-				} else {
-					throw new Error('Could not save the block.')
+				for (const key in flattenedBlock) {
+					const value = flattenedBlock[key]
+					if (value === null) {
+						unset.push(key)
+					} else {
+						set[key] = value
+					}
 				}
-				
+
+				if (Object.keys(unset).length > 0) {
+					updatePipline.push({ $unset: unset })
+				}
+				if (Object.keys(set).length > 0) {
+					updatePipline.push({ $set: set })
+				}
+
+				const updateResult = await mongodb.collections.blocks
+					.updateOne(
+						{ _id: blockId },
+						updatePipline,
+						{
+							upsert: false,
+						}
+					)
+					
+				if (updateResult.modifiedCount > 0) {
+					// block updated
+					shouldCopyToHistory = true
+				} else if (updateResult.matchedCount > 0) {
+					// block was not updated
+					// but everything is fine
+				} else { // updateResult.matchedCount === 0
+					// block was not updated
+					// because it could not be found
+					throw new Error('Could not find the block.')
+				}
 			} else {
-				console.error('User does not have permission to update the block.')
-				throw new Error('You do not have permission to edit this block.')
+				throw new Error('No permissions to edit block.')
+			}
+		} else {
+			// The block does not exist: Create it!
+
+			// metadata
+			block.metadata = {
+				...(block.metadata || {}),
+				modified_by: user.email,
+				modified: new Date(),
 			}
 
-		}else{
-			// if it does not exist: create it
+			// permissions
+			if (
+				!(!!block.permissions)
+				|| Object.keys(block.permissions).length === 0
+			) {
+				block.permissions = {
+					'/': [{
+						email: context.user.email,
+						role: 'owner',
+					}]
+				}
+			}
+
 			const result = await mongodb.collections.blocks
 				.insertOne(block)
 
-			const newBlockId = result.insertedId
+			blockId = result.insertedId
 
-			if (newBlockId) {
-				await copyToHistory(newBlockId, mongodb)
+			shouldCopyToHistory = true
+		}
 
-				// const newParent = block.parent
-				// if (
-				// 	newParent
-				// 	&& mongodb.ObjectId.isValid(newParent)
-				// ) {
-				// 	await changeParent(context, newParent, newBlockId, { positionInContent: -1 })
-				// }
-				
-				return newBlockId
-			} else {
-				console.error('Could not save the block.')
-				throw new Error('Could not save the block.')
+		if (blockId) {
+			if (shouldCopyToHistory) {
+				// copy to history
+				await copyToHistory(blockId, mongodb)
 			}
-	  }
+
+			return blockId
+		} else {
+			throw new Error('Could not save the block.')
+		}
 	}
 }
