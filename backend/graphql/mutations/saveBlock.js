@@ -44,11 +44,16 @@ module.exports = async (parent, args, context, info) => {
 		}
 
 		// check if the block exists
-		const blockExistsDoc = await mongodb.collections.blocks
+		let blockExistsDoc = null
+		if (blockId) {
+			blockExistsDoc = await mongodb.collections.blocks
 			.findOne({
 				_id: blockId,
 			})
-
+		} else {
+			blockId = new mongodb.ObjectId()
+		}
+		
 		let shouldCopyToHistory = false
 
 		if (!!blockExistsDoc) {
