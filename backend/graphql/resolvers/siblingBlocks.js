@@ -53,6 +53,9 @@ module.exports = async (parent, args, context, info) => {
 		} else {
 			// Remove permission infos from the blocks if not logged-in, to not leak user data.
 			blocks = blocks.map(block => {
+				if (!block.properties) {
+					block.properties = {}
+				}
 				if (!block.computed) {
 					block.computed = {}
 				}

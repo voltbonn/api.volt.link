@@ -29,6 +29,10 @@ module.exports = async (parent, args, context, info) => {
 	} else {
 		const block2return = blocks[0]
 
+		if (!block2return.properties) {
+			block2return.properties = {}
+		}
+
 		if (!block2return.computed) {
 			block2return.computed = {}
 		}

@@ -7,6 +7,9 @@ module.exports = async (parent, args, context, info) => {
 	if (context.logged_in === true) {
 		newContent = newContent.map(contentConfig => {
 			if (contentConfig.block && contentConfig.block.permissions) {
+				if (!contentConfig.block.properties) {
+					contentConfig.block.properties = {}
+				}
 				if (!contentConfig.block.computed) {
 					contentConfig.block.computed = {}
 				}
@@ -18,6 +21,9 @@ module.exports = async (parent, args, context, info) => {
 		// Remove permission infos from the blocks if not logged-in, to not leak user data.
 		newContent = newContent.map(contentConfig => {
 			if (contentConfig.block) {
+				if (!contentConfig.block.properties) {
+					contentConfig.block.properties = {}
+				}
 				if (!contentConfig.block.computed) {
 					contentConfig.block.computed = {}
 				}
@@ -54,6 +60,9 @@ module.exports = async (parent, args, context, info) => {
 
 			if (context.logged_in === true) {
 				blocks = blocks.map(block => {
+					if (!block.properties) {
+						block.properties = {}
+					}
 					if (!block.computed) {
 						block.computed = {}
 					}
@@ -63,6 +72,9 @@ module.exports = async (parent, args, context, info) => {
 			} else {
 				// Remove permission infos from the blocks if not logged-in, to not leak user data.
 				blocks = blocks.map(block => {
+					if (!block.properties) {
+						block.properties = {}
+					}
 					if (!block.computed) {
 						block.computed = {}
 					}

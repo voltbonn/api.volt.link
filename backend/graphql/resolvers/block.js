@@ -23,6 +23,9 @@ module.exports = async (parent, args, context, info) => {
 		throw new Error('Could not find the requested block or no sufficent permission.')
 	} else {
 		const block2return = cleanUpBlock(context, blocks[0])
+		if (!block2return.properties) {
+			block2return.properties = {}
+		}
 		return block2return
 	}
 }
