@@ -11,6 +11,8 @@ const {
 
 const { negotiateLanguages } = require('@fluent/langneg')
 const { copyManyToHistory } = require('./graphql/history.js')
+const { ObjectId } = require('mongodb')
+
 
 function removeDiacritics(stringWithDiacritics){
   // "Remove diacritics (Umlauts, Accents, Special characters) in JavaScript."
@@ -692,7 +694,11 @@ function flattenObject(obj, parentKey = null, res = {}) {
     const propName = parentKey ? parentKey + '.' + key : key
     const value = obj[key]
     if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-      flattenObject(value, propName, res)
+      if (value instanceof ObjectId || value instanceof Date) {
+        res[propName] = value
+      } else {
+        flattenObject(value, propName, res)
+      }
     } else {
       res[propName] = value
     }
