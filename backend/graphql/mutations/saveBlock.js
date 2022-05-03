@@ -45,8 +45,6 @@ module.exports = async (parent, args, context, info) => {
 				.filter(content_config => content_config !== null)
 		}
 
-		console.log('block.content', block.content)
-
 		// check if the block exists
 		let blockExistsDoc = null
 		if (blockId) {
