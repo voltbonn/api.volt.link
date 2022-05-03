@@ -323,7 +323,9 @@ const host = '0.0.0.0' // Uberspace wants 0.0.0.0
 httpServer.listen({ port, host }, () =>
   console.info(`
     🚀 Server ready
-    View the API at http://${host}:${port}/
-    http://${host}:${port}/:code
+    View the API
+    at http://localhost:4004/graphql/v1
+    or http://0.0.0.0:4004/graphql/v1
+    or https://api.volt.link/graphql/v1 for production
   `)
 )
