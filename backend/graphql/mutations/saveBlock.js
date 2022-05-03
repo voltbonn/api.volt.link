@@ -8,10 +8,7 @@ module.exports = async (parent, args, context, info) => {
 	const user = context.user
 
 	async function loadBlockSimpler(blockId){
-		return await loadBlock(parent, {
-			...args,
-			_id: blockId,
-		}, context, info)
+		return await loadBlock(parent, { _id: blockId }, context, info)
 	}
 
 	if (!context.logged_in) {
