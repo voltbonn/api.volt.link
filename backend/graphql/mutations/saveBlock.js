@@ -7,10 +7,6 @@ module.exports = async (parent, args, context, info) => {
 	const mongodb = context.mongodb
 	const user = context.user
 
-	async function loadBlockSimpler(blockId){
-		return await loadBlock(parent, { _id: blockId }, context, info)
-	}
-
 	if (!context.logged_in) {
 		throw new Error('Not logged in.')
 	} else {
@@ -26,24 +22,30 @@ module.exports = async (parent, args, context, info) => {
 		if (block.hasOwnProperty('content') && Array.isArray(block.content)) {
 			block.content = block.content
 				.filter(content_config => typeof content_config === 'object' && content_config !== null)
-				.map(async content_config => {
+				.map(content_config => {
 					if (
 						content_config.hasOwnProperty('blockId')
 						&& mongodb.ObjectId.isValid(content_config.blockId)
 					) {
-						return await loadBlockSimpler(mongodb.ObjectId(content_config.blockId))
+						return {
+							blockId: mongodb.ObjectId(content_config.blockId)
+						}
 					} else if (
 						content_config.hasOwnProperty('block')
 						&& content_config.block.hasOwnProperty('_id')
 						&& mongodb.ObjectId.isValid(content_config.block._id)
 					) {
-						return await loadBlockSimpler(mongodb.ObjectId(content_config.block._id))
+						return {
+							blockId: mongodb.ObjectId(content_config.block._id)
+						}
 					} else {
 						return null
 					}
 				})
 				.filter(content_config => content_config !== null)
 		}
+
+		console.log('block.content', block.content)
 
 		// check if the block exists
 		let blockExistsDoc = null
@@ -158,7 +160,7 @@ module.exports = async (parent, args, context, info) => {
 				await copyToHistory(blockId, mongodb)
 			}
 
-			return await loadBlockSimpler(blockId)
+			return await loadBlock(parent, { _id: blockId }, context, info)
 		} else {
 			throw new Error('Could not save the block.')
 		}
