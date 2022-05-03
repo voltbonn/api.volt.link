@@ -35,6 +35,8 @@ const schema = gql`
 
 	type SlugInfos {
 		isOkay: Boolean
+		existsAsSlug: Boolean
+		existsAsId: Boolean
 		errors: [String]
 	}
 

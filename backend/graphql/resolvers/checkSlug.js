@@ -53,8 +53,31 @@ module.exports = async (parent, args, context, info) => {
     errors.push(`Cant't be a mongoID. Just make it one letter longer.`)
   }
 
+  let existsAsSlug = false
+  let existsAsId = false
+
+  const findBySlugResult = await mongodb.collections.blocks.findOne({
+    'properties.slug': slug,
+    // don't check for permissions
+  })
+  if (findBySlugResult !== null && findBySlugResult.hasOwnProperty('_id')) {
+    existsAsSlug = true
+    // Don't send error message, as this is also true if only one block with this slug exists.
+  }
+
+  const findByIdResult = await mongodb.collections.blocks.findOne({
+    _id: slug,
+    // don't check for permissions
+  })
+  if (findByIdResult !== null && findByIdResult.hasOwnProperty('_id')) {
+    existsAsId = true
+    errors.push(`There is already an id with this slug. Please add or remove a letter.`)
+  }
+
   return {
     isOkay: errors.length === 0,
+    existsAsSlug,
+    existsAsId,
 		errors,
   }
 }
