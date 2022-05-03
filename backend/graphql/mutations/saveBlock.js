@@ -1,9 +1,18 @@
 const { getPermissionsAggregationQuery, flattenObject } = require('../../functions.js') // changeParent
 const { copyToHistory } = require('../history.js')
 
+const { loadBlock } = require('../buildQuery.js')
+
 module.exports = async (parent, args, context, info) => {
 	const mongodb = context.mongodb
 	const user = context.user
+
+	async function loadBlockSimpler(blockId){
+		return await loadBlock(parent, {
+			...args,
+			_id: blockId,
+		}, context, info)
+	}
 
 	if (!context.logged_in) {
 		throw new Error('Not logged in.')
@@ -20,22 +29,18 @@ module.exports = async (parent, args, context, info) => {
 		if (block.hasOwnProperty('content') && Array.isArray(block.content)) {
 			block.content = block.content
 				.filter(content_config => typeof content_config === 'object' && content_config !== null)
-				.map(content_config => {
+				.map(async content_config => {
 					if (
 						content_config.hasOwnProperty('blockId')
 						&& mongodb.ObjectId.isValid(content_config.blockId)
 					) {
-						return {
-							blockId: mongodb.ObjectId(content_config.blockId)
-						}
+						return await loadBlockSimpler(mongodb.ObjectId(content_config.blockId))
 					} else if (
 						content_config.hasOwnProperty('block')
 						&& content_config.block.hasOwnProperty('_id')
 						&& mongodb.ObjectId.isValid(content_config.block._id)
 					) {
-						return {
-							blockId: mongodb.ObjectId(content_config.block._id)
-						}
+						return await loadBlockSimpler(mongodb.ObjectId(content_config.block._id))
 					} else {
 						return null
 					}
@@ -156,7 +161,7 @@ module.exports = async (parent, args, context, info) => {
 				await copyToHistory(blockId, mongodb)
 			}
 
-			return blockId
+			return await loadBlockSimpler(blockId)
 		} else {
 			throw new Error('Could not save the block.')
 		}
