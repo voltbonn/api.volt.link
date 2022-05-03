@@ -690,10 +690,11 @@ function flattenObject(obj, parentKey = null, res = {}) {
   // source: https://jeffdevslife.com/p/flatten-object-with-javascript/
   for (let key in obj) {
     const propName = parentKey ? parentKey + '.' + key : key
-    if (typeof (obj[key]) === 'object' && !Array.isArray(obj[key])) {
-      flattenObject(obj[key], propName, res)
+    const value = obj[key]
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      flattenObject(value, propName, res)
     } else {
-      res[propName] = obj[key]
+      res[propName] = value
     }
   }
   return res
