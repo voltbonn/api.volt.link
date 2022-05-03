@@ -693,12 +693,14 @@ function flattenObject(obj, parentKey = null, res = {}) {
   for (let key in obj) {
     const propName = parentKey ? parentKey + '.' + key : key
     const value = obj[key]
-    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-      if (value instanceof ObjectId || value instanceof Date) {
-        res[propName] = value
-      } else {
-        flattenObject(value, propName, res)
-      }
+    if (
+      typeof value === 'object'
+      && value !== null
+      && !Array.isArray(value)
+      && !(value instanceof ObjectId)
+      && !(value instanceof Date)
+    ) {
+      flattenObject(value, propName, res)
     } else {
       res[propName] = value
     }
