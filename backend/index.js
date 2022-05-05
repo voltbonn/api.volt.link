@@ -289,6 +289,16 @@ app.get('/download_url', async (req, res) => {
             format = 'jpeg'
           }
 
+          if (format === 'webp') {
+            mime = 'image/webp'
+          }
+          if (format === 'jpeg') {
+            mime = 'image/jpeg'
+          }
+          if (format === 'png') {
+            mime = 'image/png'
+          }
+
           responseBuffer = await sharp(responseBuffer)
             .resize(maxWidth, maxHeight, {
               kernel: sharp.kernel.lanczos3,
