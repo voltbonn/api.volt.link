@@ -291,7 +291,7 @@ app.get('/download_url', async (req, res) => {
 
           responseBuffer = await sharp(responseBuffer)
             .resize(maxWidth, maxHeight, {
-              kernel: sharp.kernel.nearest,
+              kernel: sharp.kernel.lanczos3,
               fit: 'outside',
               withoutEnlargement: true,
               fastShrinkOnLoad: true,
