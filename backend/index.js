@@ -47,9 +47,6 @@ app.use(new RateLimit({
 
 app.use(express.json())
 
-// app.use(express.static('../frontend/'))
-app.use(express.static(path.join(__dirname, '../frontend/')))
-
 // START AUTH
 async function session_middleware(req, res, next) {
 
