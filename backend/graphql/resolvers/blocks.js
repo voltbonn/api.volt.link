@@ -34,6 +34,13 @@ module.exports = async (parent, args, context, info) => {
     const types = args.types.filter(type => typeof type === 'string')
     query.type = { $in: types }
   }
+  
+  if (Array.isArray(args.ids) && args.ids.length > 0) {
+    // Convert ids to mongodb ids. I can't rely on GraphQL to do this for me, as I'm sending non mongodb ids to it.
+    args.ids = args.ids
+      .filter(id => id && mongodb.ObjectId.isValid(id))
+      .map(id => new mongodb.ObjectId(id))
+  }
 
   if (
     Array.isArray(args.ids) && args.ids.length > 0
