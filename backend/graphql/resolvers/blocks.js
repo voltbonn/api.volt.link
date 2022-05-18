@@ -32,7 +32,9 @@ module.exports = async (parent, args, context, info) => {
 
   if (args.types && Array.isArray(args.types) && args.types.length > 0) {
     const types = args.types.filter(type => typeof type === 'string')
-    query.type = { $in: types }
+    if (types.length > 0) {
+      query.type = { $in: types }
+    }
   }
   
 
