@@ -123,11 +123,17 @@ function buildQuery(parent, args, context, info, options) {
       },
       {
         $addFields: {
-          "newBlock.content": {
-            $filter: {
-              input: '$newContent',
-              as: 'contentConfig',
-              cond: { $in: ["$$contentConfig.blockId", "$contentIds"] }
+          contentIds: {
+            $cond: {
+              if: { $eq: [{ $type: '$newBlock.content' }, 'array'] },
+              then: {
+                $map: {
+                  input: '$newBlock.content',
+                  as: 'contentConfig',
+                  in: '$$contentConfig.blockId'
+                }
+              },
+              else: [],
             }
           }
         }
