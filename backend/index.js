@@ -47,9 +47,6 @@ app.use(new RateLimit({
 
 app.use(express.json())
 
-// app.use(express.static('../frontend/'))
-app.use(express.static(path.join(__dirname, '../frontend/')))
-
 // START AUTH
 async function session_middleware(req, res, next) {
 
@@ -289,9 +286,19 @@ app.get('/download_url', async (req, res) => {
             format = 'jpeg'
           }
 
+          if (format === 'webp') {
+            mime = 'image/webp'
+          }
+          if (format === 'jpeg') {
+            mime = 'image/jpeg'
+          }
+          if (format === 'png') {
+            mime = 'image/png'
+          }
+
           responseBuffer = await sharp(responseBuffer)
             .resize(maxWidth, maxHeight, {
-              kernel: sharp.kernel.nearest,
+              kernel: sharp.kernel.lanczos3,
               fit: 'outside',
               withoutEnlargement: true,
               fastShrinkOnLoad: true,

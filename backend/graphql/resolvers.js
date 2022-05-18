@@ -11,6 +11,7 @@ const {
 const block = require('./resolvers/block.js')
 const blocks = require('./resolvers/blocks.js')
 const blockBySlug = require('./resolvers/blockBySlug.js')
+const blocksBySlugs = require('./resolvers/blocksBySlugs.js')
 const parentBlocks = require('./resolvers/parentBlocks.js')
 const siblingBlocks = require('./resolvers/siblingBlocks.js')
 const self = require('./resolvers/self.js')
@@ -75,6 +76,7 @@ module.exports = {
 		blocks,
 		// all_subblocks,
 		blockBySlug,
+		blocksBySlugs,
 		self,
 		parentBlocks,
 		siblingBlocks,

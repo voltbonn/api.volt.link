@@ -115,8 +115,29 @@ function buildQuery(parent, args, context, info, options) {
         ]
       }},
   
-      { $addFields: { 'newBlock': { $first: '$newBlock' } } },
-      { $addFields: { 'newBlock.content': '$newContent' } },
+      { $unwind: { path: "$newBlock" }},
+      {
+        $addFields: {
+          contentIds: { $map: { input: '$newBlock.content', as: 'contentConfig', in: '$$contentConfig.blockId' } }
+        }
+      },
+      {
+        $addFields: {
+          contentIds: {
+            $cond: {
+              if: { $eq: [{ $type: '$newBlock.content' }, 'array'] },
+              then: {
+                $map: {
+                  input: '$newBlock.content',
+                  as: 'contentConfig',
+                  in: '$$contentConfig.blockId'
+                }
+              },
+              else: [],
+            }
+          }
+        }
+      },
       { $replaceRoot: { newRoot: '$newBlock' } },
     ]
   }
