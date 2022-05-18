@@ -28,6 +28,8 @@ module.exports = async (parent, args, context, info) => {
     ]
   }
 
+
+
   let query = {}
 
   if (args.types && Array.isArray(args.types) && args.types.length > 0) {
@@ -36,7 +38,7 @@ module.exports = async (parent, args, context, info) => {
       query.type = { $in: types }
     }
   }
-  
+
 
   let ids = []
   if (Array.isArray(args.ids) && args.ids.length > 0) {
