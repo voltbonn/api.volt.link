@@ -25,6 +25,7 @@ const schema = gql`
 		siblingBlocks(_id: ObjectID!, types: [String]): [Block]
 		blockMatchesRoles(_id: ObjectID!, roles: [String]): Boolean
 		checkSlug(slug: String!): SlugInfos
+		search(query: String!, types: [String], archived: Boolean): [Block]
 	}
 
 	type Mutation {
