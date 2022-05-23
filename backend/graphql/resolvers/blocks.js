@@ -14,7 +14,13 @@ module.exports = async (parent, args, context, info) => {
         _id: { $in: args.roots },
       }},
       ...getPermissionsAggregationQuery(context),
-      { $graphLookup: {
+      {
+        $addFields: {
+          root: '$$ROOT',
+        }
+      },
+      {
+        $graphLookup: {
           from: 'blocks',
           startWith: '$content.blockId',
           connectFromField: 'content.blockId',
@@ -22,7 +28,18 @@ module.exports = async (parent, args, context, info) => {
           as: 'children',
           maxDepth: 100,
           // depthField: 'depth',
-      }},
+        }
+      },
+      {
+        $addFields: {
+          children: {
+            $concatArrays: [
+              ['$root'],
+              '$children'
+            ]
+          },
+        }
+      },
       { $unwind: '$children' },
       { $replaceRoot: { newRoot: '$children' }}
     ]
