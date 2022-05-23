@@ -16,7 +16,7 @@ const schema = gql`
 		id: ObjectID
 
 		block(_id: ObjectID!): Block
-		blocks(ids: [String], slugs: [String], types: [String], archived: Boolean, roots: [ObjectID]): [Block]
+		blocks(ids: [String], slugs: [String], types: [String], archived: Boolean, roots: [ObjectID], roles: [String]): [Block]
 		all_subblocks(_id: ObjectID!): [Block]
 		blockBySlug(slug: String!): Block
 		blocksBySlugs(slug: [String!]!): [Block]
@@ -25,6 +25,7 @@ const schema = gql`
 		siblingBlocks(_id: ObjectID!, types: [String]): [Block]
 		blockMatchesRoles(_id: ObjectID!, roles: [String]): Boolean
 		checkSlug(slug: String!): SlugInfos
+		search(query: String!, types: [String], archived: Boolean): [Block]
 	}
 
 	type Mutation {
