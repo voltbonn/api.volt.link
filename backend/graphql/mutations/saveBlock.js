@@ -46,19 +46,21 @@ module.exports = async (parent, args, context, info) => {
 		}
 
 		// check if the block exists
-		let blockExistsDoc = null
+		let blockExists = false
 		if (blockId) {
-			blockExistsDoc = await mongodb.collections.blocks
+			const blockExistsDoc = await mongodb.collections.blocks
 			.findOne({
 				_id: blockId,
 			})
-		} else {
-			blockId = new mongodb.ObjectId()
+
+			if (!!blockExistsDoc) {
+				blockExists = true
+			}
 		}
 		
 		let shouldCopyToHistory = false
 
-		if (!!blockExistsDoc) {
+		if (blockExists === true) {
 			// block already exists
 
 			// check if the user has edit permissions
@@ -123,44 +125,117 @@ module.exports = async (parent, args, context, info) => {
 			}
 		} else {
 			// The block does not exist: Create it!
+			
+			let blockIsNotEmpty = false
 
-			// metadata
-			block.metadata = {
-				...(block.metadata || {}),
-				modified_by: user.email,
-				modified: new Date(),
+			if (
+				block.hasOwnProperty('content')
+				&& typeof block.content === 'object'
+				&& block.content !== null
+				&& block.content !== undefined
+				&& Array.isArray(block.content)
+				&& block.content.length > 0
+			) {
+				blockIsNotEmpty = true
 			}
 
-			// permissions
 			if (
-				!(!!block.permissions)
-				|| Object.keys(block.permissions).length === 0
+				block.hasOwnProperty('properties')
+				&& typeof block.properties === 'object'
+				&& block.properties !== null
+				&& block.properties !== undefined
+				&& Object.keys(block.properties).length > 0
 			) {
-				block.permissions = {
-					'/': [{
-						email: context.user.email,
-						role: 'owner',
-					}]
+				let notEmptyProperties = {}
+
+				// only keep the properties that are not empty
+				for (const key in block.properties) {
+					if (block.properties.hasOwnProperty(key)) {
+						const value = block.properties[key]
+
+						if (typeof value === 'string') {
+							if (value !== '') {
+								notEmptyProperties[key] = value
+							}
+						} else if (typeof value === 'object') {
+							if (value === null || value === undefined) {
+								// do nothing
+							} else if (Array.isArray(value)) {
+								if (value.length > 0) {
+									notEmptyProperties[key] = null
+								}
+							} else if (Object.keys(value).length > 0) {
+								notEmptyProperties[key] = null
+							}
+						}
+					}
+				}
+
+				block.properties = notEmptyProperties
+
+				if (Object.keys(notEmptyProperties).length > 0) {
+					blockIsNotEmpty = true
 				}
 			}
 
-			const result = await mongodb.collections.blocks
-				.insertOne(block)
+			if (true || blockIsNotEmpty) { // TODO: can we remove the true?
+				block._id = new mongodb.ObjectId()
 
-			blockId = result.insertedId
+				// metadata
+				block.metadata = {
+					...(block.metadata || {}),
+					modified_by: user.email,
+					modified: new Date(),
+				}
 
-			shouldCopyToHistory = true
+				// permissions
+				if (
+					!(!!block.permissions)
+					|| Object.keys(block.permissions).length === 0
+				) {
+					block.permissions = {
+						'/': [{
+							email: context.user.email,
+							role: 'owner',
+						}]
+					}
+				}
+
+				const result = await mongodb.collections.blocks
+					.insertOne(block)
+
+				blockId = result.insertedId
+
+				shouldCopyToHistory = true
+			} else {
+				throw new Error('Won\'t save empty block.')
+			}
 		}
 
-		if (blockId) {
-			if (shouldCopyToHistory) {
-				// copy to history
-				await copyToHistory(blockId, mongodb)
-			}
-
+		if (shouldCopyToHistory === true) {
+			// block was created or updated (disregarding if it existed before)
+			await copyToHistory(blockId, mongodb)
+			return await loadBlock(parent, { _id: blockId }, context, info)
+		} else if (blockExists === true) {
+			// block exists BUT was not updated
 			return await loadBlock(parent, { _id: blockId }, context, info)
 		} else {
-			throw new Error('Could not save the block.')
+			// block did not exists AND it was not created
+			throw new Error('Could not create the block.')
+
+			// // This is like a silent fail.
+			// // We only want to set a new blockId for the provided block.
+			// // We could but don't want to save it yet, as it's probably empty.
+			//
+			// block._id = new mongodb.ObjectId()
+			// block.permissions = {
+			// 	'/': [{
+			// 		email: context.user.email,
+			// 		role: 'owner',
+			// 	}]
+			// }
+			//
+			// return block
 		}
 	}
 }
