@@ -18,6 +18,7 @@ module.exports = async (parent, args, context, info) => {
     $or: [
       { 'properties.text': { $regex: query_text, $options: 'i' } },
       { 'properties.translations.text': { $regex: query_text, $options: 'i' } },
+      { 'properties.slug': { $regex: query_text, $options: 'i' } },
     ]
   })
 
