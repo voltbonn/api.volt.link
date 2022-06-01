@@ -232,7 +232,11 @@ app.get('/login', (req, res) => {
 })
 
 app.get('/', (req, res) => {
-  res.redirect('https://volt.link/api_volt_link')
+  res.redirect(
+    isDevEnvironment
+      ? 'http://localhost:4003/api_volt_link'
+      : 'https://volt.link/api_volt_link'
+    )
 })
 
 // app.get('/teams.json', async (req, res) => {
