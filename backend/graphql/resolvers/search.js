@@ -19,6 +19,7 @@ module.exports = async (parent, args, context, info) => {
       { 'properties.text': { $regex: query_text, $options: 'i' } },
       { 'properties.translations.text': { $regex: query_text, $options: 'i' } },
       { 'properties.slug': { $regex: query_text, $options: 'i' } },
+      { 'properties.url': { $regex: query_text, $options: 'i' } },
       { 'properties.description': { $regex: query_text, $options: 'i' } },
       // { 'properties.linked_websites.text': { $regex: query_text, $options: 'i' } },
       // { 'properties.linked_images.text': { $regex: query_text, $options: 'i' } },
