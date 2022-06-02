@@ -234,8 +234,8 @@ app.get('/login', (req, res) => {
 app.get('/', (req, res) => {
   res.redirect(
     isDevEnvironment
-      ? 'http://localhost:4003/api_volt_link'
-      : 'https://volt.link/api_volt_link'
+      ? 'http://localhost:4003/api'
+      : 'https://volt.link/api'
     )
 })
 
