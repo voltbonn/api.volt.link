@@ -33,6 +33,7 @@ const schema = gql`
 		archiveBlock(_id: ObjectID!): Boolean
 		unarchiveBlock(_id: ObjectID!): Boolean
 		moveBlock(movingBlockId: ObjectID!, newParentId: ObjectID!, newIndex: Int!): Boolean
+		addUrlToQueue(url: String!): Boolean
 	}
 
 	type SlugInfos {
