@@ -26,6 +26,7 @@ const {
 	unarchiveBlock,
 } = require('./mutations/archiveBlock.js')
 const moveBlock = require('./mutations/moveBlock.js')
+const addUrlToQueue = require('./mutations/addUrlToQueue.js')
 
 const mongoDB_ObjectID_scalar = require('./scalars/mongoDB_ObjectID_scalar.js')
 
@@ -90,6 +91,7 @@ module.exports = {
 		archiveBlock,
 		unarchiveBlock,
 		moveBlock,
+		addUrlToQueue,
 	},
 
 	Block: {
