@@ -63,7 +63,7 @@ module.exports = async (parent, args, context, info) => {
     ...getPermissionsAggregationQuery(context),
     ...buildQuery(parent, args, context, info),
     { $sort: { 'metadata.modified': -1 } },
-    // { $limit: 10 },
+    { $limit: 50 },
   ]
 
   const cursor = mongodb.collections.blocks.aggregate(stages)
