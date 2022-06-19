@@ -1,3 +1,4 @@
+const isDevEnvironment = process.env.environment === 'dev' || false
 
 const stream = require('stream')
 const AWS = require('aws-sdk')
@@ -38,7 +39,11 @@ module.exports = async (parent, args, context, info) => {
     try {
       const { filename, createReadStream } = await file
 
-      const key_name = `files/${String(newFileId)}` // Use the files prefix to also store other stuff in the bucket.
+      const key_name = (
+        isDevEnvironment
+          ? `dev_files/${String(newFileId)}`
+          : `files/${String(newFileId)}` // Use the files prefix to also store other stuff in the bucket.
+      )
 
       const uploadStream = createUploadStream(key_name)
       const stream = createReadStream()
