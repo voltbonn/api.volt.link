@@ -1,9 +1,7 @@
 const isDevEnvironment = process.env.environment === 'dev' || false
-const path = require('path')
 const url = require('url')
 
 const { fetch } = require('cross-fetch')
-const FileType = require('file-type')
 
 const http = require('http')
 const startApolloServer = require('./graphql/expressApolloServer.js')
@@ -255,6 +253,8 @@ app.get('/', (req, res) => {
 // })
 
 app.get('/download_url', async (req, res) => {
+  const { fileTypeFromBuffer } = await import('file-type')
+
   const url = req.query.url || null
 
   if (typeof url === 'string' && url.length > 0 && isAbsoluteUrlRegexp.test(url)) {
@@ -264,7 +264,7 @@ app.get('/download_url', async (req, res) => {
 
         const filename = url.split('/').pop() || ''
 
-        let { mime } = await FileType.fromBuffer(responseBuffer) || {}
+        let { mime } = await fileTypeFromBuffer(responseBuffer) || {}
 
         if (!mime) {
           if (filename.endsWith('.svg')) {

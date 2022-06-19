@@ -8,6 +8,8 @@ const {
 	GraphQLDateTime,
 } = require('graphql-iso-date')
 
+const GraphQLUpload = require('graphql-upload/GraphQLUpload.js')
+
 const block = require('./resolvers/block.js')
 const blocks = require('./resolvers/blocks.js')
 const blockBySlug = require('./resolvers/blockBySlug.js')
@@ -27,6 +29,7 @@ const {
 } = require('./mutations/archiveBlock.js')
 const moveBlock = require('./mutations/moveBlock.js')
 const addUrlToQueue = require('./mutations/addUrlToQueue.js')
+const upload = require('./mutations/upload.js')
 
 const mongoDB_ObjectID_scalar = require('./scalars/mongoDB_ObjectID_scalar.js')
 
@@ -35,6 +38,7 @@ const mongoDB_ObjectID_scalar = require('./scalars/mongoDB_ObjectID_scalar.js')
 module.exports = {
 	// JSON: GraphQLJSON,
 	JSONObject: GraphQLJSONObject,
+	Upload: GraphQLUpload,
 
 	// Timestamp: new GraphQLScalarType({
 	// 	name: 'Timestamp',

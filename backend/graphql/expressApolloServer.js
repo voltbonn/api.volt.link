@@ -40,6 +40,7 @@ const {
 	ApolloServerPluginLandingPageGraphQLPlayground,
 	ApolloServerPluginLandingPageDisabled,
 } = require('apollo-server-core')
+const graphqlUploadExpress = require('graphql-upload/graphqlUploadExpress.js')
 
 const getMongoDbContext = require('../getMongoDbContext.js')
 
@@ -87,6 +88,9 @@ async function startApolloServer(app, httpServer) {
   ],
   })
   await apolloServer.start()
+
+	app.use(graphqlUploadExpress({ maxFileSize: 5 * 1000 * 1000 })) // max 5MB
+
   apolloServer.applyMiddleware({ app, path: '/graphql/v1', cors: false })
 }
 

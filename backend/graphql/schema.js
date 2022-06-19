@@ -12,6 +12,9 @@ const schema = gql`
 	scalar DateTime
 	scalar ObjectID
 
+	"""The Upload scalar type represents a file upload."""
+	scalar Upload
+
 	type Query {
 		id: ObjectID
 
@@ -34,6 +37,8 @@ const schema = gql`
 		unarchiveBlock(_id: ObjectID!): Boolean
 		moveBlock(movingBlockId: ObjectID!, newParentId: ObjectID!, newIndex: Int!): Boolean
 		addUrlToQueue(url: String!): Boolean
+
+		upload(file: Upload!): JSONObject
 	}
 
 	type SlugInfos {
