@@ -35,6 +35,7 @@ module.exports = async (parent, args, context, info) => {
   } else {
     const file = args.file
     const newFileId = new mongodb.ObjectID()
+    console.log('newFileId-A', newFileId)
 
     try {
       const { filename, createReadStream } = await file
@@ -44,6 +45,8 @@ module.exports = async (parent, args, context, info) => {
           ? `dev_files/${String(newFileId)}`
           : `files/${String(newFileId)}` // Use the files prefix to also store other stuff in the bucket.
       )
+
+      console.log('key_name', key_name)
 
       const uploadStream = createUploadStream(key_name)
       const stream = createReadStream()
@@ -72,10 +75,16 @@ module.exports = async (parent, args, context, info) => {
         }
       }
 
+
+      console.log('newBlock', JSON.stringify(newBlock,null,2))
+
       const insertResult = await mongodb.collections.blocks
         .insertOne(newBlock)
 
+      console.log('insertResult', JSON.stringify(insertResult, null, 2))
+
       if (insertResult.acknowledged === true) {
+        console.log('newFileId-B', newFileId)
         return newFileId // return the id of the new block (newFileId should be the same as insertResult.insertedId)
       } else {
         throw new Error('Error inserting block for file.')
