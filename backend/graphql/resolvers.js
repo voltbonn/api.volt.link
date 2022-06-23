@@ -96,6 +96,7 @@ module.exports = {
 		unarchiveBlock,
 		moveBlock,
 		addUrlToQueue,
+		upload,
 	},
 
 	Block: {
