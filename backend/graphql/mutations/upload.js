@@ -70,10 +70,18 @@ module.exports = async (parent, args, context, info) => {
           modified: new Date(),
         },
         permissions: {
-          '/': [{
-            email: context.user.email,
-            role: 'owner',
-          }]
+          '/': [
+            {
+              email: context.user.email,
+              role: 'owner',
+            }, {
+              email: '@volteuropa.org',
+              role: 'viewer',
+            }, {
+              email: '@public',
+              role: 'viewer',
+            }
+          ],
         }
       }
 
