@@ -11,7 +11,7 @@ async function both (parent, args, context, info) {
 		// 1. find all children and it's content blocks
 		let blockIdsToAddToHistory = await mongodb.collections.blocks.aggregate([
 	    { $match: {
-	      _id: args._id,
+	      _id: { $in: args.ids },
 	    } },
 			...getPermissionsAggregationQuery(context, ['editor', 'owner']),
     
@@ -89,16 +89,16 @@ async function both (parent, args, context, info) {
   }
 }
 
-function archiveBlock (parent, args, context, info) {
+function archiveBlocks (parent, args, context, info) {
 	args.archive = true
 	return both(parent, args, context, info)
 }
-function unarchiveBlock (parent, args, context, info) {
+function unarchiveBlocks (parent, args, context, info) {
 	args.archive = false
 	return both(parent, args, context, info)
 }
 
 module.exports = {
-	archiveBlock,
-	unarchiveBlock,
+	archiveBlocks,
+	unarchiveBlocks,
 }

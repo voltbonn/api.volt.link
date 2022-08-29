@@ -30,9 +30,7 @@ function copyFileSync(source, target, options) {
     change_file_name = !keep_name_array.includes(rel_old)
   }
   if (change_file_name === true && keep_name_regex !== null && isRegex(keep_name_regex)) {
-    console.log('keep_name_regex', keep_name_regex)
     change_file_name = !keep_name_regex.test(rel_old)
-    console.log('rel_old', change_file_name, rel_old)
   }
 
   if (change_file_name) {
@@ -97,7 +95,7 @@ async function build() {
     await fs.promises.access(dist_path)
     await fs.promises.rmdir(dist_path, { recursive: true, force: true })
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 
   await fs.promises.mkdir(dist_path)
@@ -118,7 +116,5 @@ async function build() {
     filepath_pairs[filepath_pair.old] = filepath_pair.new
   })
 
-  // console.log(filepath_pairs)
-  // console.log('done')
 }
 build()

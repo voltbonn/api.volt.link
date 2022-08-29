@@ -45,5 +45,5 @@ fs.readdir(tree_data_path, async function (error, files) {
     other: use_as.filter(use_as => use_as !== 'redirect' && use_as !== 'linklist' && use_as !== '').length,
   }
 
-  console.log(JSON.stringify(stats, null, 2))
+  console.info(JSON.stringify(stats, null, 2))
 })
