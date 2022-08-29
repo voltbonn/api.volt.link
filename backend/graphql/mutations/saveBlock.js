@@ -125,91 +125,35 @@ module.exports = async (parent, args, context, info) => {
 			}
 		} else {
 			// The block does not exist: Create it!
-			
-			let blockIsNotEmpty = false
 
+			block._id = new mongodb.ObjectId()
+
+			// metadata
+			block.metadata = {
+				...(block.metadata || {}),
+				modified_by: user.email,
+				modified: new Date(),
+			}
+
+			// permissions
 			if (
-				block.hasOwnProperty('content')
-				&& typeof block.content === 'object'
-				&& block.content !== null
-				&& block.content !== undefined
-				&& Array.isArray(block.content)
-				&& block.content.length > 0
+				!(!!block.permissions)
+				|| Object.keys(block.permissions).length === 0
 			) {
-				blockIsNotEmpty = true
-			}
-
-			if (
-				block.hasOwnProperty('properties')
-				&& typeof block.properties === 'object'
-				&& block.properties !== null
-				&& block.properties !== undefined
-				&& Object.keys(block.properties).length > 0
-			) {
-				let notEmptyProperties = {}
-
-				// only keep the properties that are not empty
-				for (const key in block.properties) {
-					if (block.properties.hasOwnProperty(key)) {
-						const value = block.properties[key]
-
-						if (typeof value === 'string') {
-							if (value !== '') {
-								notEmptyProperties[key] = value
-							}
-						} else if (typeof value === 'object') {
-							if (value === null || value === undefined) {
-								// do nothing
-							} else if (Array.isArray(value)) {
-								if (value.length > 0) {
-									notEmptyProperties[key] = null
-								}
-							} else if (Object.keys(value).length > 0) {
-								notEmptyProperties[key] = null
-							}
-						}
-					}
-				}
-
-				block.properties = notEmptyProperties
-
-				if (Object.keys(notEmptyProperties).length > 0) {
-					blockIsNotEmpty = true
+				block.permissions = {
+					'/': [{
+						email: context.user.email,
+						role: 'owner',
+					}]
 				}
 			}
 
-			if (true || blockIsNotEmpty) { // TODO: can we remove the true?
-				block._id = new mongodb.ObjectId()
+			const result = await mongodb.collections.blocks
+				.insertOne(block)
 
-				// metadata
-				block.metadata = {
-					...(block.metadata || {}),
-					modified_by: user.email,
-					modified: new Date(),
-				}
+			blockId = result.insertedId
 
-				// permissions
-				if (
-					!(!!block.permissions)
-					|| Object.keys(block.permissions).length === 0
-				) {
-					block.permissions = {
-						'/': [{
-							email: context.user.email,
-							role: 'owner',
-						}]
-					}
-				}
-
-				const result = await mongodb.collections.blocks
-					.insertOne(block)
-
-				blockId = result.insertedId
-
-				shouldCopyToHistory = true
-			} else {
-				throw new Error('Won\'t save empty block.')
-			}
+			shouldCopyToHistory = true
 		}
 
 		if (shouldCopyToHistory === true) {
