@@ -24,9 +24,9 @@ const search = require('./resolvers/search.js')
 
 const saveBlock = require('./mutations/saveBlock.js')
 const {
-	archiveBlock,
-	unarchiveBlock,
-} = require('./mutations/archiveBlock.js')
+	archiveBlocks,
+	unarchiveBlocks,
+} = require('./mutations/archiveBlocks.js')
 const moveBlock = require('./mutations/moveBlock.js')
 const addUrlToQueue = require('./mutations/addUrlToQueue.js')
 const upload = require('./mutations/upload.js')
@@ -92,8 +92,8 @@ module.exports = {
 	},
 	Mutation: {
 		saveBlock,
-		archiveBlock,
-		unarchiveBlock,
+		archiveBlocks,
+		unarchiveBlocks,
 		moveBlock,
 		addUrlToQueue,
 		upload,

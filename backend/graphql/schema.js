@@ -33,8 +33,8 @@ const schema = gql`
 
 	type Mutation {
 		saveBlock(block: InputBlock!): Block
-		archiveBlock(_id: ObjectID!): Boolean
-		unarchiveBlock(_id: ObjectID!): Boolean
+		archiveBlocks(ids: [ObjectID]!): Boolean
+		unarchiveBlocks(ids: [ObjectID]!): Boolean
 		moveBlock(movingBlockId: ObjectID!, newParentId: ObjectID!, newIndex: Int!): Boolean
 		addUrlToQueue(url: String!): Boolean
 
