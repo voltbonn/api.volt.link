@@ -412,73 +412,65 @@ function getPermissionsAggregationQuery(context, roles, options = {}) {
   
   const permissionsQuery = getPermissionsQuery(context, roles, options)
 
-  if (Object.keys(permissionsQuery).length === 0) { // Admins have empty permissionsQuery, to return everything. No aggregation needed.
-    return []
-  }
 
-  const query = [
-      {
-        $project: {
-          startId: startField,
-          root: '$$ROOT'
+  const before_permissionsQuery = [
+    {
+      $project: {
+        startId: startField,
+        root: '$$ROOT'
+      }
+    },
+
+    {
+      "$graphLookup": {
+        "from": "blocks",
+        "startWith": "$startId",
+        "connectFromField": "parent",
+        "connectToField": "_id",
+        "as": "parentBlocks",
+        "maxDepth": 50,
+        "depthField": "depth",
+        restrictSearchWithMatch: {
+          _id: { $not: { $eq: null } },
         }
-      },
+      }
+    },
 
-      {
-        "$graphLookup": {
-          "from": "blocks",
-          "startWith": "$startId",
-          "connectFromField": "parent",
-          "connectToField": "_id",
-          "as": "parentBlocks",
-          "maxDepth": 50,
-          "depthField": "depth",
-          restrictSearchWithMatch: {
-            _id: { $not: { $eq: null } },
-          }
-        }
-      },
+    { $unwind: '$parentBlocks' },
+    { $unwind: '$parentBlocks.' + fieldName + './' },
 
-      { $unwind: '$parentBlocks' },
-      { $unwind: '$parentBlocks.' + fieldName + './' },
+    // { $unset: ['parentBlocks.' + fieldName + './.tmp_id'] },
+    {
+      $set: {
+        ['parentBlocks.' + fieldName + './.depth']: '$parentBlocks.depth',
+      }
+    },
 
-      // { $unset: ['parentBlocks.' + fieldName + './.tmp_id'] },
-      {
-        $set: {
-          ['parentBlocks.' + fieldName + './.depth']: '$parentBlocks.depth',
-        }
-      },
-
-      {
-        $sort: {
-          'parentBlocks.depth': 1
-        }
-      },
+    {
+      $sort: {
+        'parentBlocks.depth': 1
+      }
+    },
 
 
-      {
-        $group: {
-          _id: { $concat: [{ $toString: '$startId' }, '-', '$parentBlocks.' + fieldName + './.email'] },
-          block_permission: { $first: '$parentBlocks.' + fieldName + './' },
-          root: { $first: '$root' },
-          startId: { $first: '$startId' },
-        }
-      },
+    {
+      $group: {
+        _id: { $concat: [{ $toString: '$startId' }, '-', '$parentBlocks.' + fieldName + './.email'] },
+        block_permission: { $first: '$parentBlocks.' + fieldName + './' },
+        root: { $first: '$root' },
+        startId: { $first: '$startId' },
+      }
+    },
 
-      {
-        $group: {
-          _id: '$startId',
-          inherited_block_permissions: { $push: '$block_permission' },
-          root: { $first: '$root' },
-        }
-      },
-
-      {
-        $match: {
-          inherited_block_permissions: permissionsQuery
-        }
-      },
-
+    {
+      $group: {
+        _id: '$startId',
+        inherited_block_permissions: { $push: '$block_permission' },
+        root: { $first: '$root' },
+      }
+    },
+  ]
+  const after_permissionsQuery = [
       {
         $set: {
           'root.computed.inherited_block_permissions': '$inherited_block_permissions'
@@ -488,7 +480,22 @@ function getPermissionsAggregationQuery(context, roles, options = {}) {
       { $replaceRoot: { newRoot: '$root' } },
   ]
 
-  return query
+  if (Object.keys(permissionsQuery).length === 0) { // Admins have empty permissionsQuery, to return everything. No aggregation needed.
+    return [
+      ...before_permissionsQuery,
+      ...after_permissionsQuery,
+    ]
+  }
+
+  return [
+    ...before_permissionsQuery,
+    {
+      $match: {
+        inherited_block_permissions: permissionsQuery
+      }
+    },
+    ...after_permissionsQuery,
+  ]
 }
 
 function getRolesOfUser(context, block) {
