@@ -43,7 +43,7 @@ async function pagedBlocks(parent, args, context, info) {
         }
       },
       { $unwind: '$children' },
-      { $replaceRoot: { newRoot: '$children' }}
+      { $replaceRoot: { newRoot: '$children' } }
     ]
   }
 
