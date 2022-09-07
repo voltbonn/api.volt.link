@@ -182,7 +182,7 @@ async function pagedBlocks(parent, args, context, info) {
   // }
   // END Cursor Pagination
 
-  const cursor = mongodb.collections.blocks.aggregate(stages)
+  const cursor = mongodb.collections.blocks.aggregate(stages, { allowDiskUse: true })
 
   let blocks = await cursor.toArray()
 

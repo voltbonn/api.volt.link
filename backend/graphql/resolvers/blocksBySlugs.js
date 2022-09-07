@@ -23,7 +23,7 @@ module.exports = async (parent, args, context, info) => {
       ...buildQuery(parent, args, context, info),
     ]
 
-    const cursor = mongodb.collections.blocks.aggregate(query)
+    const cursor = mongodb.collections.blocks.aggregate(query, { allowDiskUse: true })
     blocks = await cursor.toArray()
   }
 

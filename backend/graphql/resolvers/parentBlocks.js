@@ -24,7 +24,7 @@ module.exports = async (parent, args, context, info) => {
       { $replaceRoot: { newRoot: '$parents' } },
 
       ...getPermissionsAggregationQuery(context),
-    ])
+    ], { allowDiskUse: true })
 
     let blocks = await cursor.toArray()
 
