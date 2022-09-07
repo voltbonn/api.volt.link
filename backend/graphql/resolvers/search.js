@@ -66,7 +66,7 @@ module.exports = async (parent, args, context, info) => {
     { $limit: 50 },
   ]
 
-  const cursor = mongodb.collections.blocks.aggregate(stages)
+  const cursor = mongodb.collections.blocks.aggregate(stages, { allowDiskUse: true })
 
   let blocks = await cursor.toArray()
 

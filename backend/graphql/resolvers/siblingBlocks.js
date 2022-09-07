@@ -38,7 +38,7 @@ module.exports = async (parent, args, context, info) => {
 			{ $match: finalQuery },
 
 			...getPermissionsAggregationQuery(context),
-    ])
+		], { allowDiskUse: true })
 
 		let blocks = await cursor.toArray()
 
