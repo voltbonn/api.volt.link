@@ -2,7 +2,7 @@ const { getPermissionsAggregationQuery, getRolesOfUser } = require('../../functi
 
 const { buildQuery } = require('../buildQuery.js')
 
-module.exports = async (parent, args, context, info) => {
+async function pagedBlocks(parent, args, context, info) {
   const mongodb = context.mongodb
 
   let stages = []
@@ -10,9 +10,11 @@ module.exports = async (parent, args, context, info) => {
   if (args.roots && Array.isArray(args.roots) && args.roots.length > 0) {
     stages = [
       ...stages,
-      { $match: {
-        _id: { $in: args.roots },
-      }},
+      {
+        $match: {
+          _id: { $in: args.roots },
+        }
+      },
       ...getPermissionsAggregationQuery(context),
       {
         $addFields: {
@@ -41,7 +43,7 @@ module.exports = async (parent, args, context, info) => {
         }
       },
       { $unwind: '$children' },
-      { $replaceRoot: { newRoot: '$children' }}
+      { $replaceRoot: { newRoot: '$children' } }
     ]
   }
 
@@ -113,19 +115,25 @@ module.exports = async (parent, args, context, info) => {
 
   if (args.hasOwnProperty('archived') && typeof args.archived === 'boolean') {
     if (args.archived === true) {
-      stages.push({ $match: {
-        'properties.archived': { $eq: true }
-      } })
+      stages.push({
+        $match: {
+          'properties.archived': { $eq: true }
+        }
+      })
     } else {
-      stages.push({ $match: {
-        $or: [
-          { 'properties.archived': { $exists: false } },
-          { $and: [
-            { 'properties.archived': { $exists: true } },
-            { 'properties.archived': false },
-          ]}
-        ]
-      } })
+      stages.push({
+        $match: {
+          $or: [
+            { 'properties.archived': { $exists: false } },
+            {
+              $and: [
+                { 'properties.archived': { $exists: true } },
+                { 'properties.archived': false },
+              ]
+            }
+          ]
+        }
+      })
     }
   }
 
@@ -138,11 +146,42 @@ module.exports = async (parent, args, context, info) => {
     ...stages,
     ...getPermissionsAggregationQuery(context, roles),
     ...buildQuery(parent, args, context, info),
-    { $sort: {
-      'metadata.modified': 1
-    } }
+    {
+      $sort: {
+        'metadata.modified': 1
+      }
+    }
   ]
-    
+
+  // START Cursor Pagination
+  // EdgesToReturn(allEdges, before, after, first, last)
+
+  // let before = null
+  // if (args.before && typeof args.before === 'string') {
+  //   if (mongodb.ObjectId.isValid(args.before)) {
+  //     before = new mongodb.ObjectId(args.before)
+  //   }
+  // }
+  // let after = null
+  // if (args.after && typeof args.after === 'string') {
+  //   if (mongodb.ObjectId.isValid(args.after)) {
+  //     after = new mongodb.ObjectId(args.after)
+  //   }
+  // }
+  // TODO limit by before and after
+
+  let first = 1
+  if (args.first && typeof args.first === 'number' && args.first > 0) {
+    first = args.first
+    stages.push({ $limit: first })
+  }
+  // let last = 1
+  // if (args.last && typeof args.last === 'number' && args.last > 0) {
+  //   last = args.last
+  //   // stages.push({ $limit: first }) // TODO somehow get the last x items
+  // }
+  // END Cursor Pagination
+
   const cursor = mongodb.collections.blocks.aggregate(stages)
 
   let blocks = await cursor.toArray()
@@ -171,5 +210,25 @@ module.exports = async (parent, args, context, info) => {
     })
   }
 
-  return blocks
+  return {
+    // Specification: https://relay.dev/graphql/connections.htm
+    pageInfo: {
+      hasNextPage: true, // TODO: Implement this
+      hasPreviousPage: true, // TODO: Implement this
+      startCursor: blocks.length > 0 ? blocks[0]._id : null,
+      endCursor: blocks.length > 0 ? blocks[blocks.length - 1]._id : null,
+    },
+    blocks,
+  }
+}
+
+async function blocks(parent, args, context, info) {
+  args.first = 1000
+  const paged_blocks = await pagedBlocks(parent, args, context, info)
+  return paged_blocks.blocks
+}
+
+module.exports = {
+  pagedBlocks,
+  blocks,
 }

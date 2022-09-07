@@ -11,7 +11,7 @@ const {
 const GraphQLUpload = require('graphql-upload/GraphQLUpload.js')
 
 const block = require('./resolvers/block.js')
-const blocks = require('./resolvers/blocks.js')
+const { blocks, pagedBlocks } = require('./resolvers/blocks.js')
 const blockBySlug = require('./resolvers/blockBySlug.js')
 const blocksBySlugs = require('./resolvers/blocksBySlugs.js')
 const parentBlocks = require('./resolvers/parentBlocks.js')
@@ -80,6 +80,7 @@ module.exports = {
 
 		block,
 		blocks,
+		pagedBlocks,
 		// all_subblocks,
 		blockBySlug,
 		blocksBySlugs,

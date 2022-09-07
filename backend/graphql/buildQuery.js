@@ -5,14 +5,21 @@ function simpleFields(fieldsByTypeName) {
   const firstType = Object.keys(fieldsByTypeName)[0]
 
   if (typeof firstType === 'string') {
-    const fields = Object.values(fieldsByTypeName[firstType])
+    let fields = []
+    if (firstType === 'PagedBlocks') { // this is for pagination
+      fields = Object.values(fieldsByTypeName.PagedBlocks.blocks.fieldsByTypeName.Block)
+    } else {
+      fields = Object.values(fieldsByTypeName[firstType])
+    }
+
+    fields = fields
     .reduce((acc, field) => {
       acc[field.name] = {
         // ...field,
         // parentType: firstType,
         // args: field.args,
         fieldsByTypeName: simpleFields(field.fieldsByTypeName),
-      }    
+      }
       return acc
     }, {})
 
