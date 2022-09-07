@@ -19,7 +19,8 @@ const schema = gql`
 		id: ObjectID
 
 		block(_id: ObjectID!): Block
-		blocks(ids: [String], slugs: [String], types: [String], archived: Boolean, roots: [ObjectID], roles: [String]): [Block]
+		blocks(ids: [ObjectID], slugs: [String], types: [String], archived: Boolean, roots: [ObjectID], roles: [String]): [Block]
+		pagedBlocks(before: String, after: String, first: Int, last: Int, ids: [ObjectID], slugs: [String], types: [String], archived: Boolean, roots: [ObjectID], roles: [String]): PagedBlocks
 		all_subblocks(_id: ObjectID!): [Block]
 		blockBySlug(slug: String!): Block
 		blocksBySlugs(slug: [String!]!): [Block]
@@ -39,6 +40,17 @@ const schema = gql`
 		addUrlToQueue(url: String!): Boolean
 
 		upload(file: Upload!): JSONObject
+
+	type PagedBlocks {
+		blocks: [Block]
+		pageInfo: PageInfo
+	}
+	type PageInfo {
+		hasNextPage: Boolean
+		hasPreviousPage: Boolean
+		startCursor: String
+		endCursor: String
+	}
 	}
 
 	type SlugInfos {
