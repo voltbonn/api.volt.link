@@ -264,7 +264,11 @@ app.get('/download_url', async (req, res) => {
 
         const filename = url.split('/').pop() || ''
 
-        let { mime } = await fileTypeFromBuffer(responseBuffer) || {}
+        let { mime } = (
+          typeof fileTypeFromBuffer === 'function'
+          ? await fileTypeFromBuffer(responseBuffer) || {}
+          : {}
+        )
 
         if (!mime) {
           if (filename.endsWith('.svg')) {
