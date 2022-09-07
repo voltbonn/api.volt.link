@@ -42,6 +42,7 @@ const schema = gql`
 		upload(file: Upload!): JSONObject
 
 	}
+
 	type PagedBlocks {
 		blocks: [Block]
 		pageInfo: PageInfo
@@ -51,7 +52,6 @@ const schema = gql`
 		hasPreviousPage: Boolean
 		startCursor: String
 		endCursor: String
-	}
 	}
 
 	type SlugInfos {
