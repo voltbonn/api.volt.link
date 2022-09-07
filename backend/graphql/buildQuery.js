@@ -12,7 +12,7 @@ function simpleFields(fieldsByTypeName) {
         // parentType: firstType,
         // args: field.args,
         fieldsByTypeName: simpleFields(field.fieldsByTypeName),
-      }    
+      }
       return acc
     }, {})
 
