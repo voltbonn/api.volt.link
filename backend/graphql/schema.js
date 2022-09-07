@@ -41,6 +41,7 @@ const schema = gql`
 
 		upload(file: Upload!): JSONObject
 
+	}
 	type PagedBlocks {
 		blocks: [Block]
 		pageInfo: PageInfo
