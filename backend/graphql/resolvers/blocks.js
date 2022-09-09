@@ -143,15 +143,15 @@ async function pagedBlocks(parent, args, context, info) {
   }
 
   stages = [
-    ...stages,
-    ...getPermissionsAggregationQuery(context, roles),
-    ...buildQuery(parent, args, context, info),
     {
       $sort: {
         'metadata.modified': -1,
         '_id': 1,
       }
-    }
+    },
+    ...stages,
+    ...getPermissionsAggregationQuery(context, roles),
+    ...buildQuery(parent, args, context, info),
   ]
 
   // START Cursor Pagination
