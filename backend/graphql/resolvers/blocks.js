@@ -148,7 +148,7 @@ async function pagedBlocks(parent, args, context, info) {
     ...buildQuery(parent, args, context, info),
     {
       $sort: {
-        'metadata.modified': 1,
+        'metadata.modified': -1,
         '_id': 1,
       }
     }
