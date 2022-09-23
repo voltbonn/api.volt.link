@@ -74,6 +74,7 @@ async function pagedBlocks(parent, args, context, info) {
     slugs = args.slugs
       .filter(slug => slug && typeof slug === 'string')
       .map(slug => slug.toLowerCase())
+      .map(slug => slug.replace(/[–—]/g, '-')) // replace en-dash and em-dash with hyphen // TODO also replace underscore with hyphen (the slugs in the database need to be changed beforehand)
   }
 
   if (
