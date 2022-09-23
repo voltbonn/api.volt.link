@@ -52,7 +52,9 @@ async function pagedBlocks(parent, args, context, info) {
   let query = {}
 
   if (args.types && Array.isArray(args.types) && args.types.length > 0) {
-    const types = args.types.filter(type => typeof type === 'string')
+    const types = args.types
+      .filter(type => typeof type === 'string')
+      .map(type => type.toLowerCase())
     if (types.length > 0) {
       query.type = { $in: types }
     }
@@ -71,6 +73,7 @@ async function pagedBlocks(parent, args, context, info) {
   if (Array.isArray(args.slugs) && args.slugs.length > 0) {
     slugs = args.slugs
       .filter(slug => slug && typeof slug === 'string')
+      .map(slug => slug.toLowerCase())
   }
 
   if (
@@ -140,6 +143,8 @@ async function pagedBlocks(parent, args, context, info) {
   let roles = null
   if (args.hasOwnProperty('roles') && Array.isArray(args.roles) && args.roles.length > 0) {
     roles = args.roles
+      .filter(role => typeof role === 'string')
+      .map(role => role.toLowerCase())
   }
 
   stages = [
