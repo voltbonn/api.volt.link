@@ -500,6 +500,8 @@ function getPermissionsAggregationQuery(context, roles, options = {}) {
 
 function getContentAggregationQuery(context, roles, options = {}) {
 
+  return []
+
   const isArchivedQueryStage = [{ // only get not archived
     $match: {
       $or: [
