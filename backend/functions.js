@@ -646,7 +646,7 @@ function getContentAggregationQuery(context, roles, options = {}) {
             }
           }
         },
-        'root.computed.contentAsMarkdownPerBlock': {
+        /*'root.computed.contentAsMarkdownPerBlock': {
           $map: {
             input: '$newContent',
             as: 'contentConfig',
@@ -786,7 +786,7 @@ function getContentAggregationQuery(context, roles, options = {}) {
               }
             }
           }
-        }
+        }*/
       }
     },
     {
@@ -804,7 +804,7 @@ function getContentAggregationQuery(context, roles, options = {}) {
             }
           }
         },
-        'root.computed.contentAsMarkdown': {
+        /*'root.computed.contentAsMarkdown': {
           $reduce: {
             input: '$root.computed.contentAsMarkdownPerBlock',
             initialValue: '',
@@ -816,7 +816,7 @@ function getContentAggregationQuery(context, roles, options = {}) {
               ]
             }
           }
-        },
+        },*/
       }
     },
     {
@@ -828,15 +828,15 @@ function getContentAggregationQuery(context, roles, options = {}) {
             cond: { $ne: ['$$c', null] }
           }
         },
-        'root.computed.contentAsMarkdownPerBlock': {
+        /*'root.computed.contentAsMarkdownPerBlock': {
           $filter: {
             input: '$root.computed.contentAsMarkdownPerBlock',
             as: 'c',
             cond: { $ne: ['$$c', null] }
           }
-        },
+        },*/
         'root.computed.contentAsPlaintext': { $ifNull: ['$root.computed.contentAsPlaintext', ''] },
-        'root.computed.contentAsMarkdown': { $ifNull: ['$root.computed.contentAsMarkdown', ''] },
+        // 'root.computed.contentAsMarkdown': { $ifNull: ['$root.computed.contentAsMarkdown', ''] },
       }
     },
     // END convert content to markdown and plaintext

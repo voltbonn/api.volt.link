@@ -50,9 +50,9 @@ function buildQuery(parent, args, context, info, options) {
   if (fields.hasOwnProperty('computed')
     && (
       fields.computed.fieldsByTypeName.hasOwnProperty('contentAsPlaintextPerBlock')
-      || fields.computed.fieldsByTypeName.hasOwnProperty('contentAsMarkdownPerBlock')
+      // || fields.computed.fieldsByTypeName.hasOwnProperty('contentAsMarkdownPerBlock')
       || fields.computed.fieldsByTypeName.hasOwnProperty('contentAsPlaintext')
-      || fields.computed.fieldsByTypeName.hasOwnProperty('contentAsMarkdown')
+      // || fields.computed.fieldsByTypeName.hasOwnProperty('contentAsMarkdown')
     )
   ) {
     fields.content = {
@@ -175,9 +175,9 @@ function buildQuery(parent, args, context, info, options) {
     if (fields.hasOwnProperty('computed')
       && (
         fields.computed.fieldsByTypeName.hasOwnProperty('contentAsPlaintextPerBlock')
-        || fields.computed.fieldsByTypeName.hasOwnProperty('contentAsMarkdownPerBlock')
+        // || fields.computed.fieldsByTypeName.hasOwnProperty('contentAsMarkdownPerBlock')
         || fields.computed.fieldsByTypeName.hasOwnProperty('contentAsPlaintext')
-        || fields.computed.fieldsByTypeName.hasOwnProperty('contentAsMarkdown')
+        // || fields.computed.fieldsByTypeName.hasOwnProperty('contentAsMarkdown')
       )
     ) {
       stages = [
