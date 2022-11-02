@@ -500,7 +500,7 @@ function getPermissionsAggregationQuery(context, roles, options = {}) {
 
 function getContentAggregationQuery(context, roles, options = {}) {
 
-  return []
+  // return []
 
   const isArchivedQueryStage = [{ // only get not archived
     $match: {
@@ -565,8 +565,8 @@ function getContentAggregationQuery(context, roles, options = {}) {
     //   }
     // },
 
-    ...isArchivedQueryStage,
-    ...isActiveQueryStage,
+    // ...isArchivedQueryStage, // todo: works, but this needs a facet to not fully delete the block. or use filter
+    // ...isActiveQueryStage, // todo: works, but this needs a facet to not fully delete the block. or use filter
 
     // // START permissions
     // TODO: enable this !!!!!!!! Otherwise this is currently showing more text, then should be public.
