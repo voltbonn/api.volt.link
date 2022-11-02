@@ -168,10 +168,23 @@ function buildQuery(parent, args, context, info, options) {
           }
         }
       },
-      { $replaceRoot: { newRoot: '$newBlock' } },
 
-      ...getContentAggregationQuery(context),
+      { $replaceRoot: { newRoot: '$newBlock' } },
     ]
+
+    if (fields.hasOwnProperty('computed')
+      && (
+        fields.computed.fieldsByTypeName.hasOwnProperty('contentAsPlaintextPerBlock')
+        || fields.computed.fieldsByTypeName.hasOwnProperty('contentAsMarkdownPerBlock')
+        || fields.computed.fieldsByTypeName.hasOwnProperty('contentAsPlaintext')
+        || fields.computed.fieldsByTypeName.hasOwnProperty('contentAsMarkdown')
+      )
+    ) {
+      stages = [
+        ...stages,
+        ...getContentAggregationQuery(context),
+      ]
+    }
   }
   
   return stages
