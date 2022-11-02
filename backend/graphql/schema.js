@@ -90,6 +90,10 @@ const schema = gql`
 		roles: [String]
 		sort: Int
 		inherited_block_permissions: JSON
+		contentAsPlaintextPerBlock: [String]
+		contentAsMarkdownPerBlock: [String]
+		contentAsPlaintext: String
+		contentAsMarkdown: String
 	}
 
 	type Block {

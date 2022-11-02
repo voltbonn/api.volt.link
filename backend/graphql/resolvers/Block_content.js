@@ -1,4 +1,4 @@
-const { getPermissionsAggregationQuery, getRolesOfUser } = require('../../functions.js')
+const { getPermissionsAggregationQuery, getContentAggregationQuery, getRolesOfUser } = require('../../functions.js')
 
 module.exports = async (parent, args, context, info) => {
 	let newContent = (parent.content || [])
@@ -54,6 +54,7 @@ module.exports = async (parent, args, context, info) => {
     	  } },
 
 				...getPermissionsAggregationQuery(context),
+				...getContentAggregationQuery(context),
 			], { allowDiskUse: true })
 
     	let blocks = await cursor.toArray()

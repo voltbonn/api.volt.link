@@ -1,4 +1,4 @@
-const { getPermissionsAggregationQuery, cleanUpBlock } = require('../functions.js')
+const { getPermissionsAggregationQuery, getContentAggregationQuery, cleanUpBlock } = require('../functions.js')
 const { parseResolveInfo } = require('graphql-parse-resolve-info')
 
 function simpleFields(fieldsByTypeName) {
@@ -46,10 +46,31 @@ function buildQuery(parent, args, context, info, options) {
       acc[field] = true
       return acc
     }, projectStage)
-  stages.unshift({ $project: projectStage })
+
+  if (fields.hasOwnProperty('computed')
+    && (
+      fields.computed.fieldsByTypeName.hasOwnProperty('contentAsPlaintextPerBlock')
+      || fields.computed.fieldsByTypeName.hasOwnProperty('contentAsMarkdownPerBlock')
+      || fields.computed.fieldsByTypeName.hasOwnProperty('contentAsPlaintext')
+      || fields.computed.fieldsByTypeName.hasOwnProperty('contentAsMarkdown')
+    )
+  ) {
+    fields.content = {
+      fieldsByTypeName: {
+        block: {
+          fieldsByTypeName: {
+            _id: true,
+          }
+        }
+      }
+    }
+    projectStage.content = true
+  }
 
   // make sure for the query necessary fields are always loaded
   projectStage.permissions = true
+
+  stages.unshift({ $project: projectStage })
 
   if (
     fields.hasOwnProperty('content')
@@ -94,8 +115,7 @@ function buildQuery(parent, args, context, info, options) {
             localField: 'content.blockId',
             foreignField: '_id',
             as: 'content.block'
-          }
-          },
+          }},
           { $addFields: { 'content.block': { $first: '$content.block' } } },
           { $addFields: { 'content.index': '$index' } },
           { $replaceRoot: { newRoot:  '$content' } },
@@ -117,12 +137,15 @@ function buildQuery(parent, args, context, info, options) {
           { $unset: ['computed.inherited_block_permissions'] },
           // END permissions
 
+          ...getContentAggregationQuery(context),
+
           { $sort: { 'index': 1 } },
           { $unset: ['index'] },
         ]
       }},
   
       { $unwind: { path: "$newBlock" }},
+
       {
         $addFields: {
           contentIds: { $map: { input: '$newBlock.content', as: 'contentConfig', in: '$$contentConfig.blockId' } }
@@ -146,6 +169,8 @@ function buildQuery(parent, args, context, info, options) {
         }
       },
       { $replaceRoot: { newRoot: '$newBlock' } },
+
+      ...getContentAggregationQuery(context),
     ]
   }
   
@@ -162,6 +187,7 @@ async function loadBlock(parent, args, context, info) {
       }
     },
     ...getPermissionsAggregationQuery(context),
+    // ...getContentAggregationQuery(context),
 
     ...buildQuery(parent, args, context, info),
   ]
