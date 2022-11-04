@@ -24,6 +24,7 @@ const schema = gql`
 		all_subblocks(_id: ObjectID!): [Block]
 		blockBySlug(slug: String!): Block
 		blocksBySlugs(slug: [String!]!): [Block]
+		lastModifiedBlocks(types: [String], archived: Boolean, first: Int, roles: [String]): [Block]
 		self: User
 		parentBlocks(_id: ObjectID!): [Block]
 		siblingBlocks(_id: ObjectID!, types: [String]): [Block]
