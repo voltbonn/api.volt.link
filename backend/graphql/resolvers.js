@@ -21,6 +21,7 @@ const blockMatchesRoles = require('./resolvers/blockMatchesRoles.js')
 const Block_content = require('./resolvers/Block_content.js')
 const checkSlug = require('./resolvers/checkSlug.js')
 const search = require('./resolvers/search.js')
+const lastModifiedBlocks = require('./resolvers/lastModifiedBlocks.js')
 
 const saveBlock = require('./mutations/saveBlock.js')
 const {
@@ -90,6 +91,7 @@ module.exports = {
 		blockMatchesRoles,
 		checkSlug,
 		search,
+		lastModifiedBlocks,
 	},
 	Mutation: {
 		saveBlock,
