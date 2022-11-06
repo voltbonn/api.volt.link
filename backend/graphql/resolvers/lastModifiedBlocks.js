@@ -59,6 +59,11 @@ async function lastModifiedBlocks(parent, args, context, info) {
         newRoot: { $first: '$real_current_block' }
       }
     },
+    {
+      $match: {
+        type: { $in: types },
+      }
+    },
     ...getPermissionsAggregationQuery(context, roles),
 
     {
