@@ -54,7 +54,7 @@ module.exports = async (parent, args, context, info) => {
     	  } },
 
 				...getPermissionsAggregationQuery(context),
-				...getContentAggregationQuery(context),
+				// ...getContentAggregationQuery(context),
 			], { allowDiskUse: true })
 
     	let blocks = await cursor.toArray()

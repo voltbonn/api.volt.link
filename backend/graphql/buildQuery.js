@@ -137,7 +137,7 @@ function buildQuery(parent, args, context, info, options) {
           { $unset: ['computed.inherited_block_permissions'] },
           // END permissions
 
-          ...getContentAggregationQuery(context),
+          // ...getContentAggregationQuery(context),
 
           { $sort: { 'index': 1 } },
           { $unset: ['index'] },
@@ -182,7 +182,7 @@ function buildQuery(parent, args, context, info, options) {
     ) {
       stages = [
         ...stages,
-        ...getContentAggregationQuery(context),
+        // ...getContentAggregationQuery(context),
       ]
     }
   }
@@ -200,7 +200,6 @@ async function loadBlock(parent, args, context, info) {
       }
     },
     ...getPermissionsAggregationQuery(context),
-    // ...getContentAggregationQuery(context),
 
     ...buildQuery(parent, args, context, info),
   ]
