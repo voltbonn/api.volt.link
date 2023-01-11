@@ -37,7 +37,7 @@ db.getCollection('test').aggregate([
   },
   {
     $set: {
-      dotProduct: {
+      cos_similarity: {
         $divide: [
           '$dotProduct',
           {
@@ -49,5 +49,6 @@ db.getCollection('test').aggregate([
         ]
       }
     }
-  }
+  },
+  { $unset: ['index', 'source_val', 'sink_val', 'dotProduct'] }
 ])
