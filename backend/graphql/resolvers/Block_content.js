@@ -1,8 +1,11 @@
 const { getPermissionsAggregationQuery, getContentAggregationQuery, getRolesOfUser } = require('../../functions.js')
 
 module.exports = async (parent, args, context, info) => {
-	let newContent = (parent.content || [])
-	.filter(content => content !== null && Object.keys(content).length > 0) // TODO: This is a BUGFIX! Cause empty content results in an unnecessary empty object.
+	let newContent = []
+	if (Array.isArray(parent.content) && parent.content.length > 0) {
+		newContent = parent.content
+	}
+	newContent = newContent.filter(content => content !== null && Object.keys(content).length > 0) // TODO: This is a BUGFIX! Cause empty content results in an unnecessary empty object.
 
 	if (context.logged_in === true) {
 		newContent = newContent.map(contentConfig => {
@@ -54,7 +57,7 @@ module.exports = async (parent, args, context, info) => {
     	  } },
 
 				...getPermissionsAggregationQuery(context),
-				...getContentAggregationQuery(context),
+				// ...getContentAggregationQuery(context),
 			], { allowDiskUse: true })
 
     	let blocks = await cursor.toArray()
