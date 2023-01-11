@@ -1079,6 +1079,15 @@ function unflattenObject(obj) {
   return res
 }
 
+// function base64Encode(str) {
+//   // string to base64
+//   return Buffer.from(str).toString('base64')
+// }
+// function base64Decode(str) {
+//   // base64 to string
+//   return Buffer.from(str, 'base64').toString('utf-8')
+// }
+
 module.exports = {
   removeDiacritics,
   filterPagesByPermission,
@@ -1096,4 +1105,6 @@ module.exports = {
   cleanUpBlock,
   flattenObject,
   unflattenObject,
+  // base64Encode,
+  // base64Decode,
 }
