@@ -75,7 +75,7 @@ module.exports = async (parent, args, context, info) => {
               email: '@volteuropa.org',
               role: 'viewer',
             }, {
-              email: '@public',
+              email: '@public', // todo fix permissions for files
               role: 'viewer',
             }
           ],
