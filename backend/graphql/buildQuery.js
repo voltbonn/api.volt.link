@@ -168,6 +168,23 @@ function buildQuery(parent, args, context, info, options) {
           }
         }
       },
+      {
+        $addFields: {
+          contentText: {
+            $map: {
+              input: '$newContent',
+              as: 'contentConfig',
+              in: {
+                $cond: {
+                  if: { $eq: ['$$contentConfig.block.type', 'text'] },
+                  then: '$$contentConfig.block.properties.text',
+                  else: '',
+                }
+              }
+            }
+          }
+        }
+      },
 
       { $replaceRoot: { newRoot: '$newBlock' } },
     ]
