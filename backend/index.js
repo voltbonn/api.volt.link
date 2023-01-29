@@ -26,6 +26,8 @@ const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 
 const sharp = require('sharp')
 
+const { createExpressRestServer } = require('./rest/expressRestServer.js')
+
 // function getUserLocales(){
 //     const localesByCounty = {
 //       de: ['de'],
@@ -35,7 +37,7 @@ const sharp = require('sharp')
 
 const isAbsoluteUrlRegexp = new RegExp('^(?:[a-z]+:)?//', 'i')
 
-const app = express()
+let app = express()
 
 // set up rate limiter: maximum of 1000 requests per minute
 app.use(new RateLimit({
@@ -209,6 +211,8 @@ app.get('/logout', function (req, res) {
 })
 // END AUTH
 
+app = createExpressRestServer(app)
+
 app.options("/*", function (req, res, next) {
   // correctly response for cors
   if (req.is_subdomain) {
@@ -339,8 +343,15 @@ httpServer.listen({ port, host }, () =>
   console.info(`
     🚀 Server ready
     View the API
+    
     at http://localhost:4004/graphql/v1
     or http://0.0.0.0:4004/graphql/v1
     or https://api.volt.link/graphql/v1 for production
+
+    and
+
+    at http://localhost:4004/rest/v1
+    or http://0.0.0.0:4004/rest/v1
+    or https://api.volt.link/rest/v1 for production
   `)
 )

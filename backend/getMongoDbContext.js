@@ -22,6 +22,8 @@ function getMongoDbContext(){
 							graph: 'graph',
 						},
 						collections: {
+							nodes: 'nodes',
+							properties: 'properties', // this could've been called 'edges' but sometimes the other node is not a node but a value
 							blocks: 'blocks',
 							history: 'history',
 							url_queue: 'url_queue',
@@ -32,6 +34,8 @@ function getMongoDbContext(){
 						graph: mongodb_client.db(names.dbs.graph),
 					}
 					const collections = {
+						nodes: dbs.graph.collection(names.collections.nodes),
+						properties: dbs.graph.collection(names.collections.properties),
 						blocks: dbs.graph.collection(names.collections.blocks),
 						history: dbs.graph.collection(names.collections.history),
 						url_queue: dbs.graph.collection(names.collections.url_queue),
