@@ -211,8 +211,6 @@ app.get('/logout', function (req, res) {
 })
 // END AUTH
 
-app = createExpressRestServer(app)
-
 app.options("/*", function (req, res, next) {
   // correctly response for cors
   if (req.is_subdomain) {
@@ -230,6 +228,8 @@ app.get('/favicon.ico', function (req, res) {
   // respond with the favicon-file
   res.sendFile(path.join(__dirname, 'favicon.ico'))
 })
+
+app = createExpressRestServer(app)
 
 app.get('/login', (req, res) => {
   res.redirect(url.format({
