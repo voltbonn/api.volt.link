@@ -6,6 +6,14 @@ const { get_new_id, is_id } = require('./id.js')
 
 function createExpressRestServer (app) {
 
+  app.get('/protected/',
+    function (req, res) {
+      console.log('protected')
+      console.log('req.user', req.user)
+      res.json({ message: "proteed root" })
+    }
+  )
+
   app.get('/rest/v1/example/', function (req, res) {
     console.info('GET /rest/v1/example/')
 
@@ -34,43 +42,29 @@ function createExpressRestServer (app) {
       </style>
       <h1>Volt.Link Rest-API Example</h1>
       <script>
-        function add_node () {
-          fetch("http://localhost:4004/rest/v1/node/", {
-            method: "post",
+        function start () {
+          fetch("http://localhost:4004/protected/", {
+            method: "get",
             headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
+              // 'Accept': 'application/json',
+              // 'Content-Type': 'application/json',
+              'Authorization': 'Bearer test_key'
             },
           
             //make sure to serialize your JSON body
-            body: JSON.stringify({
-              node: {
-                id: '123',
-                type: 'text',
-                content: 'Hello World'
-              },
-            })
+            // body: JSON.stringify({
+            //   node: {
+            //     id: '123',
+            //     type: 'text',
+            //     content: 'Hello World'
+            //   },
+            // })
           })
           .then(response => {
-            console.info('addresponse', response)
-            delete_node()
+            console.info('response', response)
           });
         }
-
-        function delete_node () {
-          fetch("http://localhost:4004/rest/v1/node/?id=123", {
-            method: "delete",
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-          })
-          .then(response => {
-            console.info('delete-response', response)
-          });
-        }
-
-        add_node()
+        start()
       </script>
     `)
   })

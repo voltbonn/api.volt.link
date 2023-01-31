@@ -24,6 +24,8 @@ const FileStore = require('session-file-store')(session)
 const passport = require('passport')
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 
+const HeaderAPIKeyStrategy = require('passport-headerapikey').HeaderAPIKeyStrategy
+
 const sharp = require('sharp')
 
 const { createExpressRestServer } = require('./rest/expressRestServer.js')
@@ -118,8 +120,37 @@ passport.use(new GoogleStrategy({
   }
 ))
 
+passport.use(new HeaderAPIKeyStrategy(
+  { header: 'Authorization', prefix: 'Bearer ' },
+  true,
+  function (apikey, done, req) {
+    // todo API-KEY get user via api key from db
+    // User.findOne({ apikey: apikey }, function (err, user) {
+    //   if (err) { return done(err); }
+    //   if (!user) { return done(null, false); }
+    //   return done(null, user)
+    // });
+    return done(null, {
+      id: 'user_xyz',
+      api_test: true
+    })
+  }
+))
+
 app.use(passport.initialize())
 app.use(passport.session())
+
+app.use(function (req, res, next) {
+  passport.authenticate('headerapikey', { session: false }, function (error, user, info) {
+    if (error || info instanceof Error) { // TODO is the instanceof check correct
+      return next()
+    }
+    
+    req.user = user
+
+    next()
+  })(req, res, next)
+})
 
 app.use(function (req, res, next) {
   if (!!req.user && !!req.user.id && req.user.id !== null) {
