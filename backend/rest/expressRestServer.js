@@ -28,13 +28,7 @@ async function get_context (req) {
 
 function createExpressRestServer (app) {
 
-  app.get('/protected/',
-    function (req, res) {
-      console.log('protected')
-      console.log('req.user', req.user)
-      res.json({ message: "proteed root" })
     }
-  )
 const route_path_base = '/rest/v1/'
 
   app.get(`${route_path_base}example`, function (req, res) {
@@ -66,7 +60,7 @@ const route_path_base = '/rest/v1/'
       <h1>Volt.Link Rest-API Example</h1>
       <script>
         function start () {
-          fetch("http://localhost:4004/protected/", {
+          fetch("http://localhost:4004/rest/v1/node?id=123", {
             method: "get",
             headers: {
               // 'Accept': 'application/json',
