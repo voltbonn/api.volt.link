@@ -303,9 +303,15 @@ function createExpressRestServer (app) {
 
           const flattened_node = flattenObject(node)
 
+          const not_allowed_keys = [
+            // dont update the id or mongodb-id (_id)
+            'id',
+            '_id',
+          ]
+
           for (const key in flattened_node) {
-            if (key === 'id' || key === '_id') {
-              // dont update the id or mongodb-id (_id)
+            if (not_allowed_keys.includes(key) === true) {
+              // only update certain properties
               continue
             }
 
