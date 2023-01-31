@@ -22,7 +22,7 @@ function getMongoDbContext(){
 					}
 					const collections = {
 						nodes: dbs.graph.collection(names.collections.nodes),
-						properties: dbs.graph.collection(names.collections.properties), // this could've been called 'edges' but sometimes the other node is not a node but a value
+						edges: dbs.graph.collection(names.collections.edges),
 						permissions: dbs.graph.collection(names.collections.permissions),
 
 						blocks: dbs.graph.collection(names.collections.blocks),
