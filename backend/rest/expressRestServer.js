@@ -62,7 +62,9 @@ async function does_user_exist_in_permissions (email, context) {
   return exists
 }
 
-
+function string_has_length (text) {
+  return typeof text === 'string' && text.length > 0
+}
 
 
 
@@ -464,6 +466,65 @@ function createExpressRestServer (app) {
     }
   })
 
+  app.get(`${route_path_base}permissions`, async function (req, res) {
+    try {
+      const context = await get_context(req)
+
+      if (context.logged_in === false) {
+        // todo check permissions for public nodes
+        throw new Error('Not logged in.')
+      }
+
+      const id = req.query.id // the id of the permission
+      const email = req.query.email // the email of the user (@volteuropa.org, thomas.rosen@volteuropa.org, ...)
+      const role = req.query.role // the role (owner, editor, viewer)
+      const about_id = req.query.about_id // the id of the node or edge
+      const about_type = req.query.about_type // is the id is about a node or edge (node / edge) // no idea if this is needed
+
+      // fields in the database-collection:
+      // id (the id of the permission)
+      // email (@volteuropa.org, thomas.rosen@volteuropa.org, ...)
+      // role (owner, editor, viewer)
+      // about_id (the id of the node)
+      // about_type (node, edge, ...)
+     
+      const query = {}
+
+      if (string_has_length(id)) {
+        query['id'] = id
+      }
+      if (string_has_length(email)) {
+        query['email'] = email
+      }
+      if (string_has_length(role)) {
+        query['role'] = role
+      }
+      if (string_has_length(about_id)) {
+        query['about_id'] = about_id
+      }
+      if (string_has_length(about_type)) {
+        query['about_type'] = about_type
+      }
+
+      if (Object.keys(query).length > 0) {
+        const found_docs = await context.mongodb.collections.permissions
+          .find(query)
+
+        res.send({
+          error: null,
+          node: found_docs,
+        })
+      } else {
+        throw new Error('Missing query parameters.')
+      }
+    } catch (error) {
+      console.error(error)
+      res.send({
+        error: error,
+        node: null,
+      })
+    }
+  })
   /*
   // TODO implement property api
   app.post('/rest/v1/add_property/', function (req, res) {
