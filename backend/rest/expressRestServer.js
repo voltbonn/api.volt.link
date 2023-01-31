@@ -69,6 +69,56 @@ async function does_user_exist_in_permissions (email, context) {
 const route_path_base = '/rest/v1/'
 
 function createExpressRestServer (app) {
+
+  app.get(`${route_path_base}`, function (req, res) {
+    console.info('/rest/v1/')
+
+    res.send(`
+      <style>
+        body {
+          font-family: Ubuntu, sans-serif;
+          font-size: 18px;
+          line-height: 1.2;
+          color: #502379;
+          padding: 16px;
+        }
+        h1 {
+          font-size: 32px;
+        }
+        p, ul, code {
+          font-size: inherit;
+        }
+        code {
+          font-family: "Ubuntu Mono", monospace;
+        }
+        p, li {
+          margin-block-end: 16px;
+        }
+      </style>
+      <h1>Volt.Link Rest-API</h1>
+      <p>Get an API-key before using the API.</p>
+      <ul>
+        <h2>Nodes</h2>
+        <li>
+          POST /rest/v1/node/<br />
+          <code>{ id: '123', type: 'text', content: 'Hello World' }</code>
+        </li>
+        <li>GET /rest/v1/node/?id=123</li>
+        <li>DELETE /rest/v1/node/</li>
+
+        <br />
+
+        <h2>Properties</h2>
+        <li>
+          POST /rest/v1/property/<br />
+          <code>{ id: '123', to_id: '123', property_key: 'key', property_value: 'value' }</code>
+        </li>
+        <li>GET /rest/v1/property/?id=123</li>
+        <li>DELETE /rest/v1/property/</li>
+      </ul>
+    `)
+  })
+
   app.get(`${route_path_base}example`, function (req, res) {
     console.info('GET /rest/v1/example/')
 
@@ -124,57 +174,14 @@ function createExpressRestServer (app) {
     `)
   })
 
-    console.info('/rest/v1/')
   app.get(`${route_path_base}user/exists`, async function (req, res) {
     try {
       const context = await get_context(req)
 
-    res.send(`
-      <style>
-        body {
-          font-family: Ubuntu, sans-serif;
-          font-size: 18px;
-          line-height: 1.2;
-          color: #502379;
-          padding: 16px;
-        }
-        h1 {
-          font-size: 32px;
-        }
-        p, ul, code {
-          font-size: inherit;
-        }
-        code {
-          font-family: "Ubuntu Mono", monospace;
-        }
-        p, li {
-          margin-block-end: 16px;
-        }
-      </style>
-      <h1>Volt.Link Rest-API</h1>
-      <p>Get an API-key before using the API.</p>
-      <ul>
-        <h2>Nodes</h2>
-        <li>
-          POST /rest/v1/node/<br />
-          <code>{ id: '123', type: 'text', content: 'Hello World' }</code>
-        </li>
-        <li>GET /rest/v1/node/?id=123</li>
-        <li>DELETE /rest/v1/node/</li>
       const email = req.query.email
 
-        <br />
       const exists = await does_user_exist_in_permissions(email, context)
 
-        <h2>Properties</h2>
-        <li>
-          POST /rest/v1/property/<br />
-          <code>{ id: '123', to_id: '123', property_key: 'key', property_value: 'value' }</code>
-        </li>
-        <li>GET /rest/v1/property/?id=123</li>
-        <li>DELETE /rest/v1/property/</li>
-      </ul>
-    `)
       res.send({
         error: null,
         exists,
