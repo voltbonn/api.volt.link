@@ -10,6 +10,7 @@ function createExpressRestServer (app) {
     console.info('GET /rest/v1/example/')
 
     res.send(`
+      <!DOCTYPE html>
       <style>
         body {
           font-family: Ubuntu, sans-serif;
