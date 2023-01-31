@@ -17,19 +17,6 @@ function getMongoDbContext(){
 					useNewUrlParser: true,
 					useUnifiedTopology: true,
 				}).then(mongodb_client => {
-					const names = {
-						dbs: {
-							graph: 'graph',
-						},
-						collections: {
-							nodes: 'nodes',
-							properties: 'properties', // this could've been called 'edges' but sometimes the other node is not a node but a value
-							blocks: 'blocks',
-							history: 'history',
-							url_queue: 'url_queue',
-						}
-					}
-
 					const dbs = {
 						graph: mongodb_client.db(names.dbs.graph),
 					}
@@ -39,6 +26,17 @@ function getMongoDbContext(){
 						blocks: dbs.graph.collection(names.collections.blocks),
 						history: dbs.graph.collection(names.collections.history),
 						url_queue: dbs.graph.collection(names.collections.url_queue),
+					}
+
+					const names = {
+						dbs: Object.keys(dbs).reduce((acc,key)=>{
+							acc[key] = key
+							return acc
+						},{}),
+						collections: Object.keys(collections).reduce((acc, key) => {
+							acc[key] = key
+							return acc
+						}, {}),
 					}
 
 					_ContextChache_.mongodb = {
