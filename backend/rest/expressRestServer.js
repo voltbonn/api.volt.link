@@ -4,6 +4,10 @@ const getMongoDbContext = require('../getMongoDbContext.js')
 
 const { get_new_id, is_id } = require('./id.js')
 
+
+
+
+
 async function get_context (req) {
   try {
 		const locales = req.acceptsLanguages()
@@ -26,11 +30,45 @@ async function get_context (req) {
   }
 }
 
-function createExpressRestServer (app) {
+async function does_user_exist_in_permissions (email, context) {
+  // check in permissins db, if email or the domain of it is allowed somewhere
 
+  // get domain from email
+  const domain = email.split('@')[1]
+
+  // first check if the domain is gennerelly allowed somewhere
+  const found_node = await context.mongodb.collections.permissions
+    .findOne({
+      email: `@${domain}`
+    })
+
+  let exists = false
+  if (found_node !== null) {
+    exists = true
+  }
+
+  if (exists === false) {
+    // is domain is not generelly allowed, check if the one email is allowed
+    const found_node = await context.mongodb.collections.permissions
+      .findOne({
+        email,
+      })
+
+    if (found_node !== null) {
+      exists = true
     }
+  }
+
+  return exists
+}
+
+
+
+
+
 const route_path_base = '/rest/v1/'
 
+function createExpressRestServer (app) {
   app.get(`${route_path_base}example`, function (req, res) {
     console.info('GET /rest/v1/example/')
 
@@ -88,6 +126,8 @@ const route_path_base = '/rest/v1/'
 
     console.info('/rest/v1/')
   app.get(`${route_path_base}user/exists`, async function (req, res) {
+    try {
+      const context = await get_context(req)
 
     res.send(`
       <style>
@@ -121,8 +161,10 @@ const route_path_base = '/rest/v1/'
         </li>
         <li>GET /rest/v1/node/?id=123</li>
         <li>DELETE /rest/v1/node/</li>
+      const email = req.query.email
 
         <br />
+      const exists = await does_user_exist_in_permissions(email, context)
 
         <h2>Properties</h2>
         <li>
@@ -133,6 +175,17 @@ const route_path_base = '/rest/v1/'
         <li>DELETE /rest/v1/property/</li>
       </ul>
     `)
+      res.send({
+        error: null,
+        exists,
+      })
+    } catch (error) {
+      console.error(error)
+      res.send({
+        error: error,
+        exists: null,
+      })
+    }
   })
 
   app.get(`${route_path_base}id`, async function (req, res) {
