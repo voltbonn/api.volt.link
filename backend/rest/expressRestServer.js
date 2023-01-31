@@ -525,6 +525,179 @@ function createExpressRestServer (app) {
       })
     }
   })
+
+  app.post(`${route_path_base}permission`, async function (req, res) {
+    try {
+      const context = await get_context(req)
+
+      if (context.logged_in === false) {
+        throw new Error('Not logged in.')
+      }
+
+      const body = req.body
+
+      if (body && body.permission) {
+        const permission = body.permission
+        const permission_id = permission.id || null
+
+        let id_is_given = (
+          permission.hasOwnProperty('id')
+          && is_id(permission_id)
+        )
+
+        let permission_exists = false
+        if (id_is_given) {
+          // check if the permission exists
+          const permissions_exists_doc = await context.mongodb.collections.permissions
+            .findOne({
+              id: permission_id,
+            })
+
+          if (typeof permissions_exists_doc === 'object' && permissions_exists_doc !== null) {
+            // permission already exists
+            permission_exists = true
+          }
+        }
+
+        if (permission_exists) {
+          // The permission exists: UPDATE IT.
+
+          const updatePipline = []
+
+          const unset = []
+          const set = {}
+
+          const flattened_permission = flattenObject(permission)
+
+          const not_allowed_keys = [
+            // dont update the id or mongodb-id (_id)
+            'id',
+            '_id',
+          ]
+          const allowed_keys = [
+            'email',
+            'role',
+            'about_id',
+            'about_type',
+          ]
+
+          for (const key in flattened_permission) {
+            if (
+              not_allowed_keys.includes(key) === true
+              || allowed_keys.includes(key) === false
+            ) {
+              // only update certain properties
+              continue
+            }
+
+            const value = flattened_permission[key]
+            if (value === null) {
+              unset.push(key)
+            } else {
+              set[key] = value
+            }
+          }
+
+          const has_set_entries = Object.keys(set).length > 0
+          const has_unset_entries = Object.keys(unset).length > 0
+
+          if (has_set_entries || has_unset_entries) {
+
+            // add metadata
+            set['metadata.modified'] = new Date()
+            // set['metadata.modified_by'] = user.email
+
+            updatePipline.push({ $set: set })
+
+            if (has_unset_entries) {
+              updatePipline.push({ $unset: unset })
+            }
+
+            const updateResult = await context.mongodb.collections.permissions
+              .updateOne(
+                { id: permission_id },
+                updatePipline,
+                { upsert: false }
+              )
+
+            if (updateResult.modifiedCount > 0) {
+              // block updated
+              res.send({
+                error: null,
+                id: permission_id,
+              })
+            } else if (updateResult.matchedCount > 0) {
+              // block was not updated
+              // but everything is fine
+              res.send({
+                error: null,
+                id: permission_id,
+              })
+            } else { // updateResult.matchedCount === 0
+              // block was not updated
+              // because it could not be found
+              throw new Error('Could not find the block.')
+            }
+          } else {
+            // nothing to update
+            res.send({
+              error: null,
+              info: 'Nothing to update.',
+              id: permission_id,
+            })
+          }
+        } else {
+          // The permission does NOT exist: Create it!
+
+          if (!id_is_given) {
+            permission.id = await get_new_id()
+          }
+
+          // metadata
+          if (
+            permission.hasOwnProperty('metadata')
+            && typeof permission.metadata === 'object'
+            && permission.metadata !== null
+            && !Array.isArray(permission.metadata)
+          ) {
+            permission.metadata = {
+              ...permission.metadata,
+              // modified_by: user.email,
+              modified: new Date(),
+            }
+          } else {
+            permission.metadata = {
+              // modified_by: user.email,
+              modified: new Date(),
+            }
+          }
+
+          const result = await context.mongodb.collections.permissions
+            .insertOne(permission)
+
+          if (result.acknowledged === true && !!result.insertedId) {
+            // ✅ permission created
+            res.send({
+              error: null,
+              id: permission.id,
+            })
+          } else {
+            // permission not created
+            throw new Error('Could not create the permission.')
+          }
+        }
+      } else {
+        throw new Error('No data given.')
+      }
+    } catch (error) {
+      console.error(error)
+      res.send({
+        error: String(error),
+        id: null,
+      })
+    }
+  })
+
   /*
   // TODO implement property api
   app.post('/rest/v1/add_property/', function (req, res) {
