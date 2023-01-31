@@ -35,8 +35,9 @@ function createExpressRestServer (app) {
       res.json({ message: "proteed root" })
     }
   )
+const route_path_base = '/rest/v1/'
 
-  app.get('/rest/v1/example/', function (req, res) {
+  app.get(`${route_path_base}example`, function (req, res) {
     console.info('GET /rest/v1/example/')
 
     res.send(`
@@ -91,8 +92,8 @@ function createExpressRestServer (app) {
     `)
   })
 
-  app.get('/rest/v1/', function (req, res) {
     console.info('/rest/v1/')
+  app.get(`${route_path_base}user/exists`, async function (req, res) {
 
     res.send(`
       <style>
@@ -140,7 +141,7 @@ function createExpressRestServer (app) {
     `)
   })
 
-  app.get('/rest/v1/id/', async function (req, res) {
+  app.get(`${route_path_base}id`, async function (req, res) {
     try {
       const context = await get_context(req)
 
@@ -162,7 +163,7 @@ function createExpressRestServer (app) {
     }
   })
 
-  app.get('/rest/v1/node/', async function (req, res) {
+  app.get(`${route_path_base}node`, async function (req, res) {
     try {
       const context = await get_context(req)
 
@@ -205,7 +206,7 @@ function createExpressRestServer (app) {
     }
   })
 
-  app.post('/rest/v1/node/', async function (req, res) {
+  app.post(`${route_path_base}node`, async function (req, res) {
     try {
       const context = await get_context(req)
 
@@ -362,7 +363,7 @@ function createExpressRestServer (app) {
     }
   })
 
-  app.delete('/rest/v1/node/', async function (req, res) {
+  app.delete(`${route_path_base}node`, async function (req, res) {
     try {
       const context = await get_context(req)
 
