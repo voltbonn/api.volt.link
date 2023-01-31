@@ -153,8 +153,7 @@ app.get('/auth/google', function (req, res) {
   })(req, res)
 })
 
-app.get(
-  '/auth/google/callback',
+app.get('/auth/google/callback',
   passport.authenticate('google', { failureFlash: false, failureRedirect: '/auth/failure' }),
   function (req, res) {
     let redirect_to = null
