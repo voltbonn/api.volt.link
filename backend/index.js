@@ -162,7 +162,7 @@ app.use(function (req, res, next) {
   }
 
   // const origin = req.get('origin')
-  const origin = req.header('Origin')
+  const origin = req.header('Origin') || req.header('Host')
   if (checkOrigin(origin)) {
     req.is_subdomain = true
     req.origin = origin
