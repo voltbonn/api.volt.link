@@ -226,6 +226,11 @@ app.options("/*", function (req, res, next) {
   }
 })
 
+app.get('/favicon.ico', function (req, res) {
+  // respond with the favicon-file
+  res.sendFile(path.join(__dirname, 'favicon.ico'))
+})
+
 app.get('/login', (req, res) => {
   res.redirect(url.format({
     pathname: '/auth/google',
