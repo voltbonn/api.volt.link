@@ -4,6 +4,28 @@ const getMongoDbContext = require('../getMongoDbContext.js')
 
 const { get_new_id, is_id } = require('./id.js')
 
+async function get_context (req) {
+  try {
+		const locales = req.acceptsLanguages()
+
+		return {
+			locale: locales.length > 0 ? locales[0] : 'en',
+			logged_in: req.logged_in,
+			user: req.user,
+			mongodb: await getMongoDbContext(),
+		}
+	} catch (error) {
+		console.error(error)
+	}
+
+  return {
+    locale: 'en',
+    logged_in: false,
+    user: null,
+    mongodb: null,
+  }
+}
+
 function createExpressRestServer (app) {
 
   app.get('/protected/',
@@ -119,23 +141,40 @@ function createExpressRestServer (app) {
   })
 
   app.get('/rest/v1/id/', async function (req, res) {
-    // TODO check if logged in
-    // TODO check an api-/access-key
+    try {
+      const context = await get_context(req)
 
-    res.send({
-      error: null,
-      id: await get_new_id(),
-    })
+      if (context.logged_in === false) {
+        // todo check permissions for public nodes
+        throw new Error('Not logged in.')
+      }
+
+      res.send({
+        error: null,
+        id: await get_new_id(),
+      })
+    } catch (error) {
+      console.error(error)
+      res.send({
+        error: error,
+        id: null,
+      })
+    }
   })
 
   app.get('/rest/v1/node/', async function (req, res) {
     try {
-      const mongodb = await getMongoDbContext()
+      const context = await get_context(req)
+
+      if (context.logged_in === false) {
+        // todo check permissions for public nodes
+        throw new Error('Not logged in.')
+      }
 
       const node_id = req.query.id
 
       if (is_id(node_id)) {
-        const found_node = await mongodb.collections.nodes
+        const found_node = await context.mongodb.collections.nodes
           .findOne({
             id: node_id,
           })
@@ -167,12 +206,13 @@ function createExpressRestServer (app) {
   })
 
   app.post('/rest/v1/node/', async function (req, res) {
-    // TODO check if logged in
-    // TODO check an api-/access-key
-
     try {
-      const mongodb = await getMongoDbContext()
-    
+      const context = await get_context(req)
+
+      if (context.logged_in === false) {
+        throw new Error('Not logged in.')
+      }
+
       const body = req.body
 
       if (body && body.node) {
@@ -187,7 +227,7 @@ function createExpressRestServer (app) {
         let node_exists = false
         if (id_is_given) {
           // check if the node exists
-          const node_exists_doc = await mongodb.collections.nodes
+          const node_exists_doc = await context.mongodb.collections.nodes
             .findOne({
               id: node_id,
             })
@@ -237,7 +277,7 @@ function createExpressRestServer (app) {
               updatePipline.push({ $unset: unset })
             }
 
-            const updateResult = await mongodb.collections.nodes
+            const updateResult = await context.mongodb.collections.nodes
               .updateOne(
                 { id: node_id },
                 updatePipline,
@@ -296,7 +336,7 @@ function createExpressRestServer (app) {
             }
           }
 
-          const result = await mongodb.collections.nodes
+          const result = await context.mongodb.collections.nodes
             .insertOne(node)
 
           if (result.acknowledged === true && !!result.insertedId) {
@@ -323,10 +363,12 @@ function createExpressRestServer (app) {
   })
 
   app.delete('/rest/v1/node/', async function (req, res) {
-    // TODO check if logged in
-    // TODO check an api-/access-key
-
     try {
+      const context = await get_context(req)
+
+      if (context.logged_in === false) {
+        throw new Error('Not logged in.')
+      }
 
       const query = req.query || {}
       const node_id = query.id || null
@@ -334,9 +376,7 @@ function createExpressRestServer (app) {
       if (is_id(node_id)) {
         // delete node from the database
 
-        const mongodb = await getMongoDbContext()
-
-        const result = await mongodb.collections.nodes
+        const result = await context.mongodb.collections.nodes
           .deleteOne({
             id: node_id,
           })
