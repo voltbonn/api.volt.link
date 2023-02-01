@@ -150,7 +150,7 @@ async function pagedBlocks(parent, args, context, info) {
 
   stages = [
     ...stages,
-    // ...getPermissionsAggregationQuery(context, roles),
+    ...getPermissionsAggregationQuery(context, roles),
     ...buildQuery(parent, args, context, info),
     {
       $sort: {
