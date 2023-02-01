@@ -152,6 +152,7 @@ async function pagedBlocks(parent, args, context, info) {
     ...stages,
     ...getPermissionsAggregationQuery(context, roles),
     ...buildQuery(parent, args, context, info),
+    ...getPermissionsAggregationQuery(context, roles),
     {
       $sort: {
         'metadata.modified': -1,
