@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <title>Event Example</title>
   <meta charset="utf-8" />
   /* HEAD CSS */
 </head>
@@ -53,7 +54,7 @@
   <script>
   window.VoltEvents = class {
     // now = new Date().toISOString().split('T')[0]
-    start_date = new Date(new Date().setDate(new Date().getDate() - 360)).toISOString().split('T')[0]
+    start_date = new Date(new Date().setDate(new Date().getDate())).toISOString().split('T')[0]
     end_date = new Date(new Date().setDate(new Date().getDate() + 360)).toISOString().split('T')[0]
 
     ical_url = 'https://calendar.google.com/calendar/ical/c_8dguqa58qlft5to7i3j1uqbprk%40group.calendar.google.com/public/basic.ics'
