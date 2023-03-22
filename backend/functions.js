@@ -270,6 +270,16 @@ function checkOrigin(origin) {
       // allow from subdomains
       || origin.endsWith('.volt.link')
 
+      // allow from volt website
+      || origin === 'volteuropa.org'
+      || origin === 'voltdeutschland.org'
+      || origin === 'voltbrandenburg.org'
+      || origin.endsWith('volteuropa.org')
+      || origin.endsWith('voltdeutschland.org')
+      || origin.endsWith('voltbrandenburg.org')
+      || origin.includes('://www.volt')
+      || origin.includes('://volt')
+
       // allow for localhost
       || origin.endsWith('localhost:3000')
       || origin.endsWith('localhost:4003')
