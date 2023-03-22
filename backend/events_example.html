@@ -263,7 +263,7 @@
     load() {
       const now = this.build_selected_date()
       const start_date = new Date(now.setDate(now.getDate() - 1)).toISOString().split('T')[0]
-      const end_date = new Date(now.setDate(now.getDate() + 32)).toISOString().split('T')[0]
+      const end_date = new Date(now.setDate(now.getDate() + 33)).toISOString().split('T')[0]
 
       let events_url = `https://api.volt.link/events.json?url[]=${this.ical_url}&start=${start_date}&end=${end_date}`
       if (window.location.hostname === 'localhost') {
@@ -345,6 +345,7 @@
       }
       .custom_event_grid .no_events {
         grid-column: 1 / -1; /* full width */
+        text-align: center;
       }
 
       .custom_event_grid a {
