@@ -39,8 +39,9 @@
     </div>
   </div>
 
-  <div id="events_wrapper"></div>
 
+  <div id="events_wrapper" class="cards events cards__cardSize-small"></div>
+  
   <script>
 
     const start_date = new Date().toISOString().split('T')[0]
@@ -50,8 +51,7 @@
 
     const default_image = 'https://assets.volteuropa.org/styles/crop_320x160_2x/public/2021-10/volt_bb_thumbnail-presse.webp'
 
-    const event_card_html = `
-  <div class="eventcard eventcard__type-default eventcard__size-small">
+    const event_card_html = `<div class="eventcard eventcard__type-default eventcard__size-small">
     <figure class="eventcard__image">
       <picture>
         <img src="{{image}}" alt="" loading="lazy">
@@ -72,26 +72,48 @@
       </div>
       {{google_meet_link}}
     </div>
-  </div>
-    `
+  </div>`
 
-    const events_wrapper_element = document.getElementById('events_wrapper')
+  function linkify(inputText) {
+    // source: https://stackoverflow.com/questions/37684/how-to-replace-plain-urls-with-links
+    // this would be better: https://linkify.js.org/
+
+        // http://, https://, ftp://
+        var urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gim;
+
+        // www. sans http:// or https://
+        var pseudoUrlPattern = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+
+        // Email addresses
+        var emailAddressPattern = /[\w.]+@[a-zA-Z_-]+?(?:\.[a-zA-Z]{2,6})+/gim;
+
+        return inputText
+          .replace(urlPattern, '<a href="$&" target="_blank">$&</a>')
+          .replace(pseudoUrlPattern, '$1<a href="http://$2" target="_blank">$2</a>')
+          .replace(emailAddressPattern, '<a href="mailto:$&">$&</a>');
+    }
+
     function show_events(events) {
+      const events_wrapper_element = document.getElementById('events_wrapper')
       events_wrapper_element.innerHTML = ''
       events.forEach(event => {
         const event_element = document.createElement('div')
 
+        const description = linkify(event.description || '')
+          .replace(/(?:\r\n|\r|\n)/g, '<br />')
+          .replace(/Über Google Meet teilnehmen:.*/g, '')
+
         let this_event_card_html = event_card_html
           .replace('{{image}}', event.image || default_image)
           .replace('{{summary}}', event.summary || '')
-          .replace('{{description}}', event.description || '')
+          .replace('{{description}}', description)
           .replace('{{start_date}}', event.dtstart || '')
           .replace('{{organizer}}', event.location || 'Volt Brandenburg')
 
         if (event['x-google-conference']) {
           this_event_card_html = this_event_card_html
             .replace('{{google_meet_link}}', `
-              <div class="event__details__link">
+              <div class="eventcard__infoButton">
                 <a href="${event['x-google-conference']}" target="_blank" rel="noopener">In Google Meet teilnehmen</a>
               </div>
             `)
@@ -101,7 +123,7 @@
         }
 
         event_element.innerHTML = this_event_card_html
-        events_wrapper_element.appendChild(event_element)
+        events_wrapper_element.appendChild(event_element.firstChild)
       })
     }
 
@@ -121,6 +143,19 @@
       })
       .catch(console.error)
   </script>
+
+  <style>
+    #events_wrapper {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-gap: 1rem;
+      width: 100%;
+    }
+    #events_wrapper a {
+      text-underline-offset: .05em;
+    }
+  </style>
+
 </body>
 
 </html>
