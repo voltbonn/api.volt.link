@@ -149,6 +149,52 @@ function x_apple_fix(iCalendarDataText) {
   return iCalendarDataText
 }
 
+function parse_volt_links(description) {
+  const links_regex = /###LINKS###({.*})/;
+
+  let properties = {}
+
+  const links_match = description.match(links_regex)
+  if (links_match) {
+    try {
+      let links_json = (links_match[1] || '')
+        .replaceAll('"', '\\"')
+        .replaceAll('{\\"', '{"')
+        .replaceAll('\\"}', '"}')
+        .replaceAll('\\":', '":')
+        .replaceAll(':\\"', ':"')
+        .replaceAll('\\",', '",')
+        .replaceAll(',\\"', ',"')
+
+      properties = JSON.parse(links_json)
+
+      const a_tag_regex = /<a.*?href="(.*?)".*?>(.*?)<\/a>/gi
+
+      for (const key in properties) {
+        if (properties.hasOwnProperty(key)) {
+          const value = properties[key];
+          if (value.match(a_tag_regex)) {
+            properties[key] = value.replace(a_tag_regex, '$1')
+          }
+        }
+      }
+    } catch (error) {
+      properties = {
+        error: 'Could not parse links',
+        error_details: String(error),
+      }
+      console.error('Could not parse links', error)
+    }
+
+    description = description.replace(links_regex, '')
+  }
+
+  return {
+    ...properties,
+    description,
+  }
+}
+
 async function get_events_from_calendar_url(options) {
   const {
     ical_url = 'https://calendars.icloud.com/holidays/de_de.ics/',
@@ -166,10 +212,13 @@ async function get_events_from_calendar_url(options) {
     wanted_range_end: new Date(wanted_range_end),
   })
 
-  // events = events.map(event => ({
-  //   ...event,
-  //   source: ical_url,
-  // }))
+  events = events.map(event => ({
+    ...event,
+    properties: {
+      ...event.properties,
+      ...parse_volt_links(event.properties.description),
+    },
+  }))
 
   return events
 }
