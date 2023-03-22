@@ -55,18 +55,18 @@
   <script>
   window.VoltEvents = class {
 
-    now = new Date()
-
-    // now = new Date().toISOString().split('T')[0]
+    selected_year = new Date().getFullYear()
+    selected_month = new Date().getMonth()
+    selected_day = new Date().getDate()
 
     ical_url = 'https://calendar.google.com/calendar/ical/c_8dguqa58qlft5to7i3j1uqbprk%40group.calendar.google.com/public/basic.ics'
 
     default_image = 'https://assets.volteuropa.org/styles/crop_320x160_2x/public/2021-10/volt_bb_thumbnail-presse.webp'
 
     custom_events_feed_html = `
-    <!--<div>
-      <button class="prev"> <- </button> <strong class="month">Monat</strong> <button class="next"> -> </button>
-    <div>-->
+    <div>
+      <button class="prev"> <- </button> <strong class="selected_date">Month Year</strong> <button class="next"> -> </button>
+    <div>
     <div class="custom_event_grid cards events cards__cardSize-small"></div>
     `
 
@@ -94,6 +94,10 @@
         </div>`
 
     constructor() { }
+
+    build_selected_date() {
+      return new Date(this.selected_year, this.selected_month, this.selected_day) // .toISOString().split('T')[0]
+    }
 
     linkify(inputText) {
       // source: https://stackoverflow.com/questions/37684/how-to-replace-plain-urls-with-links
@@ -155,26 +159,44 @@
     }
 
     prev_month() {
-      this.now = this.addMonth(this.now, -1)
-      console.log('ISO:', this.now.toISOString())
+      this.selected_month -= 1
+      this.selected_day = 1
+      console.log('ISO:', this.build_selected_date().toISOString())
       this.load()
     }
     next_month() {
-      this.now = this.addMonth(this.now, 1)
-      console.log('ISO:', this.now.toISOString())
+      this.selected_month += 1
+      this.selected_day = 1
+      console.log('ISO:', this.build_selected_date().toISOString())
       this.load()
+    }
+
+    set_nav_date_info (custom_events_feed_element) {
+      const selected_date_element = custom_events_feed_element.querySelector('.selected_date')
+      // set month in german and full year if selected year is not the current year
+      const selected_date = this.build_selected_date()
+      const current_year = new Date().getFullYear()
+      const selected_date_string = selected_date.toLocaleString('de-DE', { month: 'long' }) + (selected_date.getFullYear() !== current_year ? ' ' + selected_date.getFullYear() : '')
+      selected_date_element.innerHTML = selected_date_string
     }
 
     show_events(events) {
       const custom_events_feed_element = document.getElementById('custom_events_feed')
       custom_events_feed_element.innerHTML = this.custom_events_feed_html
 
-      // const prev_button_element = custom_events_feed_element.querySelector('.prev')
-      // prev_button_element.addEventListener('click', () => this.prev_month())
-      // const next_button_element = custom_events_feed_element.querySelector('.next')
-      // next_button_element.addEventListener('click', () => this.next_month())
+      const prev_button_element = custom_events_feed_element.querySelector('.prev')
+      prev_button_element.addEventListener('click', () => this.prev_month())
+      const next_button_element = custom_events_feed_element.querySelector('.next')
+      next_button_element.addEventListener('click', () => this.next_month())
+
+      this.set_nav_date_info(custom_events_feed_element)
 
       const events_wrapper_element = custom_events_feed_element.querySelector('.custom_event_grid')
+
+      if (events.length === 0) {
+        events_wrapper_element.innerHTML = '<strong class="no_events">Keine Termine in diesem Zeitraum.</strong>'
+        return
+      }
 
       events
         .sort((a, b) => new Date(a.dtstart).valueOf() - new Date(b.dtstart).valueOf())
@@ -233,9 +255,9 @@
     }
 
     load() {
-      const now = this.now
+      const now = this.build_selected_date()
       const start_date = new Date(now.setDate(now.getDate() - 1)).toISOString().split('T')[0]
-      const end_date = new Date(now.setDate(now.getDate() + 360)).toISOString().split('T')[0]
+      const end_date = new Date(now.setDate(now.getDate() + 32)).toISOString().split('T')[0]
 
       let events_url = `https://api.volt.link/events.json?url[]=${this.ical_url}&start=${start_date}&end=${end_date}`
       if (window.location.hostname === 'localhost') {
@@ -285,7 +307,10 @@
         grid-gap: 1rem;
         width: 100%;
       }
-    
+      .custom_event_grid .no_events {
+        grid-column: 1 / -1; /* full width */
+      }
+
       .custom_event_grid a {
         text-underline-offset: .05em;
       }
