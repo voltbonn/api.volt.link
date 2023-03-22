@@ -19,6 +19,7 @@ const wanted_event_properties = `
     summary
     description
     location
+    created
     last-modified
     x-google-conference
   `
