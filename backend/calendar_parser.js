@@ -217,6 +217,7 @@ async function get_events_from_calendar_url(options) {
     properties: {
       ...event.properties,
       ...parse_volt_links(event.properties.description),
+      source: ical_url,
     },
   }))
 
