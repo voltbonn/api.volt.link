@@ -93,6 +93,25 @@
           .replace(emailAddressPattern, '<a href="mailto:$&">$&</a>');
     }
 
+  function format_date (date) {
+    date = new Date(date)
+
+    const day = date.getDate().toString().padStart(2, '0'); // get the day of the month and pad it with leading zeros if necessary
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // get the month (zero-indexed) and add one, then pad it with leading zeros if necessary
+    const year = date.getFullYear(); // get the full year (e.g. 2023)
+    const hours = date.getHours().toString().padStart(2, '0'); // get the hours and pad it with leading zeros if necessary
+    const minutes = date.getMinutes().toString().padStart(2, '0'); // get the minutes and pad it with leading zeros if necessary
+
+    let formattedTime = `${hours}:${minutes}`;
+    if (hours === '00' && minutes === '00') {
+      formattedTime = '';
+    }
+
+    const formattedDate = `${day}.${month}.${year}${formattedTime ? `, ${formattedTime}` : ''}`; // concatenate the date and time into the desired format, omitting the time if it's zero
+
+    return formattedDate;
+  }
+
     function show_events(events) {
       const events_wrapper_element = document.getElementById('events_wrapper')
       events_wrapper_element.innerHTML = ''
@@ -107,7 +126,7 @@
           .replace('{{image}}', event.image || default_image)
           .replace('{{summary}}', event.summary || '')
           .replace('{{description}}', description)
-          .replace('{{start_date}}', event.dtstart || '')
+          .replace('{{start_date}}', format_date(event.dtstart || ''))
           .replace('{{organizer}}', event.location || 'Volt Brandenburg')
 
         if (event['x-google-conference']) {
