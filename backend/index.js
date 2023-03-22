@@ -32,6 +32,8 @@ const sharp = require('sharp')
 
 const { createExpressRestServer } = require('./rest/expressRestServer.js')
 
+const { get_events_from_calendar_url } = require('./calendar_parser.js')
+
 // function getUserLocales(){
 //     const localesByCounty = {
 //       de: ['de'],
@@ -276,6 +278,80 @@ app.get('/', (req, res) => {
       ? 'http://localhost:4003/api'
       : 'https://volt.link/api'
     )
+})
+
+app.get('/events.json', async (req, res) => {
+  let ical_urls = req.query.url // can be an array by using ?url[]=url1&url[]=url2
+
+  if (!ical_urls) {
+    res.json({
+      events: [],
+      error: 'No url provided. This can be an array by using ?url[]=url1&url[]=url2',
+    })
+    return
+  }
+
+  const wanted_range_start = req.query.start
+  if (!wanted_range_start) {
+    res.json({
+      events: [],
+      error: 'No start date provided. The date format is YYYY-MM-DD.',
+    })
+    return
+  }
+
+  const wanted_range_end = req.query.end
+  if (!wanted_range_end) {
+    res.json({
+      events: [],
+      error: 'No end date provided. The date format is YYYY-MM-DD.',
+    })
+    return
+  }
+
+  try {
+
+    const all_events = []
+
+    if (!Array.isArray(ical_urls) && typeof ical_urls === 'string') {
+      ical_urls = [ical_urls]
+    } else {
+      ical_urls = ical_urls
+        .filter(url => typeof url === 'string')
+    }
+
+    if (ical_urls.length === 0) {
+      res.json({
+        events: [],
+        error: 'No valid url provided.',
+      })
+      return
+    }
+
+    for (const url of ical_urls) {
+        try {
+          const events = await get_events_from_calendar_url({
+            ical_url: url,
+            wanted_range_start,
+            wanted_range_end,
+          })
+          all_events.push(...events)
+        } catch (error) {
+          console.error(error)
+        }
+    }
+
+    res.json({
+      events: all_events,
+      error: null,
+    })
+  } catch (error) {
+    console.error(error)
+    res.json({
+      events: [],
+      error: String(error),
+    })
+  }
 })
 
 // app.get('/teams.json', async (req, res) => {
