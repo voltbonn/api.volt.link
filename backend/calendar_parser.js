@@ -66,8 +66,8 @@ function get_event_properties(event) {
     }, {})
   
   return {
+    ...properties,
     type: 'event',
-    properties,
     // vevent: String(event.toString()),
   }
 }
@@ -110,12 +110,16 @@ function get_cal_events (iCalendarDataText, options = {}) {
       }
 
       let event_properties = get_event_properties(ocs.item)
-      event_properties.properties.dtstart = { type: 'date-time', value: startDate.toISOString() }
-      event_properties.properties.dtend = { type: 'date-time', value: endDate.toISOString() }
+      event_properties.dtstart = { type: 'date-time', value: startDate.toISOString() }
+      event_properties.dtend = { type: 'date-time', value: endDate.toISOString() }
 
       if (with_property_types === false) {
-        event_properties.properties = Object.keys(event_properties.properties).reduce((acc, key) => {
-          acc[key] = event_properties.properties[key].value
+        event_properties = Object.keys(event_properties).reduce((acc, key) => {
+          if (typeof event_properties[key] === 'object' && event_properties[key].value !== null) {
+            acc[key] = event_properties[key].value
+          } else {
+            acc[key] = event_properties[key]
+          }
           return acc
         }, {})
       }
@@ -213,10 +217,9 @@ async function get_events_from_calendar_url(options) {
     wanted_range_end: new Date(wanted_range_end),
   })
 
-  events = events.map(event => ({
-    type: event.type,
-    ...event.properties,
-    ...parse_volt_links(event.properties.description),
+  events = events.map(event_properties => ({
+    ...event_properties,
+    ...parse_volt_links(event_properties.description),
     source: ical_url,
   }))
 
