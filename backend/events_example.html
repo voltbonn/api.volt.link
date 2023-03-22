@@ -55,6 +55,8 @@
   <script>
   window.VoltEvents = class {
 
+    amount_of_day = 33 // amount of days to load events for
+
     selected_year = new Date().getFullYear()
     selected_month = new Date().getMonth()
     selected_day = new Date().getDate()
@@ -263,7 +265,7 @@
     load() {
       const now = this.build_selected_date()
       const start_date = new Date(now.setDate(now.getDate() - 1)).toISOString().split('T')[0]
-      const end_date = new Date(now.setDate(now.getDate() + 33)).toISOString().split('T')[0]
+      const end_date = new Date(now.setDate(now.getDate() + this.amount_of_day)).toISOString().split('T')[0]
 
       let events_url = `https://api.volt.link/events.json?url[]=${this.ical_url}&start=${start_date}&end=${end_date}`
       if (window.location.hostname === 'localhost') {
@@ -335,6 +337,9 @@
     }
     .custom_events_feed .nav button:hover {
       background-color: var(--color-dark);
+    }
+    .custom_events_feed .nav h3 {
+      margin: 0;
     }
 
       .custom_event_grid {
