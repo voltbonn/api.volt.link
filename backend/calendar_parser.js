@@ -213,6 +213,7 @@ async function get_events_from_calendar_url(options) {
   })
 
   events = events.map(event => ({
+    type: event.type,
     ...event.properties,
     ...parse_volt_links(event.properties.description),
     source: ical_url,
