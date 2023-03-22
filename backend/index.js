@@ -313,6 +313,16 @@ app.get('/events.json', async (req, res) => {
   }
 })
 
+app.get('/events_example.html', function (req, res) {
+  // read events_example.html
+  const fs = require('fs')
+  const path = require('path')
+  const filePath = path.join(__dirname, 'events_example.html')
+  const contents = fs.readFileSync(filePath, 'utf8');
+  res.send(contents)
+})
+
+
 // app.get('/teams.json', async (req, res) => {
 //   if (!req.logged_in) {
 //     res.json({ error: 'You are not logged in.' })
