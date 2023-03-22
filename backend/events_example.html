@@ -63,7 +63,7 @@
 
     ical_url = 'https://calendar.google.com/calendar/ical/c_8dguqa58qlft5to7i3j1uqbprk%40group.calendar.google.com/public/basic.ics'
 
-    default_image = 'https://assets.volteuropa.org/styles/crop_320x160_2x/public/2021-10/volt_bb_thumbnail-presse.webp'
+    default_image = 'https://assets.volteuropa.org/styles/crop_320x160_2x/public/2023-03/image_2023-03-07_114249944.png'
 
     custom_events_feed_html = `<div class="custom_events_feed">
       <div class="nav">
@@ -300,12 +300,14 @@
   }
 
   function init() {
+    console.log('init custom volt events')
     const volt_events = new window.VoltEvents()
     volt_events.load()
   }
+  window.addEventListener('popstate', init)
+  window.addEventListener('locationchange', init)
   init()
 
-  window.addEventListener('popstate', init)
   </script>
 
   <style>
