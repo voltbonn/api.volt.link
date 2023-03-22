@@ -49,17 +49,26 @@
 
 
 
-  <div id="events_wrapper" class="custom_event_grid cards events cards__cardSize-small"></div>
+  
+  <div id="custom_events_feed"></div>
 
   <script>
   window.VoltEvents = class {
+
+    now = new Date()
+
     // now = new Date().toISOString().split('T')[0]
-    start_date = new Date(new Date().setDate(new Date().getDate())).toISOString().split('T')[0]
-    end_date = new Date(new Date().setDate(new Date().getDate() + 360)).toISOString().split('T')[0]
 
     ical_url = 'https://calendar.google.com/calendar/ical/c_8dguqa58qlft5to7i3j1uqbprk%40group.calendar.google.com/public/basic.ics'
 
     default_image = 'https://assets.volteuropa.org/styles/crop_320x160_2x/public/2021-10/volt_bb_thumbnail-presse.webp'
+
+    custom_events_feed_html = `
+    <!--<div>
+      <button class="prev"> <- </button> <strong class="month">Monat</strong> <button class="next"> -> </button>
+    <div>-->
+    <div class="custom_event_grid cards events cards__cardSize-small"></div>
+    `
 
     event_card_html = `<div class="eventcard eventcard__type-default eventcard__size-small">
           <figure class="eventcard__image">
@@ -135,9 +144,37 @@
       tmp_description.innerHTML = html
       return tmp_description.textContent || tmp_description.innerText || ''
     }
+
+    addMonth(date, months) {
+      let d = date.getDate();
+      date.setMonth(date.getMonth() + months);
+      if (date.getDate() != d) {
+        date.setDate(0);
+      }
+      return date;
+    }
+
+    prev_month() {
+      this.now = this.addMonth(this.now, -1)
+      console.log('ISO:', this.now.toISOString())
+      this.load()
+    }
+    next_month() {
+      this.now = this.addMonth(this.now, 1)
+      console.log('ISO:', this.now.toISOString())
+      this.load()
+    }
+
     show_events(events) {
-      const events_wrapper_element = document.getElementById('events_wrapper')
-      events_wrapper_element.innerHTML = ''
+      const custom_events_feed_element = document.getElementById('custom_events_feed')
+      custom_events_feed_element.innerHTML = this.custom_events_feed_html
+
+      // const prev_button_element = custom_events_feed_element.querySelector('.prev')
+      // prev_button_element.addEventListener('click', () => this.prev_month())
+      // const next_button_element = custom_events_feed_element.querySelector('.next')
+      // next_button_element.addEventListener('click', () => this.next_month())
+
+      const events_wrapper_element = custom_events_feed_element.querySelector('.custom_event_grid')
 
       events
         .sort((a, b) => new Date(a.dtstart).valueOf() - new Date(b.dtstart).valueOf())
@@ -195,11 +232,14 @@
         })
     }
 
-
     load() {
-      let events_url = `https://api.volt.link/events.json?url[]=${this.ical_url}&start=${this.start_date}&end=${this.end_date}`
+      const now = this.now
+      const start_date = new Date(now.setDate(now.getDate() - 1)).toISOString().split('T')[0]
+      const end_date = new Date(now.setDate(now.getDate() + 360)).toISOString().split('T')[0]
+
+      let events_url = `https://api.volt.link/events.json?url[]=${this.ical_url}&start=${start_date}&end=${end_date}`
       if (window.location.hostname === 'localhost') {
-        events_url = `http://localhost:4004/events.json?url[]=${this.ical_url}&start=${this.start_date}&end=${this.end_date}`
+        events_url = `http://localhost:4004/events.json?url[]=${this.ical_url}&start=${start_date}&end=${end_date}`
       }
 
       if (!window.fetch) {
