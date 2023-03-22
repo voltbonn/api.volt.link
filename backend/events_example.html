@@ -48,153 +48,170 @@
 
 
 
-    <div id="events_wrapper" class="custom_event_grid cards events cards__cardSize-small"></div>
+  <div id="events_wrapper" class="custom_event_grid cards events cards__cardSize-small"></div>
 
-    <script>
+  <script>
+  window.VoltEvents = class {
+    // now = new Date().toISOString().split('T')[0]
+    start_date = new Date(new Date().setDate(new Date().getDate() - 360)).toISOString().split('T')[0]
+    end_date = new Date(new Date().setDate(new Date().getDate() + 360)).toISOString().split('T')[0]
 
-      const now = new Date().toISOString().split('T')[0]
-      const start_date = new Date(new Date().setDate(new Date().getDate() - 360)).toISOString().split('T')[0]
-      const end_date = new Date(new Date().setDate(new Date().getDate() + 360)).toISOString().split('T')[0]
+    ical_url = 'https://calendar.google.com/calendar/ical/c_8dguqa58qlft5to7i3j1uqbprk%40group.calendar.google.com/public/basic.ics'
 
-      const ical_url = 'https://calendar.google.com/calendar/ical/c_8dguqa58qlft5to7i3j1uqbprk%40group.calendar.google.com/public/basic.ics'
+    default_image = 'https://assets.volteuropa.org/styles/crop_320x160_2x/public/2021-10/volt_bb_thumbnail-presse.webp'
 
-      const default_image = 'https://assets.volteuropa.org/styles/crop_320x160_2x/public/2021-10/volt_bb_thumbnail-presse.webp'
-
-      const event_card_html = `<div class="eventcard eventcard__type-default eventcard__size-small">
-        <figure class="eventcard__image">
-          <picture>
-            <img src="{{image}}" alt="" loading="lazy">
-          </picture>
-        </figure>
-        <div class="event__details eventcard__content">
-          <h4 class="event__details__title">
-            <span>{{summary}}</span>
-          </h4>
-          <div class="event__details__time">
-            <span> {{start_date}}</span>
+    event_card_html = `<div class="eventcard eventcard__type-default eventcard__size-small">
+          <figure class="eventcard__image">
+            <picture>
+              <img src="{{image}}" alt="" loading="lazy">
+            </picture>
+          </figure>
+          <div class="event__details eventcard__content">
+            <h4 class="event__details__title">
+              <span>{{summary}}</span>
+            </h4>
+            <div class="event__details__time">
+              <span> {{start_date}}</span>
+            </div>
+            <div class="event__details__organizer-language">
+              {{organizer}}
+            </div>
+            <div class="event__details__description">
+              {{description}}
+            </div>
+            {{google_meet_link}}
           </div>
-          <div class="event__details__organizer-language">
-            {{organizer}}
-          </div>
-          <div class="event__details__description">
-            {{description}}
-          </div>
-          {{google_meet_link}}
-        </div>
-      </div>`
+        </div>`
 
-      function linkify(inputText) {
-        // source: https://stackoverflow.com/questions/37684/how-to-replace-plain-urls-with-links
-        // this would be better: https://linkify.js.org/
+    constructor() { }
 
-        // http://, https://, ftp://
-        var urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gim;
+    linkify(inputText) {
+      // source: https://stackoverflow.com/questions/37684/how-to-replace-plain-urls-with-links
+      // this would be better: https://linkify.js.org/
 
-        // www. sans http:// or https://
-        var pseudoUrlPattern = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+      // http://, https://, ftp://
+      var urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gim;
 
-        // Email addresses
-        var emailAddressPattern = /[\w.]+@[a-zA-Z_-]+?(?:\.[a-zA-Z]{2,6})+/gim;
+      // www. sans http:// or https://
+      var pseudoUrlPattern = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
 
-        return inputText
-          .replace(urlPattern, '<a href="$&" target="_blank">$&</a>')
-          .replace(pseudoUrlPattern, '$1<a href="http://$2" target="_blank">$2</a>')
-          .replace(emailAddressPattern, '<a href="mailto:$&">$&</a>');
+      // Email addresses
+      var emailAddressPattern = /[\w.]+@[a-zA-Z_-]+?(?:\.[a-zA-Z]{2,6})+/gim;
+
+      return inputText
+        .replace(urlPattern, '<a href="$&" target="_blank">$&</a>')
+        .replace(pseudoUrlPattern, '$1<a href="http://$2" target="_blank">$2</a>')
+        .replace(emailAddressPattern, '<a href="mailto:$&">$&</a>');
+    }
+
+    format_date(date) {
+      date = new Date(date)
+
+      const day = date.getDate().toString().padStart(2, '0'); // get the day of the month and pad it with leading zeros if necessary
+      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // get the month (zero-indexed) and add one, then pad it with leading zeros if necessary
+      const year = date.getFullYear(); // get the full year (e.g. 2023)
+      const hours = date.getHours().toString().padStart(2, '0'); // get the hours and pad it with leading zeros if necessary
+      const minutes = date.getMinutes().toString().padStart(2, '0'); // get the minutes and pad it with leading zeros if necessary
+
+      let formattedTime = `${hours}:${minutes}`;
+      if (hours === '00' && minutes === '00') {
+        formattedTime = '';
       }
 
-      function format_date(date) {
-        date = new Date(date)
+      const formattedDate = `${day}.${month}.${year}${formattedTime ? `, ${formattedTime}` : ''}`; // concatenate the date and time into the desired format, omitting the time if it's zero
 
-        const day = date.getDate().toString().padStart(2, '0'); // get the day of the month and pad it with leading zeros if necessary
-        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // get the month (zero-indexed) and add one, then pad it with leading zeros if necessary
-        const year = date.getFullYear(); // get the full year (e.g. 2023)
-        const hours = date.getHours().toString().padStart(2, '0'); // get the hours and pad it with leading zeros if necessary
-        const minutes = date.getMinutes().toString().padStart(2, '0'); // get the minutes and pad it with leading zeros if necessary
+      return formattedDate;
+    }
 
-        let formattedTime = `${hours}:${minutes}`;
-        if (hours === '00' && minutes === '00') {
-          formattedTime = '';
-        }
+    get_plaintext(html) {
+      html = html
+        .replace(/<br\s*\/?>/g, '\n')
+        .replace(/<p>/g, '\n')
+        .replace(/<\/p>/g, '\n')
+        .replace(/(<\/li>)/g, '$1\n')
+        .replace(/(<\/ul>)/g, '$1\n')
+      let tmp_description = document.createElement('div')
+      tmp_description.innerHTML = html
+      return tmp_description.textContent || tmp_description.innerText || ''
+    }
+    show_events(events) {
+      const events_wrapper_element = document.getElementById('events_wrapper')
+      events_wrapper_element.innerHTML = ''
 
-        const formattedDate = `${day}.${month}.${year}${formattedTime ? `, ${formattedTime}` : ''}`; // concatenate the date and time into the desired format, omitting the time if it's zero
-
-        return formattedDate;
-      }
-
-      function get_plaintext(html) {
-        html = html
-          .replace(/<br\s*\/?>/g, '\n')
-          .replace(/<p>/g, '\n')
-          .replace(/<\/p>/g, '\n')
-          .replace(/(<\/li>)/g, '$1\n')
-          .replace(/(<\/ul>)/g, '$1\n')
-        let tmp_description = document.createElement('div')
-        tmp_description.innerHTML = html
-        return tmp_description.textContent || tmp_description.innerText || ''
-      }
-      function show_events(events) {
-        const events_wrapper_element = document.getElementById('events_wrapper')
-        events_wrapper_element.innerHTML = ''
-
-        events
-          .sort((a, b) => new Date(a.dtstart).valueOf() - new Date(b.dtstart).valueOf())
-          .forEach(event => {
-            const event_element = document.createElement('div')
+      events
+        .sort((a, b) => new Date(a.dtstart).valueOf() - new Date(b.dtstart).valueOf())
+        .forEach(event => {
+          const event_element = document.createElement('div')
 
 
-            let description = get_plaintext(event.description || '')
-            description = linkify(description)
-              .replace(/(?:\r\n|\r|\n){3,}/g, '\n\n') // remove multiple newlines
-              .replace(/^[\n\s]+/g, '') // remove leading newlines
-              .replace(/[\n\s]+$/g, '') // remove trailing newlines
-              .replace(/Über Google Meet teilnehmen:(?:.|\n)*/g, '') // remove google meets clutter
+          let description = this.get_plaintext(event.description || '')
+          description = this.linkify(description)
+            .replace(/(?:\r\n|\r|\n){3,}/g, '\n\n') // remove multiple newlines
+            .replace(/^[\n\s]+/g, '') // remove leading newlines
+            .replace(/[\n\s]+$/g, '') // remove trailing newlines
+            .replace(/Über Google Meet teilnehmen:(?:.|\n)*/g, '') // remove google meets clutter
 
-            const cut_lenght = 200
-            const check_lenght = cut_lenght + 10
-            if (description.length > check_lenght) {
-              const first_part = description
-                .substring(0, cut_lenght)
-                .replace(/\n/g, '<br />') // replace newlines with <br />
-              const second_part = description.substring(cut_lenght)
-                .replace(/\n/g, '<br />') // replace newlines with <br />
+          const cut_lenght = 200
+          const check_lenght = cut_lenght + 10
+          if (description.length > check_lenght) {
+            const first_part = description
+              .substring(0, cut_lenght)
+              .replace(/\n/g, '<br />') // replace newlines with <br />
+            const second_part = description.substring(cut_lenght)
+              .replace(/\n/g, '<br />') // replace newlines with <br />
 
-              description = `
+            description = `
                 <details>
                   <summary>${first_part}</summary>${second_part}
                 </details>
               `
-            } else {
-              description = description
-                .replace(/\n/g, '<br />') // replace newlines with <br />
-            }
+          } else {
+            description = description
+              .replace(/\n/g, '<br />') // replace newlines with <br />
+          }
 
-            let this_event_card_html = event_card_html
-              .replace('{{image}}', event.image || default_image)
-              .replace('{{summary}}', event.summary || '')
-              .replace('{{description}}', description)
-              .replace('{{start_date}}', format_date(event.dtstart || ''))
-              .replace('{{organizer}}', event.location || 'Volt Brandenburg')
+          let this_event_card_html = this.event_card_html
+            .replace('{{image}}', event.image || this.default_image)
+            .replace('{{summary}}', event.summary || '')
+            .replace('{{description}}', description)
+            .replace('{{start_date}}', this.format_date(event.dtstart || ''))
+            .replace('{{organizer}}', event.location || 'Volt Brandenburg')
 
-            if (event['x-google-conference']) {
-              this_event_card_html = this_event_card_html
-                .replace('{{google_meet_link}}', `
+          if (event['x-google-conference']) {
+            this_event_card_html = this_event_card_html
+              .replace('{{google_meet_link}}', `
                   <div class="eventcard__infoButton">
                     <a href="${event['x-google-conference']}" target="_blank" rel="noopener">In Google Meet teilnehmen</a>
                   </div>
                 `)
-            } else {
-              this_event_card_html = this_event_card_html
-                .replace('{{google_meet_link}}', '')
-            }
+          } else {
+            this_event_card_html = this_event_card_html
+              .replace('{{google_meet_link}}', '')
+          }
 
-            event_element.innerHTML = this_event_card_html
-            events_wrapper_element.appendChild(event_element.firstChild)
-          })
+          event_element.innerHTML = this_event_card_html
+          events_wrapper_element.appendChild(event_element.firstChild)
+        })
+    }
+
+
+    load() {
+      let events_url = `https://api.volt.link/events.json?url[]=${this.ical_url}&start=${this.start_date}&end=${this.end_date}`
+      if (window.location.hostname === 'localhost') {
+        events_url = `http://localhost:4004/events.json?url[]=${this.ical_url}&start=${this.start_date}&end=${this.end_date}`
       }
 
-      let events_url = `https://api.volt.link/events.json?url[]=${ical_url}&start=${start_date}&end=${end_date}`
-      if (window.location.hostname === 'localhost') {
-        events_url = `http://localhost:4004/events.json?url[]=${ical_url}&start=${start_date}&end=${end_date}`
+      if (!window.fetch) {
+        throw new Error('fetch is not available')
+      }
+
+      if (!window.volt_event_cache) {
+        window.volt_event_cache = {}
+      }
+
+      if (window.volt_event_cache[events_url]) {
+        this.show_events(window.volt_event_cache[events_url])
+        return
       }
 
       fetch(events_url)
@@ -203,13 +220,24 @@
           if (typeof data.error === 'string' && data.error.length > 0) {
             throw new Error(data.error)
           } else {
-            show_events(data.events)
+            window.volt_event_cache[events_url] = data.events
+            this.show_events(data.events)
           }
         })
         .catch(console.error)
-    </script>
+    }
+  }
 
-    <style>
+  function init() {
+    const volt_events = new window.VoltEvents()
+    volt_events.load()
+  }
+  init()
+
+  window.addEventListener('popstate', init)
+  </script>
+
+  <style>
       .custom_event_grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -251,7 +279,7 @@
       .custom_event_grid details[open] summary:after {
         content: '';
       }
-    </style>
+  </style>
 
 
 
