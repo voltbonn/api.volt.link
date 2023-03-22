@@ -152,11 +152,9 @@
             const cut_lenght = 200
             const check_lenght = cut_lenght + 10
             if (description.length > check_lenght) {
-              const first_part = (
-                description
-                  .substring(0, cut_lenght)
-                  .replace(/\n/g, '<br />') // replace newlines with <br />
-              ) + '…'
+              const first_part = description
+                .substring(0, cut_lenght)
+                .replace(/\n/g, '<br />') // replace newlines with <br />
               const second_part = description.substring(cut_lenght)
                 .replace(/\n/g, '<br />') // replace newlines with <br />
 
@@ -239,12 +237,19 @@
       .custom_event_grid .eventcard .event__details__description p:last-of-type{
         margin-block-end: 0;
       }
-      .custom_event_grid summary {
+      .custom_event_grid details summary {
         display: inline;
         cursor: pointer;
+        /* margin-inline-end: -4px; */
       }
-      .custom_event_grid summary:hover {
+      .custom_event_grid details summary:hover {
         opacity: .8;
+      }
+      .custom_event_grid details summary:after {
+        content: '…';
+      }
+      .custom_event_grid details[open] summary:after {
+        content: '';
       }
     </style>
 
