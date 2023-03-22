@@ -45,43 +45,47 @@
   </div>
 
 
-  <div id="events_wrapper" class="cards events cards__cardSize-small"></div>
-  
-  <script>
 
-    const start_date = new Date().toISOString().split('T')[0]
-    const end_date = new Date(new Date().setDate(new Date().getDate() + 60)).toISOString().split('T')[0]
 
-    const ical_url = 'https://calendar.google.com/calendar/ical/c_8dguqa58qlft5to7i3j1uqbprk%40group.calendar.google.com/public/basic.ics'
 
-    const default_image = 'https://assets.volteuropa.org/styles/crop_320x160_2x/public/2021-10/volt_bb_thumbnail-presse.webp'
+    <div id="events_wrapper" class="custom_event_grid cards events cards__cardSize-small"></div>
 
-    const event_card_html = `<div class="eventcard eventcard__type-default eventcard__size-small">
-    <figure class="eventcard__image">
-      <picture>
-        <img src="{{image}}" alt="" loading="lazy">
-      </picture>
-    </figure>
-    <div class="event__details eventcard__content">
-      <h4 class="event__details__title">
-        <span>{{summary}}</span>
-      </h4>
-      <div class="event__details__organizer-language">
-        {{organizer}}
-      </div>
-      <div class="event__details__time">
-        <span> {{start_date}}</span>
-      </div>
-      <div class="event__details__description">
-        {{description}}
-      </div>
-      {{google_meet_link}}
-    </div>
-  </div>`
+    <script>
 
-  function linkify(inputText) {
-    // source: https://stackoverflow.com/questions/37684/how-to-replace-plain-urls-with-links
-    // this would be better: https://linkify.js.org/
+      const now = new Date().toISOString().split('T')[0]
+      const start_date = new Date(new Date().setDate(new Date().getDate() - 360)).toISOString().split('T')[0]
+      const end_date = new Date(new Date().setDate(new Date().getDate() + 360)).toISOString().split('T')[0]
+
+      const ical_url = 'https://calendar.google.com/calendar/ical/c_8dguqa58qlft5to7i3j1uqbprk%40group.calendar.google.com/public/basic.ics'
+
+      const default_image = 'https://assets.volteuropa.org/styles/crop_320x160_2x/public/2021-10/volt_bb_thumbnail-presse.webp'
+
+      const event_card_html = `<div class="eventcard eventcard__type-default eventcard__size-small">
+        <figure class="eventcard__image">
+          <picture>
+            <img src="{{image}}" alt="" loading="lazy">
+          </picture>
+        </figure>
+        <div class="event__details eventcard__content">
+          <h4 class="event__details__title">
+            <span>{{summary}}</span>
+          </h4>
+          <div class="event__details__time">
+            <span> {{start_date}}</span>
+          </div>
+          <div class="event__details__organizer-language">
+            {{organizer}}
+          </div>
+          <div class="event__details__description">
+            {{description}}
+          </div>
+          {{google_meet_link}}
+        </div>
+      </div>`
+
+      function linkify(inputText) {
+        // source: https://stackoverflow.com/questions/37684/how-to-replace-plain-urls-with-links
+        // this would be better: https://linkify.js.org/
 
         // http://, https://, ftp://
         var urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gim;
@@ -96,89 +100,122 @@
           .replace(urlPattern, '<a href="$&" target="_blank">$&</a>')
           .replace(pseudoUrlPattern, '$1<a href="http://$2" target="_blank">$2</a>')
           .replace(emailAddressPattern, '<a href="mailto:$&">$&</a>');
-    }
+      }
 
-  function format_date (date) {
-    date = new Date(date)
+      function format_date(date) {
+        date = new Date(date)
 
-    const day = date.getDate().toString().padStart(2, '0'); // get the day of the month and pad it with leading zeros if necessary
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // get the month (zero-indexed) and add one, then pad it with leading zeros if necessary
-    const year = date.getFullYear(); // get the full year (e.g. 2023)
-    const hours = date.getHours().toString().padStart(2, '0'); // get the hours and pad it with leading zeros if necessary
-    const minutes = date.getMinutes().toString().padStart(2, '0'); // get the minutes and pad it with leading zeros if necessary
+        const day = date.getDate().toString().padStart(2, '0'); // get the day of the month and pad it with leading zeros if necessary
+        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // get the month (zero-indexed) and add one, then pad it with leading zeros if necessary
+        const year = date.getFullYear(); // get the full year (e.g. 2023)
+        const hours = date.getHours().toString().padStart(2, '0'); // get the hours and pad it with leading zeros if necessary
+        const minutes = date.getMinutes().toString().padStart(2, '0'); // get the minutes and pad it with leading zeros if necessary
 
-    let formattedTime = `${hours}:${minutes}`;
-    if (hours === '00' && minutes === '00') {
-      formattedTime = '';
-    }
-
-    const formattedDate = `${day}.${month}.${year}${formattedTime ? `, ${formattedTime}` : ''}`; // concatenate the date and time into the desired format, omitting the time if it's zero
-
-    return formattedDate;
-  }
-
-    function show_events(events) {
-      const events_wrapper_element = document.getElementById('events_wrapper')
-      events_wrapper_element.innerHTML = ''
-      events.forEach(event => {
-        const event_element = document.createElement('div')
-
-        const description = linkify(event.description || '')
-          .replace(/(?:\r\n|\r|\n)/g, '<br />')
-          .replace(/Über Google Meet teilnehmen:.*/g, '')
-
-        let this_event_card_html = event_card_html
-          .replace('{{image}}', event.image || default_image)
-          .replace('{{summary}}', event.summary || '')
-          .replace('{{description}}', description)
-          .replace('{{start_date}}', format_date(event.dtstart || ''))
-          .replace('{{organizer}}', event.location || 'Volt Brandenburg')
-
-        if (event['x-google-conference']) {
-          this_event_card_html = this_event_card_html
-            .replace('{{google_meet_link}}', `
-              <div class="eventcard__infoButton">
-                <a href="${event['x-google-conference']}" target="_blank" rel="noopener">In Google Meet teilnehmen</a>
-              </div>
-            `)
-        } else {
-          this_event_card_html = this_event_card_html
-            .replace('{{google_meet_link}}', '')
+        let formattedTime = `${hours}:${minutes}`;
+        if (hours === '00' && minutes === '00') {
+          formattedTime = '';
         }
 
-        event_element.innerHTML = this_event_card_html
-        events_wrapper_element.appendChild(event_element.firstChild)
-      })
-    }
+        const formattedDate = `${day}.${month}.${year}${formattedTime ? `, ${formattedTime}` : ''}`; // concatenate the date and time into the desired format, omitting the time if it's zero
 
-    let events_url = `https://api.volt.link/events.json?url[]=${ical_url}&start=${start_date}&end=${end_date}`
-    if (window.location.hostname === 'localhost') {
-      events_url = `http://localhost:4004/events.json?url[]=${ical_url}&start=${start_date}&end=${end_date}`
-    }
+        return formattedDate;
+      }
 
-    fetch(events_url)
-      .then(response => response.json())
-      .then(data => {
-        if (typeof data.error === 'string' && data.error.length > 0) {
-          throw new Error(data.error)
-        } else {
-          show_events(data.events)
-        }
-      })
-      .catch(console.error)
-  </script>
+      function show_events(events) {
+        const events_wrapper_element = document.getElementById('events_wrapper')
+        events_wrapper_element.innerHTML = ''
+        events
+          .sort((a, b) => new Date(a.dtstart).valueOf() - new Date(b.dtstart).valueOf())
+          .forEach(event => {
+            const event_element = document.createElement('div')
 
-  <style>
-    #events_wrapper {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      grid-gap: 1rem;
-      width: 100%;
-    }
-    #events_wrapper a {
-      text-underline-offset: .05em;
-    }
-  </style>
+            let description = linkify(event.description || '')
+              .replace(/(?:\r\n|\r|\n)/g, '<br />')
+              .replace(/Über Google Meet teilnehmen:.*/g, '')
+
+            const max_lenght = 250
+            if (description.length > max_lenght) {
+              const first_part = description.substring(0, max_lenght) + '…'
+              const second_part = description.substring(max_lenght)
+
+              description = `
+                <details>
+                  <summary>${first_part}</summary>${second_part}
+                </details>
+              `
+            }
+
+            let this_event_card_html = event_card_html
+              .replace('{{image}}', event.image || default_image)
+              .replace('{{summary}}', event.summary || '')
+              .replace('{{description}}', description)
+              .replace('{{start_date}}', format_date(event.dtstart || ''))
+              .replace('{{organizer}}', event.location || 'Volt Brandenburg')
+
+            if (event['x-google-conference']) {
+              this_event_card_html = this_event_card_html
+                .replace('{{google_meet_link}}', `
+                  <div class="eventcard__infoButton">
+                    <a href="${event['x-google-conference']}" target="_blank" rel="noopener">In Google Meet teilnehmen</a>
+                  </div>
+                `)
+            } else {
+              this_event_card_html = this_event_card_html
+                .replace('{{google_meet_link}}', '')
+            }
+
+            event_element.innerHTML = this_event_card_html
+            events_wrapper_element.appendChild(event_element.firstChild)
+          })
+      }
+
+      let events_url = `https://api.volt.link/events.json?url[]=${ical_url}&start=${start_date}&end=${end_date}`
+      if (window.location.hostname === 'localhost') {
+        events_url = `http://localhost:4004/events.json?url[]=${ical_url}&start=${start_date}&end=${end_date}`
+      }
+
+      fetch(events_url)
+        .then(response => response.json())
+        .then(data => {
+          if (typeof data.error === 'string' && data.error.length > 0) {
+            throw new Error(data.error)
+          } else {
+            show_events(data.events)
+          }
+        })
+        .catch(console.error)
+    </script>
+
+    <style>
+      .custom_event_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        grid-gap: 1rem;
+        width: 100%;
+      }
+    
+      .custom_event_grid a {
+        text-underline-offset: .05em;
+      }
+      .custom_event_grid .eventcard__image {
+        min-height: 7rem;
+        aspect-ratio: 2/1;
+        height: auto;
+      }
+      .custom_event_grid .eventcard .event__details__organizer-language {
+        padding-top: 16px;
+      }
+      .custom_event_grid .eventcard .event__details__time{
+        padding-top: 4px;
+      }
+      .custom_event_grid summary {
+        display: inline;
+        cursor: pointer;
+      }
+      .custom_event_grid summary:hover {
+        opacity: .8;
+      }
+    </style>
 
 
 
