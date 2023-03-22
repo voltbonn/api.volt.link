@@ -136,7 +136,6 @@
         const events_wrapper_element = document.getElementById('events_wrapper')
         events_wrapper_element.innerHTML = ''
 
-        let counter = 0
         events
           .sort((a, b) => new Date(a.dtstart).valueOf() - new Date(b.dtstart).valueOf())
           .forEach(event => {
@@ -151,12 +150,7 @@
               .replace(/\n/g, '<br />') // replace newlines with <br />
               .replace(/Über Google Meet teilnehmen:.*/g, '') // remove google meets clutter
 
-              counter += 1
-            if (counter === 3) {
-              console.log('description', description)
-            }
-
-            const max_lenght = 250
+            const max_lenght = 200
             if (description.length > max_lenght) {
               const first_part = description.substring(0, max_lenght) + '…'
               const second_part = description.substring(max_lenght)
