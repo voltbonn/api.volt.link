@@ -317,9 +317,15 @@ app.get('/events_example.html', function (req, res) {
   // read events_example.html
   const fs = require('fs')
   const path = require('path')
-  const filePath = path.join(__dirname, 'events_example.html')
-  const contents = fs.readFileSync(filePath, 'utf8');
-  res.send(contents)
+
+  const css_filePath = path.join(__dirname, 'events_example.css')
+  const css_contents = fs.readFileSync(css_filePath, 'utf8');
+
+  const html_filePath = path.join(__dirname, 'events_example.html')
+  let html_contents = fs.readFileSync(html_filePath, 'utf8');
+  html_contents = html_contents.replace('/* HEAD CSS */', css_contents)
+
+  res.send(html_contents)
 })
 
 
