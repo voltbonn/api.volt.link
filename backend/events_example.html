@@ -169,13 +169,11 @@
     prev_month() {
       this.selected_month -= 1
       this.selected_day = 1
-      console.log('ISO:', this.build_selected_date().toISOString())
       this.load()
     }
     next_month() {
       this.selected_month += 1
       this.selected_day = 1
-      console.log('ISO:', this.build_selected_date().toISOString())
       this.load()
     }
 
@@ -299,14 +297,24 @@
     }
   }
 
-  function init() {
-    console.log('init custom volt events')
+  function load_events() {
+    // console.log('init custom volt events')
     const volt_events = new window.VoltEvents()
     volt_events.load()
   }
-  window.addEventListener('popstate', init)
-  window.addEventListener('locationchange', init)
-  init()
+  function init_events() {
+    window.lastUrl;
+    window.event_interval = setInterval(() => {
+      let currUrl = window.location.href
+      if (currUrl != window.lastUrl) {
+        load_events()
+        window.lastUrl = currUrl
+      }
+    }, 100)
+
+    // load_events() // is called by the interval
+  }
+  init_events()
 
   </script>
 
@@ -395,6 +403,46 @@
 
 
 
+
+
+
+
+
+
+<!--
+<script>
+
+  // window.addEventListener('load', load_events)
+  // window.addEventListener('popstate', load_events)
+  // window.addEventListener('locationchange', load_events)
+  // window.addEventListener('online', load_events)
+  // window.addEventListener('pageshow', load_events)
+
+  function history_event_overwrite() {
+    // source: https://stackoverflow.com/questions/6390341/how-to-detect-if-url-has-changed-after-hash-in-javascript
+    let oldPushState = history.pushState;
+    history.pushState = function pushState() {
+      let ret = oldPushState.apply(this, arguments);
+      window.dispatchEvent(new Event('pushstate'));
+      window.dispatchEvent(new Event('locationchange'));
+      return ret;
+    };
+
+    let oldReplaceState = history.replaceState;
+    history.replaceState = function replaceState() {
+      let ret = oldReplaceState.apply(this, arguments);
+      window.dispatchEvent(new Event('replacestate'));
+      window.dispatchEvent(new Event('locationchange'));
+      return ret;
+    };
+
+    window.addEventListener('popstate', () => {
+      window.dispatchEvent(new Event('locationchange'));
+    });
+  }
+  history_event_overwrite()
+</script>
+-->
 
       </div>
     </div>
