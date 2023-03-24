@@ -16,7 +16,10 @@ async function load_insta_posts_option_1 (user_profile_id, count) {
     },
   })
   let posts = await response.json()
-  posts = posts.data.user.edge_owner_to_timeline_media.edges
+
+  console.log('posts', posts)
+  
+  posts = posts?.data?.user?.edge_owner_to_timeline_media?.edges
 
   posts = posts.map(post => {
     post = post.node
