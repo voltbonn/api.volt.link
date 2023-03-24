@@ -9,6 +9,8 @@ const special_user_agent = 'Instagram 219.0.0.12.117 Android'
 async function load_insta_posts_option_1 (user_profile_id, count) {
   const url = `https://www.instagram.com/graphql/query/?query_id=17888483320059182&variables={"id":"${user_profile_id}","first":${count},"after":null}`
 
+  console.log('url', url)
+
   // fetch posts but use a special the user agent
   const response = await fetch(url, {
     headers: {
@@ -18,7 +20,7 @@ async function load_insta_posts_option_1 (user_profile_id, count) {
   let posts = await response.json()
 
   console.log('posts', posts)
-  
+
   posts = posts?.data?.user?.edge_owner_to_timeline_media?.edges
 
   posts = posts.map(post => {
