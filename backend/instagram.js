@@ -112,7 +112,22 @@ async function load_insta_posts_option_3(user_name, count) {
   posts = posts.items
 
   posts = posts.map(post => {
-    const image_url = post.image_versions2.candidates.sort((a, b) => b.width - a.width)[0].url
+
+    // START GET THE IMAGE
+    let image_url = null
+    let image_versions2 = []
+
+    if (post?.carousel_media) {
+      image_versions2 = post?.carousel_media[0]?.image_versions2?.candidates || []
+    } else if (post?.image_versions2) {
+      image_versions2 = post?.image_versions2?.candidates || []
+    }
+
+    if (image_versions2.length > 0) {
+      image_url = image_versions2
+        .sort((a, b) => b.width - a.width)[0].url
+    }
+    // END GET THE IMAGE
 
     let caption = ''
     if (post?.caption?.text) {
