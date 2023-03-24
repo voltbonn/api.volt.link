@@ -27,6 +27,7 @@ const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 const sharp = require('sharp')
 
 const { get_events_from_calendar_url } = require('./calendar_parser.js')
+const { load_insta_posts } = require('./instagram.js')
 
 // function getUserLocales(){
 //     const localesByCounty = {
@@ -327,6 +328,50 @@ app.get('/events_example.html', function (req, res) {
 
   res.send(html_contents)
 })
+
+app.get('/instagram_posts.json', async (req, res) => {
+  const username = req.query.username
+  const userid = req.query.userid
+  let count = req.query.count
+
+  if (typeof username !== 'string' || username.length === 0) {
+    res.json({
+      events: [],
+      error: 'No username provided.',
+    })
+    return
+  }
+
+  if (typeof userid !== 'string' || userid.length === 0) {
+    res.json({
+      events: [],
+      error: 'No userid provided.',
+    })
+    return
+  }
+
+  count = parseInt(count)
+  if (count < 1) {
+    count = 1
+  }
+
+  try {
+
+    const posts = await load_insta_posts(userid, username, count)
+
+    res.json({
+      posts: posts,
+      error: null,
+    })
+  } catch (error) {
+    console.error(error)
+    res.json({
+      posts: [],
+      error: String(error),
+    })
+  }
+})
+
 
 
 // app.get('/teams.json', async (req, res) => {

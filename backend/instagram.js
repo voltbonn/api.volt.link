@@ -222,6 +222,21 @@ module.exports = {
 }
 
 
+/*
+
+http://localhost:4004/instagram_posts.json?username=voltbrandenburg&userid=44732153616&count=1
+
+https://api.volt.link/instagram_posts.json?username=voltbrandenburg&userid=44732153616&count=1
+
+Example Insta Accounts:
+
+username = voltpotsdam
+userid = 55472423271
+
+username = voltbrandenburg
+userid = 44732153616
+
+*/
 
 /*
 
