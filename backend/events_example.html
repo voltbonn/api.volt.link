@@ -52,7 +52,7 @@
 
   <div id="custom_events_feed"></div>
 
-  <script>
+  <script onLoad="load_events(); init_events();">
   window.VoltEvents = class {
 
     amount_of_day = 33 // amount of days to load events for
@@ -188,6 +188,9 @@
 
     show_events(events) {
       const custom_events_feed_element = document.getElementById('custom_events_feed')
+      if (!custom_events_feed_element) {
+        return
+      }
       custom_events_feed_element.innerHTML = this.custom_events_feed_html
 
       const prev_button_element = custom_events_feed_element.querySelector('.prev')
@@ -306,7 +309,7 @@
     window.lastUrl;
     window.event_interval = setInterval(() => {
       let currUrl = window.location.href
-      if (currUrl != window.lastUrl) {
+      if (currUrl !== window.lastUrl) {
         load_events()
         window.lastUrl = currUrl
       }
@@ -317,6 +320,7 @@
   init_events()
 
   </script>
+  <img onLoad="load_events(); init_events();" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" />
 
   <style>
     .custom_events_feed .nav {
