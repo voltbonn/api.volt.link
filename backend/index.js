@@ -319,7 +319,7 @@ app.get('/events_example.html', function (req, res) {
   const fs = require('fs')
   const path = require('path')
 
-  const css_filePath = path.join(__dirname, 'events_example.css')
+  const css_filePath = path.join(__dirname, 'vcp.css')
   const css_contents = fs.readFileSync(css_filePath, 'utf8');
 
   const html_filePath = path.join(__dirname, 'events_example.html')
