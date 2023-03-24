@@ -139,9 +139,9 @@ async function load_insta_posts_option_3(user_name, count) {
 async function load_remote_insta_posts(user_profile_id, user_name, count) {
   posts = []
   try {
-    posts = await load_insta_posts_option_1(user_profile_id, count)
+    // posts = await load_insta_posts_option_1(user_profile_id, count)
     // posts = await load_insta_posts_option_2(user_name, count)
-    // posts = await load_insta_posts_option_3(user_profile_id, count)
+    posts = await load_insta_posts_option_3(user_profile_id, count)
   } catch (error) {
     console.error(error)
   }
