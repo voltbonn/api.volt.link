@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Instagram Example</title>
+  <meta charset="utf-8" />
+  /* HEAD CSS */
+</head>
+<body>
+  <main data-fetch-key="0" class="page-content">
+    <div class="columns__2 columns-gaps-medium">
+      <div class="column has-width" style="flex-basis:100%;flex-grow:100;">
+
+  <h1>Instagram Example</h1>
+
+  <div style="display:none;" class="eventcard eventcard__type-default eventcard__size-small">
+    <figure class="eventcard__image">
+      <picture>
+        <img src="https://assets.volteuropa.org/styles/crop_240x160/public/2022-03/MVE_Welcome.jpg"  alt="Meet Volt Europa welcome banner" loading="lazy">
+      </picture>
+    </figure>
+    <div class="event__details eventcard__content">
+      <h4 class="event__details__title">
+        <span>Meet Volt Europa March 2023</span>
+      </h4>
+      <div class="event__details__organizer-language">
+        Volt Europa,
+        English
+      </div>
+      <div class="event__details__time">
+        <span> 22.03.2023, 19:00</span>
+      </div>
+      <div class="event__details__description">
+        Have you ever wondered what’s it like to hang out with people passionate about shaping the future of Europe? Now is the time to find out! 
+      </div>
+      <!---->
+      <div class="event__details__link">
+        <a href="https://us06web.zoom.us/j/85159675442?pwd=aE1uWWI0SnNxc1QxbzdHcUJqTTBtQT09" target="_blank" rel="noopener">https://us06web.zoom.us/j/85159675442?pwd=aE1uWWI0SnNxc1QxbzdHcUJqTTBtQT09</a>
+      </div>
+      <!---->
+      <script type="application/ld+json">{"@context":"https://schema.org","@type":"Event","name":"Meet Volt Europa March 2023","url":"https://www.volteuropa.org/events_MVE_march_23","description":"Have you ever wondered what’s it like to hang out with people passionate about shaping the future of Europe? Now is the time to find out! ","startDate":"2023-03-22T18:00:00+00:00","endDate":"2023-03-22T19:30:00+00:00","image":["https://assets.volteuropa.org/2022-03/MVE_Welcome.jpg"],"organizer":{"@type":"Organization","name":"Volt Europa","url":"https://www.volteuropa.org","logo":{"@type":"ImageObject","url":"https://www.volteuropa.org/volt-logo.png"}},"location":{"@type":"VirtualLocation","url":"https://us06web.zoom.us/j/85159675442?pwd=aE1uWWI0SnNxc1QxbzdHcUJqTTBtQT09"},"sameAs":[]}</script>
+    </div>
+    <div class="eventcard__spacer"></div>
+    <div class="eventcard__infoButton">
+      <a href="https://www.volteuropa.org/events_MVE_march_23" hreflang="en">Mehr Informationen</a>
+    </div>
+  </div>
+
+
+
+
+
+
+  <div id="custom_insta_feed"></div>
+
+  <script onLoad="load_cards(); init_cards();">
+  window.VoltEvents = class {
+
+    amount_of_day = 33 // amount of days to load events for
+
+    selected_year = new Date().getFullYear()
+    selected_month = new Date().getMonth()
+    selected_day = new Date().getDate()
+
+    username = 'voltbrandenburg'
+    userid = '44732153616'
+    count = 12
+
+    default_image = 'https://assets.volteuropa.org/styles/crop_320x160_2x/public/2023-03/image_2023-03-07_114249944.png'
+
+    custom_feed_html = `<div class="custom_feed">
+      <div class="custom_cards_grid cards events cards__cardSize-small"></div>
+    </div>`
+
+    card_html = `<a href="{{href}}" target="_blank">
+      <div class="eventcard eventcard__type-default eventcard__size-small">
+          <figure class="eventcard__image">
+            <picture>
+              <img src="{{image}}" alt="" loading="lazy">
+            </picture>
+          </figure>
+          <div class="event__details eventcard__content">
+            <div class="event__details__time big_top_gap">
+              <span> {{start_date}}</span>
+            </div>
+            <h4 class="event__details__title small_top_gap">
+              <span>{{summary}}</span>
+            </h4>
+            <!-- <div class="event__details__organizer-language">
+              {{organizer}}
+            </div> -->
+            <!-- <div class="event__details__description">
+              {{description}}
+            </div> -->
+            <!-- {{google_meet_link}} -->
+          </div>
+        </div>
+      </a>
+    `
+
+    constructor() { }
+
+    build_selected_date() {
+      return new Date(this.selected_year, this.selected_month, this.selected_day) // .toISOString().split('T')[0]
+    }
+
+    linkify(inputText) {
+      // source: https://stackoverflow.com/questions/37684/how-to-replace-plain-urls-with-links
+      // this would be better: https://linkify.js.org/
+
+      // http://, https://, ftp://
+      var urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gim;
+
+      // www. sans http:// or https://
+      var pseudoUrlPattern = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+
+      // Email addresses
+      var emailAddressPattern = /[\w.]+@[a-zA-Z_-]+?(?:\.[a-zA-Z]{2,6})+/gim;
+
+      return inputText
+        .replace(urlPattern, '<a href="$&" target="_blank">$&</a>')
+        .replace(pseudoUrlPattern, '$1<a href="http://$2" target="_blank">$2</a>')
+        .replace(emailAddressPattern, '<a href="mailto:$&">$&</a>');
+    }
+
+    format_date(date) {
+      date = new Date(date)
+
+      const day = date.getDate().toString().padStart(2, '0'); // get the day of the month and pad it with leading zeros if necessary
+      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // get the month (zero-indexed) and add one, then pad it with leading zeros if necessary
+      const year = date.getFullYear(); // get the full year (e.g. 2023)
+      const hours = date.getHours().toString().padStart(2, '0'); // get the hours and pad it with leading zeros if necessary
+      const minutes = date.getMinutes().toString().padStart(2, '0'); // get the minutes and pad it with leading zeros if necessary
+
+      let formattedTime = `${hours}:${minutes}`;
+      if (hours === '00' && minutes === '00') {
+        formattedTime = '';
+      }
+
+      const formattedDate = `${day}.${month}.${year}${formattedTime ? `, ${formattedTime}` : ''}`; // concatenate the date and time into the desired format, omitting the time if it's zero
+
+      return formattedDate;
+    }
+
+    get_plaintext(html) {
+      html = html
+        .replace(/<br\s*\/?>/g, '\n')
+        .replace(/<p>/g, '\n')
+        .replace(/<\/p>/g, '\n')
+        .replace(/(<\/li>)/g, '$1\n')
+        .replace(/(<\/ul>)/g, '$1\n')
+      let tmp_description = document.createElement('div')
+      tmp_description.innerHTML = html
+      return tmp_description.textContent || tmp_description.innerText || ''
+    }
+
+    addMonth(date, months) {
+      let d = date.getDate();
+      date.setMonth(date.getMonth() + months);
+      if (date.getDate() != d) {
+        date.setDate(0);
+      }
+      return date;
+    }
+
+    show_cards(cards) {
+      const custom_feed_element = document.getElementById('custom_insta_feed')
+      if (!custom_feed_element) {
+        return
+      }
+      custom_feed_element.innerHTML = this.custom_feed_html
+
+      const events_wrapper_element = custom_feed_element.querySelector('.custom_cards_grid')
+
+      if (cards.length === 0) {
+        events_wrapper_element.innerHTML = `<p class="no_cards" style="text-align:center;"><strong>Die Posts konnten nicht geladen werden.</strong><br />Schau doch mal auf <a href="https://www.instagram.com/${this.username}/" target="_blank">@${this.username}</a> vorbei.</p>`
+        return
+      }
+
+      cards
+        .map(card => ({
+          ...card,
+          timestamp: card.timestamp * 1000,
+        }))
+        .sort((a, b) => new Date(b.timestamp).valueOf() - new Date(a.timestamp).valueOf())
+        .forEach(event => {
+          const event_element = document.createElement('div')
+
+
+          let description = (event.caption || '') // this.linkify(event.caption || '')
+            .replace(/(?:\r\n|\r|\n){3,}/g, '\n\n') // remove multiple newlines
+            .replace(/^[\n\s]+/g, '') // remove leading newlines
+            .replace(/[\n\s]+$/g, '') // remove trailing newlines
+
+          // get first line of description if it is less than 50 characters. Otherwise cut it at 50 characters. And get the first senctence.
+
+          const cut_lenght = 60
+          const check_lenght = cut_lenght + 10
+
+          let first_line = description.split('\n')[0]
+          if (first_line.length > check_lenght) {
+            first_line = first_line.substring(0, cut_lenght) + '…'
+
+            const first_sentence_regex = /^((.*?)([0-9]{3,}|[^0-9])[.!?])\s/u;
+            const first_sentence = first_line.match(first_sentence_regex)
+            if (first_sentence) {
+              description = first_sentence[0]
+            } else {
+              description = first_line
+            }
+          } else {
+            description = first_line
+          }
+
+          let image_url = this.default_image
+          if (event.image_url) {
+            image_url = `https://storage.volt.link/download_url?f=webp&w=500&h=500&url=${encodeURIComponent(event.image_url)}`
+          }
+
+          let this_card_html = this.card_html
+            .replace('{{href}}', event.link || `https://www.instagram.com/p/${event.id}/`)
+            .replace('{{image}}', image_url)
+            .replace('{{summary}}', description)
+            // .replace('{{description}}', description)
+            .replace('{{start_date}}', this.format_date(event.timestamp || ''))
+            // .replace('{{organizer}}', event.location || 'Volt Brandenburg')
+
+          // if (event.link) {
+          //   this_card_html = this_card_html
+          //     .replace('{{google_meet_link}}', `
+          //         <div class="eventcard__infoButton">
+          //           <a href="${event.link}" target="_blank" rel="noopener">View on Instagram</a>
+          //         </div>
+          //       `)
+          // } else {
+          //   this_card_html = this_card_html
+          //     .replace('{{google_meet_link}}', '')
+          // }
+
+          event_element.innerHTML = this_card_html
+          events_wrapper_element.appendChild(event_element.firstChild)
+        })
+    }
+
+    load() {
+
+      let data_url = `http://localhost:4004/instagram_posts.json?username=${this.username}&userid=${this.userid}&count=${this.count}`
+      if (window.location.hostname === 'localhost') {
+        data_url = `http://localhost:4004/instagram_posts.json?username=${this.username}&userid=${this.userid}&count=${this.count}`
+      }
+
+      if (!window.fetch) {
+        throw new Error('fetch is not available')
+      }
+
+      if (!window.volt_instagram_post_cache) {
+        window.volt_instagram_post_cache = {}
+      }
+
+      if (window.volt_instagram_post_cache[data_url]) {
+        this.show_cards(window.volt_instagram_post_cache[data_url])
+        return
+      }
+
+      http://storage.volt.link/download=https://www.volteuropa.org/stripes/intermediate-red.jpg&f=webp&w=500&h=500&id=635d228274ef8c2a3d09631f
+      https://storage.volt.link/download_file/?f=webp&w=10000&h=10000&id=635d228274ef8c2a3d09631f
+
+      fetch(data_url)
+        .then(response => response.json())
+        .then(data => {
+          if (typeof data.error === 'string' && data.error.length > 0) {
+            throw new Error(data.error)
+          } else {
+            window.volt_instagram_post_cache[data_url] = data.posts
+            this.show_cards(data.posts)
+          }
+        })
+        .catch(console.error)
+    }
+  }
+
+  function load_cards() {
+    // console.log('init custom volt events')
+    const volt_events = new window.VoltEvents()
+    volt_events.load()
+  }
+  function init_cards() {
+    window.lastUrl;
+    window.event_interval = setInterval(() => {
+      let currUrl = window.location.href
+      if (currUrl !== window.lastUrl) {
+        load_cards()
+        window.lastUrl = currUrl
+      }
+    }, 100)
+
+    // load_cards() // is called by the interval
+  }
+  init_cards()
+
+  </script>
+  <img onLoad="load_cards(); init_cards();" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" />
+
+  <style>
+    .custom_feed {
+      --color: #E63E12;
+      --color-alpha10: rgba(230, 62, 18,0.1);
+    }
+    .custom_feed .nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: space-between;
+    }
+    .custom_feed .nav button{
+      padding: 9px 14px;
+      border: 0;
+      display: inline-block;
+      line-height: 1;
+      font-family: Ubuntu, sans-serif;
+      font-weight: 400;
+      /* font-size: 14px; */
+      line-height: 1.14;
+      text-decoration: none;
+      text-align: center;
+      transition: all .5s ease;
+      cursor: pointer;
+      background-color: var(--color);
+      color: var(--bgcolor);
+
+      font-weight: bold;
+      font-size: 24px;
+      padding: 8px 16px;
+    }
+    .custom_feed .nav button:hover {
+      background-color: var(--color-dark);
+    }
+    .custom_feed .nav h3 {
+      margin: 0;
+      color: var(--color);
+    }
+
+      .custom_cards_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        grid-gap: 1rem;
+        width: 100%;
+      }
+      .custom_cards_grid .no_cards {
+        grid-column: 1 / -1; /* full width */
+        text-align: center;
+      }
+
+      .eventcard .event__details__title > span {
+        box-shadow: 7px 0 0 var(--color),-7px 0 0 var(--color);
+      }
+
+      .custom_cards_grid a {
+        text-underline-offset: .05em;
+      }
+      .custom_cards_grid a {
+        text-decoration: none !important;
+      }
+      .custom_cards_grid a:hover{
+        --color: #502379;
+        --color-alpha10: rgba(80, 35, 121,0.1);
+      }
+      .custom_cards_grid .eventcard__image {
+        min-height: 7rem;
+        aspect-ratio: 1;
+        height: auto;
+      }
+      .custom_cards_grid .eventcard .big_top_gap {
+        padding-top: 16px;
+      }
+      .custom_cards_grid .eventcard .small_top_gap{
+        padding-top: 4px;
+      }
+
+      .custom_cards_grid .eventcard .event__details__organizer-language,
+      .custom_cards_grid .eventcard .event__details__time{
+        padding-top: 0;
+      }
+      .custom_cards_grid .eventcard .event__details__description p:first-of-type{
+        margin-block-start: 0;
+      }
+      .custom_cards_grid .eventcard .event__details__description p:last-of-type{
+        margin-block-end: 0;
+      }
+      .custom_cards_grid details summary {
+        display: inline;
+        cursor: pointer;
+        /* margin-inline-end: -4px; */
+      }
+      .custom_cards_grid details summary:hover {
+        opacity: .8;
+      }
+      .custom_cards_grid details summary:after {
+        content: '…';
+      }
+      .custom_cards_grid details[open] summary:after {
+        content: '';
+      }
+  </style>
+
+
+
+
+
+
+
+
+
+
+
+<!--
+<script>
+
+  // window.addEventListener('load', load_cards)
+  // window.addEventListener('popstate', load_cards)
+  // window.addEventListener('locationchange', load_cards)
+  // window.addEventListener('online', load_cards)
+  // window.addEventListener('pageshow', load_cards)
+
+  function history_event_overwrite() {
+    // source: https://stackoverflow.com/questions/6390341/how-to-detect-if-url-has-changed-after-hash-in-javascript
+    let oldPushState = history.pushState;
+    history.pushState = function pushState() {
+      let ret = oldPushState.apply(this, arguments);
+      window.dispatchEvent(new Event('pushstate'));
+      window.dispatchEvent(new Event('locationchange'));
+      return ret;
+    };
+
+    let oldReplaceState = history.replaceState;
+    history.replaceState = function replaceState() {
+      let ret = oldReplaceState.apply(this, arguments);
+      window.dispatchEvent(new Event('replacestate'));
+      window.dispatchEvent(new Event('locationchange'));
+      return ret;
+    };
+
+    window.addEventListener('popstate', () => {
+      window.dispatchEvent(new Event('locationchange'));
+    });
+  }
+  history_event_overwrite()
+</script>
+-->
+
+      </div>
+    </div>
+  </main>
+</body>
+</html>

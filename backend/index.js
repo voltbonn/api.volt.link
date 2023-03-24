@@ -319,7 +319,7 @@ app.get('/events_example.html', function (req, res) {
   const fs = require('fs')
   const path = require('path')
 
-  const css_filePath = path.join(__dirname, 'events_example.css')
+  const css_filePath = path.join(__dirname, 'vcp.css')
   const css_contents = fs.readFileSync(css_filePath, 'utf8');
 
   const html_filePath = path.join(__dirname, 'events_example.html')
@@ -370,6 +370,21 @@ app.get('/instagram_posts.json', async (req, res) => {
       error: String(error),
     })
   }
+})
+
+app.get('/instagram_example.html', function (req, res) {
+  // read instagram_example.html
+  const fs = require('fs')
+  const path = require('path')
+
+  const css_filePath = path.join(__dirname, 'vcp.css')
+  const css_contents = fs.readFileSync(css_filePath, 'utf8');
+
+  const html_filePath = path.join(__dirname, 'instagram_example.html')
+  let html_contents = fs.readFileSync(html_filePath, 'utf8');
+  html_contents = html_contents.replace('/* HEAD CSS */', css_contents)
+
+  res.send(html_contents)
 })
 
 
