@@ -27,6 +27,7 @@ const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 const sharp = require('sharp')
 
 const { get_events_from_calendar_url } = require('./calendar_parser.js')
+const { load_insta_posts } = require('./instagram.js')
 
 // function getUserLocales(){
 //     const localesByCounty = {
@@ -317,10 +318,60 @@ app.get('/events_example.html', function (req, res) {
   // read events_example.html
   const fs = require('fs')
   const path = require('path')
-  const filePath = path.join(__dirname, 'events_example.html')
-  const contents = fs.readFileSync(filePath, 'utf8');
-  res.send(contents)
+
+  const css_filePath = path.join(__dirname, 'events_example.css')
+  const css_contents = fs.readFileSync(css_filePath, 'utf8');
+
+  const html_filePath = path.join(__dirname, 'events_example.html')
+  let html_contents = fs.readFileSync(html_filePath, 'utf8');
+  html_contents = html_contents.replace('/* HEAD CSS */', css_contents)
+
+  res.send(html_contents)
 })
+
+app.get('/instagram_posts.json', async (req, res) => {
+  const username = req.query.username
+  const userid = req.query.userid
+  let count = req.query.count
+
+  if (typeof username !== 'string' || username.length === 0) {
+    res.json({
+      events: [],
+      error: 'No username provided.',
+    })
+    return
+  }
+
+  if (typeof userid !== 'string' || userid.length === 0) {
+    res.json({
+      events: [],
+      error: 'No userid provided.',
+    })
+    return
+  }
+
+  count = parseInt(count)
+  if (count < 1) {
+    count = 1
+  }
+
+  try {
+
+    const posts = await load_insta_posts(userid, username, count)
+
+    res.json({
+      posts: posts,
+      error: null,
+    })
+  } catch (error) {
+    console.error(error)
+    res.json({
+      posts: [],
+      error: String(error),
+    })
+  }
+})
+
 
 
 // app.get('/teams.json', async (req, res) => {

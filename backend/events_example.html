@@ -1,9 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
+  <title>Event Example</title>
+  <meta charset="utf-8" />
+  /* HEAD CSS */
+</head>
 <body>
+  <main data-fetch-key="0" class="page-content">
+    <div class="columns__2 columns-gaps-medium">
+      <div class="column has-width" style="flex-basis:100%;flex-grow:100;">
+
   <h1>Event Example</h1>
 
   <div style="display:none;" class="eventcard eventcard__type-default eventcard__size-small">
@@ -40,141 +46,410 @@
   </div>
 
 
-  <div id="events_wrapper" class="cards events cards__cardSize-small"></div>
-  
-  <script>
 
-    const start_date = new Date().toISOString().split('T')[0]
-    const end_date = new Date(new Date().setDate(new Date().getDate() + 60)).toISOString().split('T')[0]
 
-    const ical_url = 'https://calendar.google.com/calendar/ical/c_8dguqa58qlft5to7i3j1uqbprk%40group.calendar.google.com/public/basic.ics'
 
-    const default_image = 'https://assets.volteuropa.org/styles/crop_320x160_2x/public/2021-10/volt_bb_thumbnail-presse.webp'
 
-    const event_card_html = `<div class="eventcard eventcard__type-default eventcard__size-small">
-    <figure class="eventcard__image">
-      <picture>
-        <img src="{{image}}" alt="" loading="lazy">
-      </picture>
-    </figure>
-    <div class="event__details eventcard__content">
-      <h4 class="event__details__title">
-        <span>{{summary}}</span>
-      </h4>
-      <div class="event__details__organizer-language">
-        {{organizer}}
+  <div id="custom_events_feed"></div>
+
+  <script onLoad="load_events(); init_events();">
+  window.VoltEvents = class {
+
+    amount_of_day = 33 // amount of days to load events for
+
+    selected_year = new Date().getFullYear()
+    selected_month = new Date().getMonth()
+    selected_day = new Date().getDate()
+
+    ical_url = 'https://calendar.google.com/calendar/ical/c_8dguqa58qlft5to7i3j1uqbprk%40group.calendar.google.com/public/basic.ics'
+
+    default_image = 'https://assets.volteuropa.org/styles/crop_320x160_2x/public/2023-03/image_2023-03-07_114249944.png'
+
+    custom_events_feed_html = `<div class="custom_events_feed">
+      <div class="nav">
+        <button class="prev" style="transform: scaleX(-1);">
+          ➔
+        </button>
+        <h3 class="selected_date"></h3>
+        <button class="next">
+          ➔
+        </button>
       </div>
-      <div class="event__details__time">
-        <span> {{start_date}}</span>
-      </div>
-      <div class="event__details__description">
-        {{description}}
-      </div>
-      {{google_meet_link}}
-    </div>
-  </div>`
+      <div class="custom_event_grid cards events cards__cardSize-small"></div>
+    </div>`
 
-  function linkify(inputText) {
-    // source: https://stackoverflow.com/questions/37684/how-to-replace-plain-urls-with-links
-    // this would be better: https://linkify.js.org/
+    event_card_html = `<div class="eventcard eventcard__type-default eventcard__size-small">
+          <figure class="eventcard__image">
+            <picture>
+              <img src="{{image}}" alt="" loading="lazy">
+            </picture>
+          </figure>
+          <div class="event__details eventcard__content">
+            <h4 class="event__details__title">
+              <span>{{summary}}</span>
+            </h4>
+            <div class="event__details__time">
+              <span> {{start_date}}</span>
+            </div>
+            <div class="event__details__organizer-language">
+              {{organizer}}
+            </div>
+            <div class="event__details__description">
+              {{description}}
+            </div>
+            {{google_meet_link}}
+          </div>
+        </div>`
 
-        // http://, https://, ftp://
-        var urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gim;
+    constructor() { }
 
-        // www. sans http:// or https://
-        var pseudoUrlPattern = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
-
-        // Email addresses
-        var emailAddressPattern = /[\w.]+@[a-zA-Z_-]+?(?:\.[a-zA-Z]{2,6})+/gim;
-
-        return inputText
-          .replace(urlPattern, '<a href="$&" target="_blank">$&</a>')
-          .replace(pseudoUrlPattern, '$1<a href="http://$2" target="_blank">$2</a>')
-          .replace(emailAddressPattern, '<a href="mailto:$&">$&</a>');
+    build_selected_date() {
+      return new Date(this.selected_year, this.selected_month, this.selected_day) // .toISOString().split('T')[0]
     }
 
-  function format_date (date) {
-    date = new Date(date)
+    linkify(inputText) {
+      // source: https://stackoverflow.com/questions/37684/how-to-replace-plain-urls-with-links
+      // this would be better: https://linkify.js.org/
 
-    const day = date.getDate().toString().padStart(2, '0'); // get the day of the month and pad it with leading zeros if necessary
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // get the month (zero-indexed) and add one, then pad it with leading zeros if necessary
-    const year = date.getFullYear(); // get the full year (e.g. 2023)
-    const hours = date.getHours().toString().padStart(2, '0'); // get the hours and pad it with leading zeros if necessary
-    const minutes = date.getMinutes().toString().padStart(2, '0'); // get the minutes and pad it with leading zeros if necessary
+      // http://, https://, ftp://
+      var urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gim;
 
-    let formattedTime = `${hours}:${minutes}`;
-    if (hours === '00' && minutes === '00') {
-      formattedTime = '';
+      // www. sans http:// or https://
+      var pseudoUrlPattern = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+
+      // Email addresses
+      var emailAddressPattern = /[\w.]+@[a-zA-Z_-]+?(?:\.[a-zA-Z]{2,6})+/gim;
+
+      return inputText
+        .replace(urlPattern, '<a href="$&" target="_blank">$&</a>')
+        .replace(pseudoUrlPattern, '$1<a href="http://$2" target="_blank">$2</a>')
+        .replace(emailAddressPattern, '<a href="mailto:$&">$&</a>');
     }
 
-    const formattedDate = `${day}.${month}.${year}${formattedTime ? `, ${formattedTime}` : ''}`; // concatenate the date and time into the desired format, omitting the time if it's zero
+    format_date(date) {
+      date = new Date(date)
 
-    return formattedDate;
+      const day = date.getDate().toString().padStart(2, '0'); // get the day of the month and pad it with leading zeros if necessary
+      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // get the month (zero-indexed) and add one, then pad it with leading zeros if necessary
+      const year = date.getFullYear(); // get the full year (e.g. 2023)
+      const hours = date.getHours().toString().padStart(2, '0'); // get the hours and pad it with leading zeros if necessary
+      const minutes = date.getMinutes().toString().padStart(2, '0'); // get the minutes and pad it with leading zeros if necessary
+
+      let formattedTime = `${hours}:${minutes}`;
+      if (hours === '00' && minutes === '00') {
+        formattedTime = '';
+      }
+
+      const formattedDate = `${day}.${month}.${year}${formattedTime ? `, ${formattedTime}` : ''}`; // concatenate the date and time into the desired format, omitting the time if it's zero
+
+      return formattedDate;
+    }
+
+    get_plaintext(html) {
+      html = html
+        .replace(/<br\s*\/?>/g, '\n')
+        .replace(/<p>/g, '\n')
+        .replace(/<\/p>/g, '\n')
+        .replace(/(<\/li>)/g, '$1\n')
+        .replace(/(<\/ul>)/g, '$1\n')
+      let tmp_description = document.createElement('div')
+      tmp_description.innerHTML = html
+      return tmp_description.textContent || tmp_description.innerText || ''
+    }
+
+    addMonth(date, months) {
+      let d = date.getDate();
+      date.setMonth(date.getMonth() + months);
+      if (date.getDate() != d) {
+        date.setDate(0);
+      }
+      return date;
+    }
+
+    prev_month() {
+      this.selected_month -= 1
+      this.selected_day = 1
+      this.load()
+    }
+    next_month() {
+      this.selected_month += 1
+      this.selected_day = 1
+      this.load()
+    }
+
+    set_nav_date_info (custom_events_feed_element) {
+      const selected_date_element = custom_events_feed_element.querySelector('.selected_date')
+      // set month in german and full year if selected year is not the current year
+      const selected_date = this.build_selected_date()
+      const current_year = new Date().getFullYear()
+      const selected_date_string = selected_date.toLocaleString('de-DE', { month: 'long' }) + (selected_date.getFullYear() !== current_year ? ' ' + selected_date.getFullYear() : '')
+      selected_date_element.innerHTML = selected_date_string
+    }
+
+    show_events(events) {
+      const custom_events_feed_element = document.getElementById('custom_events_feed')
+      if (!custom_events_feed_element) {
+        return
+      }
+      custom_events_feed_element.innerHTML = this.custom_events_feed_html
+
+      const prev_button_element = custom_events_feed_element.querySelector('.prev')
+      prev_button_element.addEventListener('click', () => this.prev_month())
+      const next_button_element = custom_events_feed_element.querySelector('.next')
+      next_button_element.addEventListener('click', () => this.next_month())
+
+      this.set_nav_date_info(custom_events_feed_element)
+
+      const events_wrapper_element = custom_events_feed_element.querySelector('.custom_event_grid')
+
+      if (events.length === 0) {
+        events_wrapper_element.innerHTML = '<strong class="no_events">Keine Termine in diesem Zeitraum.</strong>'
+        return
+      }
+
+      events
+        .sort((a, b) => new Date(a.dtstart).valueOf() - new Date(b.dtstart).valueOf())
+        .forEach(event => {
+          const event_element = document.createElement('div')
+
+
+          let description = this.get_plaintext(event.description || '')
+          description = this.linkify(description)
+            .replace(/(?:\r\n|\r|\n){3,}/g, '\n\n') // remove multiple newlines
+            .replace(/^[\n\s]+/g, '') // remove leading newlines
+            .replace(/[\n\s]+$/g, '') // remove trailing newlines
+            .replace(/Über Google Meet teilnehmen:(?:.|\n)*/g, '') // remove google meets clutter
+
+          const cut_lenght = 200
+          const check_lenght = cut_lenght + 10
+          if (description.length > check_lenght) {
+            const first_part = description
+              .substring(0, cut_lenght)
+              .replace(/\n/g, '<br />') // replace newlines with <br />
+            const second_part = description.substring(cut_lenght)
+              .replace(/\n/g, '<br />') // replace newlines with <br />
+
+            description = `
+                <details>
+                  <summary>${first_part}</summary>${second_part}
+                </details>
+              `
+          } else {
+            description = description
+              .replace(/\n/g, '<br />') // replace newlines with <br />
+          }
+
+          let this_event_card_html = this.event_card_html
+            .replace('{{image}}', event.image || this.default_image)
+            .replace('{{summary}}', event.summary || '')
+            .replace('{{description}}', description)
+            .replace('{{start_date}}', this.format_date(event.dtstart || ''))
+            .replace('{{organizer}}', event.location || 'Volt Brandenburg')
+
+          if (event['x-google-conference']) {
+            this_event_card_html = this_event_card_html
+              .replace('{{google_meet_link}}', `
+                  <div class="eventcard__infoButton">
+                    <a href="${event['x-google-conference']}" target="_blank" rel="noopener">In Google Meet teilnehmen</a>
+                  </div>
+                `)
+          } else {
+            this_event_card_html = this_event_card_html
+              .replace('{{google_meet_link}}', '')
+          }
+
+          event_element.innerHTML = this_event_card_html
+          events_wrapper_element.appendChild(event_element.firstChild)
+        })
+    }
+
+    load() {
+      const now = this.build_selected_date()
+      const start_date = new Date(now.setDate(now.getDate() - 1)).toISOString().split('T')[0]
+      const end_date = new Date(now.setDate(now.getDate() + this.amount_of_day)).toISOString().split('T')[0]
+
+      let events_url = `https://api.volt.link/events.json?url[]=${this.ical_url}&start=${start_date}&end=${end_date}`
+      if (window.location.hostname === 'localhost') {
+        events_url = `http://localhost:4004/events.json?url[]=${this.ical_url}&start=${start_date}&end=${end_date}`
+      }
+
+      if (!window.fetch) {
+        throw new Error('fetch is not available')
+      }
+
+      if (!window.volt_event_cache) {
+        window.volt_event_cache = {}
+      }
+
+      if (window.volt_event_cache[events_url]) {
+        this.show_events(window.volt_event_cache[events_url])
+        return
+      }
+
+      fetch(events_url)
+        .then(response => response.json())
+        .then(data => {
+          if (typeof data.error === 'string' && data.error.length > 0) {
+            throw new Error(data.error)
+          } else {
+            window.volt_event_cache[events_url] = data.events
+            this.show_events(data.events)
+          }
+        })
+        .catch(console.error)
+    }
   }
 
-    function show_events(events) {
-      const events_wrapper_element = document.getElementById('events_wrapper')
-      events_wrapper_element.innerHTML = ''
-      events.forEach(event => {
-        const event_element = document.createElement('div')
+  function load_events() {
+    // console.log('init custom volt events')
+    const volt_events = new window.VoltEvents()
+    volt_events.load()
+  }
+  function init_events() {
+    window.lastUrl;
+    window.event_interval = setInterval(() => {
+      let currUrl = window.location.href
+      if (currUrl !== window.lastUrl) {
+        load_events()
+        window.lastUrl = currUrl
+      }
+    }, 100)
 
-        const description = linkify(event.description || '')
-          .replace(/(?:\r\n|\r|\n)/g, '<br />')
-          .replace(/Über Google Meet teilnehmen:.*/g, '')
+    // load_events() // is called by the interval
+  }
+  init_events()
 
-        let this_event_card_html = event_card_html
-          .replace('{{image}}', event.image || default_image)
-          .replace('{{summary}}', event.summary || '')
-          .replace('{{description}}', description)
-          .replace('{{start_date}}', format_date(event.dtstart || ''))
-          .replace('{{organizer}}', event.location || 'Volt Brandenburg')
-
-        if (event['x-google-conference']) {
-          this_event_card_html = this_event_card_html
-            .replace('{{google_meet_link}}', `
-              <div class="eventcard__infoButton">
-                <a href="${event['x-google-conference']}" target="_blank" rel="noopener">In Google Meet teilnehmen</a>
-              </div>
-            `)
-        } else {
-          this_event_card_html = this_event_card_html
-            .replace('{{google_meet_link}}', '')
-        }
-
-        event_element.innerHTML = this_event_card_html
-        events_wrapper_element.appendChild(event_element.firstChild)
-      })
-    }
-
-    let events_url = `https://api.volt.link/events.json?url[]=${ical_url}&start=${start_date}&end=${end_date}`
-    if (window.location.hostname === 'localhost') {
-      events_url = `http://localhost:4004/events.json?url[]=${ical_url}&start=${start_date}&end=${end_date}`
-    }
-
-    fetch(events_url)
-      .then(response => response.json())
-      .then(data => {
-        if (typeof data.error === 'string' && data.error.length > 0) {
-          throw new Error(data.error)
-        } else {
-          show_events(data.events)
-        }
-      })
-      .catch(console.error)
   </script>
+  <img onLoad="load_events(); init_events();" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" />
 
   <style>
-    #events_wrapper {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      grid-gap: 1rem;
-      width: 100%;
+    .custom_events_feed .nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: space-between;
     }
-    #events_wrapper a {
-      text-underline-offset: .05em;
+    .custom_events_feed .nav button{
+      padding: 9px 14px;
+      border: 0;
+      display: inline-block;
+      line-height: 1;
+      font-family: Ubuntu, sans-serif;
+      font-weight: 400;
+      /* font-size: 14px; */
+      line-height: 1.14;
+      text-decoration: none;
+      text-align: center;
+      transition: all .5s ease;
+      cursor: pointer;
+      background-color: var(--color);
+      color: var(--bgcolor);
+
+      font-weight: bold;
+      font-size: 24px;
+      padding: 8px 16px;
     }
+    .custom_events_feed .nav button:hover {
+      background-color: var(--color-dark);
+    }
+    .custom_events_feed .nav h3 {
+      margin: 0;
+    }
+
+      .custom_event_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        grid-gap: 1rem;
+        width: 100%;
+      }
+      .custom_event_grid .no_events {
+        grid-column: 1 / -1; /* full width */
+        text-align: center;
+      }
+
+      .custom_event_grid a {
+        text-underline-offset: .05em;
+      }
+      .custom_event_grid .eventcard__image {
+        min-height: 7rem;
+        aspect-ratio: 2/1;
+        height: auto;
+      }
+      .custom_event_grid .eventcard .event__details__organizer-language {
+        padding-top: 16px;
+      }
+      .custom_event_grid .eventcard .event__details__time{
+        padding-top: 4px;
+      }
+      .custom_event_grid .eventcard .event__details__description p:first-of-type{
+        margin-block-start: 0;
+      }
+      .custom_event_grid .eventcard .event__details__description p:last-of-type{
+        margin-block-end: 0;
+      }
+      .custom_event_grid details summary {
+        display: inline;
+        cursor: pointer;
+        /* margin-inline-end: -4px; */
+      }
+      .custom_event_grid details summary:hover {
+        opacity: .8;
+      }
+      .custom_event_grid details summary:after {
+        content: '…';
+      }
+      .custom_event_grid details[open] summary:after {
+        content: '';
+      }
   </style>
 
-</body>
 
+
+
+
+
+
+
+
+
+
+<!--
+<script>
+
+  // window.addEventListener('load', load_events)
+  // window.addEventListener('popstate', load_events)
+  // window.addEventListener('locationchange', load_events)
+  // window.addEventListener('online', load_events)
+  // window.addEventListener('pageshow', load_events)
+
+  function history_event_overwrite() {
+    // source: https://stackoverflow.com/questions/6390341/how-to-detect-if-url-has-changed-after-hash-in-javascript
+    let oldPushState = history.pushState;
+    history.pushState = function pushState() {
+      let ret = oldPushState.apply(this, arguments);
+      window.dispatchEvent(new Event('pushstate'));
+      window.dispatchEvent(new Event('locationchange'));
+      return ret;
+    };
+
+    let oldReplaceState = history.replaceState;
+    history.replaceState = function replaceState() {
+      let ret = oldReplaceState.apply(this, arguments);
+      window.dispatchEvent(new Event('replacestate'));
+      window.dispatchEvent(new Event('locationchange'));
+      return ret;
+    };
+
+    window.addEventListener('popstate', () => {
+      window.dispatchEvent(new Event('locationchange'));
+    });
+  }
+  history_event_overwrite()
+</script>
+-->
+
+      </div>
+    </div>
+  </main>
+</body>
 </html>
