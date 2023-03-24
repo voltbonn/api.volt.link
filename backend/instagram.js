@@ -214,6 +214,20 @@ function load_insta_posts(user_profile_id, user_name, count) {
     callback(posts_to_return)
 
 
+
+    // get newest post date from cache
+    const newest_post_date = (cached_posts[0]?.timestamp || 0) * 1000
+
+    // check if newest_post_date is longer than 1 day ago
+    const one_day = 1000 * 60 * 60 * 24 // 1000 * 60 * 60 * 24 = 1 day
+    const now = new Date().getTime()
+    if (now - newest_post_date > one_day) {
+      // nothing to do. the cache is still valid / less than 1 day old
+      return
+    }
+
+
+
     // load new posts in background
     const new_posts = await load_remote_insta_posts('55472423271', 'voltpotsdam', count)
       .catch(console.error)
