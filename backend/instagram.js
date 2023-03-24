@@ -114,11 +114,16 @@ async function load_insta_posts_option_3(user_name, count) {
   posts = posts.map(post => {
     const image_url = post.image_versions2.candidates.sort((a, b) => b.width - a.width)[0].url
 
+    let caption = ''
+    if (post?.caption?.text) {
+      caption = post?.caption?.text
+    }
+
     return {
       id: post.id,
       found_timestamp: new Date().getTime(),
       shortcode: post.code,
-      caption: post.caption.text,
+      caption: caption,
       timestamp: post.taken_at,
       is_video: post.media_type === 2,
       width: post.original_width,
