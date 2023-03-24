@@ -53,13 +53,7 @@
   <div id="custom_insta_feed"></div>
 
   <script onLoad="load_cards(); init_cards();">
-  window.VoltEvents = class {
-
-    amount_of_day = 33 // amount of days to load events for
-
-    selected_year = new Date().getFullYear()
-    selected_month = new Date().getMonth()
-    selected_day = new Date().getDate()
+  window.VoltInstaPosts = class {
 
     username = 'voltbrandenburg'
     userid = '44732153616'
@@ -69,6 +63,11 @@
 
     custom_feed_html = `<div class="custom_feed">
       <div class="custom_cards_grid cards events cards__cardSize-small"></div>
+      <p style="text-align: center;">
+        <strong>
+          Mehr Posts gibt es auf unserem Insta Account: <a href="https://www.instagram.com/${this.username}/" target="_blank">@${this.username}</a>
+        </strong>
+      </p>
     </div>`
 
     card_html = `<a href="{{href}}" target="_blank">
@@ -169,10 +168,10 @@
       }
       custom_feed_element.innerHTML = this.custom_feed_html
 
-      const events_wrapper_element = custom_feed_element.querySelector('.custom_cards_grid')
+      const cards_wrapper_element = custom_feed_element.querySelector('.custom_cards_grid')
 
       if (cards.length === 0) {
-        events_wrapper_element.innerHTML = `<p class="no_cards" style="text-align:center;"><strong>Die Posts konnten nicht geladen werden.</strong><br />Schau doch mal auf <a href="https://www.instagram.com/${this.username}/" target="_blank">@${this.username}</a> vorbei.</p>`
+        cards_wrapper_element.innerHTML = `<p class="no_cards" style="text-align:center;"><strong>Die Posts konnten nicht geladen werden.</strong><br />Schau doch mal auf <a href="https://www.instagram.com/${this.username}/" target="_blank">@${this.username}</a> vorbei.</p>`
         return
       }
 
@@ -182,11 +181,11 @@
           timestamp: card.timestamp * 1000,
         }))
         .sort((a, b) => new Date(b.timestamp).valueOf() - new Date(a.timestamp).valueOf())
-        .forEach(event => {
-          const event_element = document.createElement('div')
+        .forEach(card => {
+          const card_element = document.createElement('div')
 
 
-          let description = (event.caption || '') // this.linkify(event.caption || '')
+          let description = (card.caption || '') // this.linkify(card.caption || '')
             .replace(/(?:\r\n|\r|\n){3,}/g, '\n\n') // remove multiple newlines
             .replace(/^[\n\s]+/g, '') // remove leading newlines
             .replace(/[\n\s]+$/g, '') // remove trailing newlines
@@ -212,23 +211,23 @@
           }
 
           let image_url = this.default_image
-          if (event.image_url) {
-            image_url = `https://storage.volt.link/download_url?f=webp&w=500&h=500&url=${encodeURIComponent(event.image_url)}`
+          if (card.image_url) {
+            image_url = `https://storage.volt.link/download_url?f=webp&w=500&h=500&url=${encodeURIComponent(card.image_url)}`
           }
 
           let this_card_html = this.card_html
-            .replace('{{href}}', event.link || `https://www.instagram.com/p/${event.id}/`)
+            .replace('{{href}}', card.link || `https://www.instagram.com/p/${card.id}/`)
             .replace('{{image}}', image_url)
             .replace('{{summary}}', description)
             // .replace('{{description}}', description)
-            .replace('{{start_date}}', this.format_date(event.timestamp || ''))
-            // .replace('{{organizer}}', event.location || 'Volt Brandenburg')
+            .replace('{{start_date}}', this.format_date(card.timestamp || ''))
+            // .replace('{{organizer}}', card.location || 'Volt Brandenburg')
 
-          // if (event.link) {
+          // if (card.link) {
           //   this_card_html = this_card_html
           //     .replace('{{google_meet_link}}', `
           //         <div class="eventcard__infoButton">
-          //           <a href="${event.link}" target="_blank" rel="noopener">View on Instagram</a>
+          //           <a href="${card.link}" target="_blank" rel="noopener">View on Instagram</a>
           //         </div>
           //       `)
           // } else {
@@ -236,8 +235,8 @@
           //     .replace('{{google_meet_link}}', '')
           // }
 
-          event_element.innerHTML = this_card_html
-          events_wrapper_element.appendChild(event_element.firstChild)
+          card_element.innerHTML = this_card_html
+          cards_wrapper_element.appendChild(card_element.firstChild)
         })
     }
 
@@ -279,13 +278,13 @@
   }
 
   function load_cards() {
-    // console.log('init custom volt events')
-    const volt_events = new window.VoltEvents()
-    volt_events.load()
+    // console.log('init custom volt cards')
+    const volt_insta_posts = new window.VoltInstaPosts()
+    volt_insta_posts.load()
   }
   function init_cards() {
     window.lastUrl;
-    window.event_interval = setInterval(() => {
+    window.volt_insta_posts_interval = setInterval(() => {
       let currUrl = window.location.href
       if (currUrl !== window.lastUrl) {
         load_cards()
@@ -345,6 +344,13 @@
         grid-gap: 1rem;
         width: 100%;
       }
+      /*
+      @media (max-width: 600px) {
+        .custom_cards_grid {
+          grid-template-columns: repeat(auto-fill, minmax(40%, 1fr));
+        }
+      }
+      */
       .custom_cards_grid .no_cards {
         grid-column: 1 / -1; /* full width */
         text-align: center;
@@ -368,6 +374,14 @@
         min-height: 7rem;
         aspect-ratio: 1;
         height: auto;
+      }
+      @media (max-width: 605px) { /* the +5 is cause of a weird bug */
+        .custom_cards_grid .eventcard__image {
+          /* 50vmin to make the images not too big on mobile OR should they be full_width ???*/
+          min-height: 50vmin;
+          height: 50vmin;
+          width: 50vmin;
+        }
       }
       .custom_cards_grid .eventcard .big_top_gap {
         padding-top: 16px;
