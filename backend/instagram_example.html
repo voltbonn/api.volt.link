@@ -242,7 +242,7 @@
 
     load() {
 
-      let data_url = `http://localhost:4004/instagram_posts.json?username=${this.username}&userid=${this.userid}&count=${this.count}`
+      let data_url = `https://api.volt.link/instagram_posts.json?username=${this.username}&userid=${this.userid}&count=${this.count}`
       if (window.location.hostname === 'localhost') {
         data_url = `http://localhost:4004/instagram_posts.json?username=${this.username}&userid=${this.userid}&count=${this.count}`
       }
