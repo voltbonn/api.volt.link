@@ -48,22 +48,58 @@
 
 
 
+<section
+  data-events="true"
+  data-amount_of_day="33"
+  data-ical_url="https://calendar.google.com/calendar/ical/c_8dguqa58qlft5to7i3j1uqbprk%40group.calendar.google.com/public/basic.ics"
+  data-default_image="https://assets.volteuropa.org/styles/crop_320x160_2x/public/2023-03/image_2023-03-07_114249944.png"
+></section>
 
 
-  <div id="custom_events_feed"></div>
 
-  <script onLoad="load_events(); init_events();">
+<script>
+  window.notify_about_element = function (selector, matches_callback) {
+
+    // Callback function to execute when mutations are observed
+    const mo_callback = (mutationList, observer) => {
+      for (const mutation of mutationList) {
+        if (mutation.type === 'childList') {
+          // A child node has been added or removed.
+          for (const node of mutation.addedNodes) {
+            if (node.matches && node.matches(selector)) {
+              // The added/removed node matches the selector
+              matches_callback({
+                target: node,
+                observer, // The observer property could be used for stopping the observer with observer.disconnect()
+              })
+            }
+          }
+        }
+      }
+    }
+
+    // Create an observer instance linked to the callback function
+    const observer = new MutationObserver(mo_callback)
+
+    // Start observing the target node for configured mutations
+    observer.observe(document.body, {
+      // Options for the observer (which mutations to observe)
+      attributes: false,
+      childList: true,
+      subtree: true,
+    })
+  }
+
   window.VoltEvents = class {
 
-    amount_of_day = 33 // amount of days to load events for
+    amount_of_day = null // amount of days to load events for
 
     selected_year = new Date().getFullYear()
     selected_month = new Date().getMonth()
     selected_day = new Date().getDate()
 
-    ical_url = 'https://calendar.google.com/calendar/ical/c_8dguqa58qlft5to7i3j1uqbprk%40group.calendar.google.com/public/basic.ics'
-
-    default_image = 'https://assets.volteuropa.org/styles/crop_320x160_2x/public/2023-03/image_2023-03-07_114249944.png'
+    ical_url = null
+    default_image = null
 
     custom_events_feed_html = `<div class="custom_events_feed">
       <div class="nav">
@@ -101,7 +137,17 @@
           </div>
         </div>`
 
+    feed_element = null
+
     constructor() { }
+
+    setFeedElement(new_feed_wrapper_element) {
+      this.amount_of_day = parseInt(new_feed_wrapper_element.dataset.amount_of_day)
+      this.ical_url = new_feed_wrapper_element.dataset.ical_url
+      this.default_image = new_feed_wrapper_element.dataset.default_image
+
+      this.feed_element = new_feed_wrapper_element
+    }
 
     build_selected_date() {
       return new Date(this.selected_year, this.selected_month, this.selected_day) // .toISOString().split('T')[0]
@@ -187,7 +233,11 @@
     }
 
     show_events(events) {
-      const custom_events_feed_element = document.getElementById('custom_events_feed')
+      if (!this.feed_element) {
+        throw new Error('feed_element not set')
+      }
+
+      const custom_events_feed_element = this.feed_element
       if (!custom_events_feed_element) {
         return
       }
@@ -300,29 +350,53 @@
     }
   }
 
-  function load_events() {
-    // console.log('init custom volt events')
-    const volt_events = new window.VoltEvents()
-    volt_events.load()
-  }
   function init_events() {
+    // if (window.hasOwnProperty('custom_events_started') && window.custom_events_started === true) {
+    //   console.log('Custom events already started. Skipping.')
+    //   return
+    // }
+    // window.custom_events_started = true
+
+    const custom_events_feed_selector = '[data-events]' // '.events_feed_wrapper'
+
+    function load_events(feed_element) {
+      // console.log('init custom volt events')
+      feed_element.volt_events = new window.VoltEvents()
+      feed_element.volt_events.setFeedElement(feed_element)
+      feed_element.volt_events.load()
+
+      // add to the feed_element itself to have it deleted when the element is removed from the dom
+    }
+
+    // initaly load all events
+    function init_all_event_feeds() {
+      const all_events_feed_wrapper = document.querySelectorAll(custom_events_feed_selector)
+      all_events_feed_wrapper.forEach(feed_element => {
+        load_events(feed_element)
+      })
+    }
+
+    // load events when the elements are added to the dom
+    window.notify_about_element(custom_events_feed_selector, ({ target, observer }) => {
+      load_events(target)
+    })
+
+    init_all_event_feeds()
+
     window.lastUrl;
     window.event_interval = setInterval(() => {
       let currUrl = window.location.href
       if (currUrl !== window.lastUrl) {
-        load_events()
         window.lastUrl = currUrl
+        init_all_event_feeds()
       }
     }, 100)
-
-    // load_events() // is called by the interval
   }
   init_events()
+</script>
+<img class="" onLoad="init_events();" alt="" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" />
 
-  </script>
-  <img onLoad="load_events(); init_events();" alt="" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" />
-
-  <style>
+<style>
     .custom_events_feed .nav {
       display: flex;
       align-items: center;
@@ -401,7 +475,7 @@
       .custom_event_grid details[open] summary:after {
         content: '';
       }
-  </style>
+</style>
 
 
 
