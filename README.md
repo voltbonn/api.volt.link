@@ -4,4 +4,4 @@
 
 This is the API for volt.link. Go to the [volt.link-frontend](https://github.com/voltbonn/volt.link-frontend/) repo for the editor and renderer.
 
-Contact [thomas.rosen@volteuropa.org](mailto:thomas.rosen@volteuropa.org) for any questions.
+Contact [thomas.rosen@volteuropa.org](mailto:thomas.rosen@volteuropa.org) for any questions. 
