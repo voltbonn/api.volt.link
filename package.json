@@ -31,7 +31,7 @@
     "markdown-it": "^12.3.2",
     "markdown-it-emoji": "^2.0.0",
     "markdown-it-kbd": "^2.2.2",
-    "mongodb": "^4.1.1",
+    "mongodb": "^4.17.0",
     "normalize-url": "^7.0.3",
     "passport": "^0.6.0",
     "passport-google-oauth": "^2.0.0",
